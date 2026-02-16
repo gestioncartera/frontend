@@ -114,10 +114,9 @@ export class CambioSucursalComponent implements OnInit {
       );
       
       // Determine redirection based on user role
-      const user = this.authService.getCurrentUserValue();
-      const isCobrador = user?.tipoUsuarioId === 2; // Assuming 2 is Cobrador based on your mock data
-
-      if (isCobrador) {
+      const esCobrador = this.authService.isCobrador();
+      console.log('Usuario es cobrador:', esCobrador);
+      if (esCobrador) {
         this.router.navigate(['/cobro/crear-cobro']);
       } else {
         this.router.navigate(['/ruta/list-ruta']);

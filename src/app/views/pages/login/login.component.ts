@@ -65,7 +65,7 @@ export class LoginComponent implements OnInit {
 
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      password: ['', [Validators.required, Validators.minLength(5)]]
     });
 
     // Obtener URL de retorno
@@ -90,9 +90,10 @@ export class LoginComponent implements OnInit {
     console.log('Intentando login con:', email);
 
     this.authService.login(email, password).subscribe({
-      next: () => {
-        console.log('Login exitoso, redirigiendo...');
-        this.router.navigate([this.returnUrl]);
+      next: (response) => {
+        console.log('Datos retornados por el backend:', response);
+        console.log('Login exitoso, redirigiendo a selección de sucursal...');
+        this.router.navigate(['/cambio-sucursal']);
       },
       error: (error) => {
         console.error('Error en login:', error);

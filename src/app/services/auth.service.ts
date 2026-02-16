@@ -31,12 +31,12 @@ export interface RegisterData {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = `${environment.apiUrl}/auth`;
+  private apiUrl = `${environment.apiUrl}/usuario`; // Ajustar si tu backend usa /usuario/login
   private currentUserSubject = new BehaviorSubject<Usuario | null>(this.getUserFromStorage());
   public currentUser$ = this.currentUserSubject.asObservable();
   
   // Modo local para desarrollo (cambiar a false cuando la API esté lista)
-  private USE_LOCAL_AUTH = true;
+  private USE_LOCAL_AUTH = false;
 
   // Usuarios de prueba para desarrollo local
   private mockUsers = [
@@ -83,7 +83,24 @@ export class AuthService {
   // Obtener usuario del localStorage
   private getUserFromStorage(): Usuario | null {
     const userStr = localStorage.getItem('currentUser');
-    return userStr ? JSON.parse(userStr) : null;
+    console.log('Obteniendo usuario del storage:', userStr);
+    if (!userStr || userStr === 'undefined') {
+      if (userStr === 'undefined') {
+        localStorage.removeItem('currentUser');
+      }
+      return null;
+    }
+    try {
+      const user = JSON.parse(userStr);
+      console.log('Usuario parseado:', user);
+      return user;
+    } catch (e) {
+      console.error('Error parseando usuario del storage:', e);
+      // Limpiar datos corruptos para evitar bloqueo de la app
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('token');
+      return null;
+    }
   }
 
   // Login Local (Mock)
@@ -106,6 +123,7 @@ export class AuthService {
       tap(res => {
         localStorage.setItem('token', res.token);
         localStorage.setItem('currentUser', JSON.stringify(res.usuario));
+        console.log('Guardando usuario en storage (loginLocal):', res.usuario);
         this.currentUserSubject.next(res.usuario);
       })
     );
@@ -143,6 +161,7 @@ export class AuthService {
       tap(res => {
         localStorage.setItem('token', res.token);
         localStorage.setItem('currentUser', JSON.stringify(res.usuario));
+        console.log('Guardando usuario en storage (registerLocal):', res.usuario);
         this.currentUserSubject.next(res.usuario);
       })
     );
@@ -151,16 +170,25 @@ export class AuthService {
   // Login
   login(email: string, password: string): Observable<LoginResponse> {
     if (this.USE_LOCAL_AUTH) {
-      return this.loginLocal(email, password);
+      return this.loginLocal(email, password); 
     }
     
     return this.http.post<LoginResponse>(`${this.apiUrl}/login`, { email, password })
       .pipe(
         tap(response => {
           // Guardar token y usuario en localStorage
-          localStorage.setItem('token', response.token);
-          localStorage.setItem('currentUser', JSON.stringify(response.usuario));
-          this.currentUserSubject.next(response.usuario);
+          //localStorage.setItem('token', response.token);
+          sessionStorage.setItem('token', response.token);
+         
+          if (response.usuario) {
+            localStorage.setItem('currentUser', JSON.stringify(response.usuario));
+            console.log('Guardando usuario en storage (login API):', response.usuario);
+            this.currentUserSubject.next(response.usuario);
+          } else {
+            localStorage.removeItem('currentUser');
+            this.currentUserSubject.next(null);
+            console.warn('No se recibió usuario en la respuesta del login');
+          }
         })
       );
   }
@@ -177,6 +205,7 @@ export class AuthService {
           // Guardar token y usuario en localStorage
           localStorage.setItem('token', response.token);
           localStorage.setItem('currentUser', JSON.stringify(response.usuario));
+          console.log('Guardando usuario en storage (register API):', response.usuario);
           this.currentUserSubject.next(response.usuario);
         })
       );
@@ -184,8 +213,8 @@ export class AuthService {
 
   // Logout
   logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('currentUser');
+    localStorage.clear(); // Limpia todo el localStorage (tokens, usuario, temas, etc.)
+    sessionStorage.clear(); // Limpiar también sessionStorage para el token
     this.currentUserSubject.next(null);
     this.sucursalContextService.clearSucursal(); // Limpiar sucursal al cerrar sesión
     this.router.navigate(['/login']);
@@ -193,12 +222,13 @@ export class AuthService {
 
   // Verificar si el usuario está autenticado
   isAuthenticated(): boolean {
-    return !!localStorage.getItem('token');
+    // El token ahora se guarda en sessionStorage
+    return !!sessionStorage.getItem('token');
   }
 
   // Obtener token
   getToken(): string | null {
-    return localStorage.getItem('token');
+    return sessionStorage.getItem('token');
   }
 
   // Obtener usuario actual
@@ -206,15 +236,25 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
+  // Helper para obtener el rol de forma segura
+  private getRolId(): number | null {
+    const user = this.getCurrentUser();
+    if (!user) return null;
+
+    // Intentamos leer tipoUsuarioId (frontend/mock) o tipo_usuario (backend real)
+    const rolId = user.tipoUsuarioId ?? (user as any).tipo_usuario;
+    const numericRolId = Number(rolId);
+    return isNaN(numericRolId) ? null : numericRolId;
+  }
+
   // Verificar si es admin
   isAdmin(): boolean {
-    const user = this.getCurrentUser();
-    return user?.tipoUsuarioId === 1; // Asumiendo que 1 es admin
+    return this.getRolId() === 1; // Asumiendo que 1 es admin
   }
 
   // Verificar si es cobrador
   isCobrador(): boolean {
-    const user = this.getCurrentUser();
-    return user?.tipoUsuarioId === 2; // Asumiendo que 2 es cobrador
+    return this.getRolId() === 2; // Asumiendo que 2 es cobrador
   }
 }
+

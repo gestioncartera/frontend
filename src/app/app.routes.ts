@@ -5,7 +5,7 @@ import { sucursalGuard } from './guards/sucursal.guard';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'cambio-sucursal',
+    redirectTo: 'dashboard',
     pathMatch: 'full',
   },
   {

@@ -16,6 +16,7 @@ import { ReplaySubject, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { Prestamos, PrestamoService } from '../../../services/prestamo.service';
 import { TipoPrestamo, TipoPrestamoService } from '../../../services/tipoPrestamo.service';
+import { SucursalContextService } from '../../../services/sucursal-context.service';
 
 @Component({
   selector: 'app-crear-prestamo',
@@ -63,7 +64,8 @@ export class CrearPrestamoComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private clienteService: ClienteService,
     private prestamoService: PrestamoService,
-    private tipoPrestamoService: TipoPrestamoService
+    private tipoPrestamoService: TipoPrestamoService,
+    private sucursalContextService: SucursalContextService
   ) {}
 
   ngOnInit() {
@@ -88,7 +90,9 @@ export class CrearPrestamoComponent implements OnInit, OnDestroy {
   }
 
   cargarClientes() {
-    this.clienteService.getClientes().subscribe({
+    const idSucursal = this.sucursalContextService.getSucursalId();
+    if (!idSucursal) return;
+    this.clienteService.getClientes(idSucursal).subscribe({
       next: (data) => {
         this.clientes = data;
         this.filteredClientes.next(this.clientes.slice());
@@ -98,7 +102,9 @@ export class CrearPrestamoComponent implements OnInit, OnDestroy {
   }
 
   cargarTiposPrestamo() {
-    this.tipoPrestamoService.getTiposPrestamo().subscribe({
+    const idSucursal = this.sucursalContextService.getSucursalId();
+    if (!idSucursal) return;
+    this.tipoPrestamoService.getTiposPrestamo(idSucursal).subscribe({
       next: (data) => {
         this.tiposPrestamo = data;
         console.log('Tipos de préstamo cargados:', data); // Debug para verificar estructura

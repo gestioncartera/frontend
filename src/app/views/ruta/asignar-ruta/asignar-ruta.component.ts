@@ -4,15 +4,20 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { DragDropModule, moveItemInArray, CdkDragDrop } from '@angular/cdk/drag-drop';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
 import { ModalClienteComponent } from '../modal-cliente/modal-cliente.component';
 import { RutasService } from '../../../services/rutas.service';
 import { ActivatedRoute } from '@angular/router';
+import { Cliente, ClienteService } from '../../../services/cliente.service';
+import { SucursalContextService } from '../../../services/sucursal-context.service';
 @Component({
   selector: 'app-asignar-ruta',
   standalone: true,
-  imports: [CommonModule, DragDropModule, MatButtonModule, MatIconModule, MatMenuModule],
+  imports: [CommonModule, DragDropModule, MatButtonModule, MatIconModule, MatMenuModule, MatProgressSpinnerModule, MatFormFieldModule, MatSelectModule],
   templateUrl: './asignar-ruta.component.html',
   styleUrls: ['./asignar-ruta.component.scss']
 })
@@ -21,21 +26,51 @@ export class AsignarRutaComponent {
   clientesAsignados: any[] = []; // Aquí cargas tus 100 clientes
   ordenModificado = false;
   idRutaActual!: number;
-
+  loading = false;
+  listaRutas: any[] = [];
   constructor(
     private snackBar: MatSnackBar,
     private dialog: MatDialog,
-    private RutasService: RutasService,
-    private route: ActivatedRoute
+    private clienteService: ClienteService,
+    private route: ActivatedRoute,
+    private sucursalContextService: SucursalContextService,
+    private rutasService: RutasService
   ) {}
 
   ngOnInit() {
+    this.cargarListaDeRutas();
     // Obtenemos el ID de la ruta desde los parámetros de la URL
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.idRutaActual = Number(id);
        
     }
+  }
+
+  //Asignar orden de clientes a la ruta
+
+  cargarListaDeRutas(): void {
+    // Asumiendo que getRutas() es el método en tu servicio para el SELECT
+    const idSucursal = this.sucursalContextService.getSucursalId(); 
+   if (idSucursal !== null) {
+    this.rutasService.getRutas(idSucursal).subscribe({
+      next: (data: any) => {
+        this.listaRutas = data;
+      },
+      error: (err: any) => {
+        console.error('Error al cargar rutas:', err);
+        this.snackBar.open('Error al obtener la lista de rutas', 'Cerrar');
+      }
+    });
+    }  
+  }
+  onRutaChange(idRuta: number): void {
+    if (!idRuta) return;
+    
+    this.idRutaActual = idRuta;
+    this.ordenModificado = false; // Reset de cambios al cambiar de ruta
+    this.abrirModalClientes();
+    console.log('Ruta seleccionada:', this.idRutaActual);
   }
 
   // Maneja el arrastre visual
@@ -47,9 +82,14 @@ export class AsignarRutaComponent {
   }
 
   abrirModalClientes() {
+    if (!this.idRutaActual) {
+    this.snackBar.open('Por favor, selecciona una ruta primero', 'OK', { duration: 3000 });
+    return;
+  }
     const dialogRef = this.dialog.open(ModalClienteComponent, {
       width: '450px',
-      maxHeight: '90vh'
+      maxHeight: '90vh',
+      data: { id_ruta: this.idRutaActual }
     });
 
     dialogRef.afterClosed().subscribe(clienteSeleccionado => {
@@ -97,34 +137,36 @@ export class AsignarRutaComponent {
     }
   }
 
-  guardarOrden() {
-  // 1. Preparamos el cuerpo de la petición (Payload)
-  // Mapeamos para enviar el ID del cliente y su nuevo índice (+1 para que empiece en 1)
-  const payload = this.clientesAsignados.map((cliente, index) => ({
-    cliente_id: cliente.cliente_id, // Asegúrate que el nombre coincida con tu objeto
-    orden: index + 1
-  }));
-
-  console.log('Enviando al backend:', payload);
-
-  // 2. Llamamos al servicio (Suponiendo que tienes un RutaService)
-  this.RutasService.actualizarOrdenClientes(this.idRutaActual, payload).subscribe({
-    next: (res:any) => {
-      this.ordenModificado = false;
-      this.snackBar.open('¡Orden de ruta guardado exitosamente!', 'Cerrar', {
-        duration: 3000,
-        panelClass: ['success-snackbar']
-      });
-    },
-    error: (err: any) => {
-      console.error('Error al guardar orden:', err);
-      this.snackBar.open('Error al guardar el nuevo orden', 'Cerrar', {
-        duration: 3000,
-        panelClass: ['error-snackbar']
-      });
+ guardarOrden() {
+    if (this.clientesAsignados.length === 0) {
+      this.snackBar.open('No hay clientes en la ruta para guardar', 'Cerrar');
+      return;
     }
-  });
-}
+
+    // Preparamos solo el array de objetos con el nuevo orden
+    const payload = this.clientesAsignados.map((cliente, index) => ({
+      cliente_id: cliente.cliente_id,
+      nuevo_orden: index + 1 // El orden visual para el cobrador
+    }));
+ 
+
+    this.loading = true;
+    this.clienteService.actualizarOrdenClientes(this.idRutaActual, payload).subscribe({
+      next: () => {
+        this.ordenModificado = false;
+        this.loading = false;
+        this.snackBar.open('¡Ruta organizada correctamente!', 'Éxito', { duration: 3000 });
+      },
+
+      error: (err: any) => {
+        console.error(err);
+        this.loading = false;
+        console.error('Error al guardar el nuevo orden:', payload);
+        console.log('Payload enviado:', JSON.stringify(payload));
+        this.snackBar.open('Error al guardar los cambios', 'Reintentar');
+      }
+    });
+  }
 
 /*
   quitarDeRuta(index: number): void {

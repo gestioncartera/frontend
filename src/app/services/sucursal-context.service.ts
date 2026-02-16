@@ -20,7 +20,13 @@ export class SucursalContextService {
   // Obtener sucursal del localStorage
   private getSucursalFromStorage(): SucursalContext | null {
     const sucursalStr = localStorage.getItem(this.STORAGE_KEY);
-    return sucursalStr ? JSON.parse(sucursalStr) : null;
+    if (!sucursalStr) return null;
+    try {
+      return JSON.parse(sucursalStr);
+    } catch (e) {
+      localStorage.removeItem(this.STORAGE_KEY);
+      return null;
+    }
   }
 
   // Establecer sucursal actual

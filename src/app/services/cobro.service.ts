@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
-// Interface para crear cobro (enviar al backend)
+// Interface para crear cobro
 export interface CreateCobroDto {
   prestamo_id: number;
   usuario_id: number;
@@ -34,7 +34,6 @@ export interface Cobrohistorial {
   monto: number;
 }
 
-
 @Injectable({
   providedIn: 'root'
 })
@@ -43,8 +42,15 @@ export class CobroService {
 
   constructor(private http: HttpClient) { }
 
+  // NUEVO: Validar múltiples cobros (Aprobar Todo)
+  // Usamos PATCH para actualización parcial del estado
+  validarMultiplesCobros(ids: number[]): Observable<{message: string}> {
+    return this.http.patch<{message: string}>(`${this.apiUrl}/validarMultiplesCobros`, { ids });
+  }
+
   getCobros(): Observable<Cobro[]> {
-    return this.http.get<Cobro[]>(`${environment.apiUrl}/cliente/getClientesByRuta/1`);
+    // Corregido para que apunte a la ruta de cobros por defecto o la que definas
+    return this.http.get<Cobro[]>(`${this.apiUrl}/list`); 
   }
 
   getCobro(id: number | string): Observable<Cobro> {
@@ -56,18 +62,19 @@ export class CobroService {
   }
   
   getClientesByuser(userId: number | string): Observable<Cobro[]> {
+    // Nota: Aquí tenías Hardcoded el '1', podrías usar `${userId}` en el futuro
     return this.http.get<Cobro[]>(`${this.apiUrl}/getClientesByRuta/1`);
   }
 
   createCobro(cobro: CreateCobroDto): Observable<Cobro> {
-    const url = `${this.apiUrl}/createCobro`; 
-    return this.http.post<Cobro>(url, cobro);
+    return this.http.post<Cobro>(`${this.apiUrl}/createCobro`, cobro);
   }
+
   getCobrosByRutaId(rutaId: number | string): Observable<Cobro[]> {
     return this.http.get<Cobro[]>(`${this.apiUrl}/getCobrosByRutaid/${rutaId}`);
   }
-   gethistorialcobros(prestamoId: number | string): Observable<Cobrohistorial[]> {
+
+  gethistorialcobros(prestamoId: number | string): Observable<Cobrohistorial[]> {
     return this.http.get<Cobrohistorial[]>(`${this.apiUrl}/getCobrosByPrestamoId/${prestamoId}`);
   }
- 
 }

@@ -11,6 +11,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { PrestamoService, PrestamoCliente } from '../../../services/prestamo.service';
 import { ClienteService, Cliente } from '../../../services/cliente.service';
+import { SucursalContextService } from '../../../services/sucursal-context.service';
 
 export interface Prestamo {
   id: number;
@@ -55,7 +56,8 @@ displayedColumns: string[]  = ['prestamo_id', 'saldo_pendiente', 'valor_cuota', 
     private route: ActivatedRoute,
     private prestamoService: PrestamoService,
     private clienteService: ClienteService,
-    private location: Location
+    private location: Location,
+    private sucursalContextService: SucursalContextService
   ) {}
 
   ngOnInit(): void {
@@ -118,8 +120,10 @@ displayedColumns: string[]  = ['prestamo_id', 'saldo_pendiente', 'valor_cuota', 
         }
       });
     } else {
+      const idSucursal = this.sucursalContextService.getSucursalId();
+    if (!idSucursal) return;
       // Cargar lista de clientes
-      this.clienteService.getClientes().subscribe({
+      this.clienteService.getClientes(idSucursal).subscribe({
           next: (clientes) => {
             this.dataSource.data = clientes;
             // Columnas para mostrar clientes

@@ -14,6 +14,7 @@ import { MatOptionModule } from '@angular/material/core';
 import { MatCheckboxModule } from '@angular/material/checkbox'; 
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { TipoPrestamo, TipoPrestamoService } from '../../../services/tipoPrestamo.service';
+import { SucursalContextService } from '../../../services/sucursal-context.service';
 
 
 @Component({
@@ -50,7 +51,8 @@ export class TipoPrestamoComponent implements OnInit {
     private tipoPrestamoService: TipoPrestamoService,
     private router: Router,
     private route: ActivatedRoute, // Para obtener el ID si estamos editando
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+     private sucursalContextService: SucursalContextService,
   ) { }
 
   ngOnInit(): void {
@@ -140,8 +142,11 @@ export class TipoPrestamoComponent implements OnInit {
         }
       });
     } else {
-      this.tipoPrestamoService.createTipoPrestamo(tipoPrestamoData).subscribe({
+       const idSucursal = this.sucursalContextService.getSucursalId();
+    if (!idSucursal) return;
+      this.tipoPrestamoService.createTipoPrestamo(idSucursal, tipoPrestamoData).subscribe({
         next: (res: TipoPrestamo) => {
+          console.log('Datos a actualizar:', tipoPrestamoData);
           this.snackBar.open('Configuración guardada exitosamente', 'Cerrar', {
             duration: 3000,
             horizontalPosition: 'end',
@@ -149,6 +154,7 @@ export class TipoPrestamoComponent implements OnInit {
             panelClass: ['success-snackbar']
           });
           this.cancelar();
+          
         },
         error: (err: HttpErrorResponse) => {
           console.error('Error de servidor:', err.status);

@@ -16,6 +16,12 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { Rutas, RutasService } from '../../../services/rutas.service';
 import { ActivatedRoute } from '@angular/router';
 import { AuthMockService } from '../../../services/AuthMockService';
+import { Injectable } from '@angular/core'; 
+import { BehaviorSubject, Observable } from 'rxjs';
+import { SucursalContextService } from '../../../services/sucursal-context.service';
+
+
+
 @Component({
   selector: 'app-list-ruta',
   standalone: true,
@@ -63,7 +69,8 @@ export class ListRutaComponent implements OnInit, AfterViewInit {
     private router: Router,
     private rutaService: RutasService,
     private route: ActivatedRoute,
-    private auth: AuthMockService
+    private auth: AuthMockService,
+    private sucursalContextService: SucursalContextService
   ) {
     this.dataSource = new MatTableDataSource(this.rutas);
     
@@ -72,18 +79,22 @@ export class ListRutaComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
 
     // Seguridad: si el usuario es cobrador, forzar modo cobrador
-   const userRol = this.auth.getRol(); // admin | cobrador
-  const routeMode = this.route.snapshot.data['mode'] as 'admin' | 'cobrador' | undefined;
+   const userRol = this.auth.getRol(); // 1 | 2
+   const routeMode = this.route.snapshot.data['mode'] as 'admin' | 'cobrador' | undefined;
 
- this.mode = userRol === 'admin'
-    ? (routeMode ?? 'admin')
-    : 'cobrador';
-    
-  this.isAdmin = this.mode === 'admin';
-  this.isCobrador = this.mode === 'cobrador';
+   this.mode = userRol === 1
+     ? (routeMode ?? 'admin')
+     : 'cobrador';
+     console.log('Modo de la ruta:', userRol);
+
+   this.isAdmin = userRol === 1;
+   this.isCobrador = userRol === 2;
   this.configurarColumnas();
     this.detectMobile();
-    this.getRutas();
+    // Nos suscribimos a los cambios de sucursal para recargar la lista automáticamente
+    this.sucursalContextService.sucursalActual$.subscribe(() => {
+      this.getRutas();
+    });
   }
   configurarColumnas() {
   this.displayedColumns = this.isAdmin
@@ -123,12 +134,23 @@ export class ListRutaComponent implements OnInit, AfterViewInit {
   }
 
   getRutas() {
-    this.rutaService.getRutas().subscribe((data: Rutas[]) => {
-      this.rutas = data;
-      this.dataSource.data = data;
-      this.dataSource.paginator = this.paginator;
-      this.dataSource.sort = this.sort;
+    const idSucursal = this.sucursalContextService.getSucursalId(); 
+   if (idSucursal !== null) {
+    this.rutaService.getRutas(idSucursal).subscribe({
+      next: (data: Rutas[]) => {
+        this.rutas = data;
+        this.dataSource.data = data;
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
+        console.log('Rutas cargadas:', data);
+      },
+      error: (err) => console.error('Error al cargar rutas:', err)
     });
+    
+  } else {
+    console.warn('No se puede cargar: No hay sucursal seleccionada');
+    this.dataSource.data = []; // Limpiamos la tabla si no hay sucursal
+  }
   }
 
   applyFilters() {

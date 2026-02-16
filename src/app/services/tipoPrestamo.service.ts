@@ -24,8 +24,8 @@ export class TipoPrestamoService {
   constructor(private http: HttpClient) {}
 
   // Obtener todos los tipos de préstamo
-  getTiposPrestamo(): Observable<TipoPrestamo[]> {
-    return this.http.get<TipoPrestamo[]>(`${this.apiUrl}/getTipoPrestamo`);
+  getTiposPrestamo(idSucursal: number | string): Observable<TipoPrestamo[]> {
+    return this.http.get<TipoPrestamo[]>(`${this.apiUrl}/getTipoPrestamo/${idSucursal}`);
   }
 
   // Obtener un tipo de préstamo por ID
@@ -34,8 +34,8 @@ export class TipoPrestamoService {
   }
 
   // Crear un nuevo tipo de préstamo
-  createTipoPrestamo(data: Partial<TipoPrestamo>): Observable<TipoPrestamo> {
-    return this.http.post<TipoPrestamo>(`${this.apiUrl}/create`, data);
+  createTipoPrestamo(sucursalId: number,data: Partial<TipoPrestamo>): Observable<TipoPrestamo> {
+    return this.http.post<TipoPrestamo>(`${this.apiUrl}/createTipoPrestamo/${sucursalId}`, data);
   }
 
 

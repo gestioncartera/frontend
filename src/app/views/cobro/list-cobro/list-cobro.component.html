@@ -40,21 +40,32 @@
         <input matInput (keyup)="applyFilter($event)" placeholder="Ej. Juan Pérez..." />
       </mat-form-field>
       
-      <div class="metrics-actions">  
-          <div class="total-day-box">
-            <div class="total-content">
-              <span class="total-label">Recaudado hoy</span>
-              <span class="total-amount">{{ totalRecaudadoDia | currency }}</span>
-            </div>
-            <div class="total-icon">
-              <mat-icon>payments</mat-icon>
-            </div>
-          </div>
-          <button mat-flat-button class="approve-all-btn" (click)="aprobarTodosLosCobros()">
-            <mat-icon>done_all</mat-icon>
-            <span>Aprobar Todo</span>
-          </button>
-      </div>
+      <div class="metrics-actions">
+  <div class="metrics-dashboard">
+    <div class="metric-item income">
+      <span class="m-label">Recaudado</span>
+      <span class="m-amount">{{ totalRecaudadoDia | currency }}</span>
+    </div>
+
+    <div class="metric-operator">−</div>
+
+    <div class="metric-item expenses">
+      <span class="m-label">Gastos</span>
+      <span class="m-amount">{{ totalGastosDia | currency }}</span> </div>
+
+    <div class="metric-operator">=</div>
+
+    <div class="metric-item net">
+      <span class="m-label">Total Neto</span>
+      <span class="m-amount">{{ (totalRecaudadoDia - totalGastosDia) | currency }}</span>
+    </div>
+  </div>
+
+  <button mat-flat-button class="approve-all-btn" (click)="aprobarTodosLosCobros()">
+    <mat-icon>done_all</mat-icon>
+    <span>Aprobar Todo</span>
+  </button>
+</div>
     </div>
 
     <div *ngIf="!isMobile" class="table-responsive">

@@ -40,20 +40,20 @@ export class ClienteService {
  //clinetes de una ruta
 getClientesByRuta(rutaId: number): Observable<ClienteCobro[]> {
   return this.http.get<ClienteCobro[]>(
-    `${this.apiUrl}/getClientesbyUser/${rutaId}`
+    `${this.apiUrl}/getClientesByRuta/${rutaId}`
   );
 }
 
-getClientes(): Observable<Cliente[]> {
-  return this.http.get<Cliente[]>(`${this.apiUrl}/getClientes`);
+getClientes(id_sucursal: number | string): Observable<Cliente[]> {
+  return this.http.get<Cliente[]>(`${this.apiUrl}/getClientes/${id_sucursal}`);
 }
 
 getCliente(id: number): Observable<Cliente> {
   return this.http.get<Cliente>(`${this.apiUrl}/getClienteById/${id}`);
 }
 
-createCliente(cliente: Partial<Cliente>): Observable<Cliente> {
-  return this.http.post<Cliente>(`${this.apiUrl}/createCliente`, cliente);
+createCliente(idSucursal: number,  cliente: Partial<Cliente>): Observable<Cliente> {
+  return this.http.post<Cliente>(`${this.apiUrl}/createCliente/${idSucursal}`, cliente);
 }
 
 updateCliente(id: number, cliente: Partial<Cliente>): Observable<Cliente> {
@@ -66,6 +66,11 @@ updateCliente(id: number, cliente: Partial<Cliente>): Observable<Cliente> {
 
 deleteCliente(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/deleteCliente/${id}`);
+}
+
+ actualizarOrdenClientes(id_ruta: number, clientes: any[]): Observable<any> {
+  // PATCH es correcto porque modificamos la columna 'orden' de registros existentes
+  return this.http.patch(`${this.apiUrl}/actualizarOrdenClientes/${id_ruta}`, clientes);
 }
     
 }

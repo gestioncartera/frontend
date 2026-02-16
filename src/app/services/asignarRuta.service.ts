@@ -3,6 +3,7 @@ import { FormGroup } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
+import { lastValueFrom, Observable } from 'rxjs';
 
 
 
@@ -15,7 +16,7 @@ export interface RutaCobro{
   providedIn: 'root'
 })
 export class AsignarRutaService {  
-     private apiUrl = `${environment.apiUrl}/asignacionRuta`; 
+     private apiUrl = `${environment.apiUrl}/cliente`; 
 constructor(private http: HttpClient) { }
 
 asignaCobrador(rutaCobro: RutaCobro): Promise<any> {
@@ -26,6 +27,10 @@ asignaCobrador(rutaCobro: RutaCobro): Promise<any> {
   };
 
   return this.http.post<any>(`${this.apiUrl}/createAsignacionRuta`, payload).toPromise();
+}
+ actualizarOrdenClientes(id_ruta: number, clientes: any[]): Observable<any> {
+  // PATCH es correcto porque modificamos la columna 'orden' de registros existentes
+  return this.http.patch(`${this.apiUrl}/api/cliente/actualizarOrdenClientes/${id_ruta}`, clientes);
 }
 
     }   

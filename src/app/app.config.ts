@@ -9,14 +9,16 @@ import {
   withViewTransitions
 } from '@angular/router';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
-
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { DropdownModule, SidebarModule } from '@coreui/angular';
 import { IconSetService } from '@coreui/icons-angular';
 import { routes } from './app.routes';
 import { authInterceptor } from './interceptors/auth.interceptor';
+import { JwtInterceptor } from './interceptors/jwt.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     provideRouter(routes,
       withRouterConfig({
         onSameUrlNavigation: 'reload'
@@ -38,3 +40,4 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync()
   ]
 };
+export class AppModule { }

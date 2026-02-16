@@ -1,8 +1,7 @@
-import { Component, inject } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { Component, inject, OnInit } from '@angular/core';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { NgScrollbar } from 'ngx-scrollbar';
 
-import { IconDirective } from '@coreui/icons-angular';
 import {
   ContainerComponent,
   ShadowOnScrollDirective,
@@ -17,7 +16,8 @@ import {
 
 import { DefaultFooterComponent, DefaultHeaderComponent } from './';
 import { navItems } from './_nav';
-import { AuthMockService } from '../../services/AuthMockService';
+import { AuthService } from '../../services/auth.service';
+import { IconSetService } from '@coreui/icons-angular';
 
 function isOverflown(element: HTMLElement) {
   return (
@@ -41,19 +41,30 @@ function isOverflown(element: HTMLElement) {
     ContainerComponent,
     DefaultFooterComponent,
     DefaultHeaderComponent,
-    IconDirective,
     NgScrollbar,
     RouterOutlet,
     RouterLink,
     ShadowOnScrollDirective
   ]
 })
-export class DefaultLayoutComponent {
-  private authMockService = inject(AuthMockService);
+export class DefaultLayoutComponent implements OnInit {
+  private authService = inject(AuthService);
+  private router = inject(Router);
   public navItems = this.getFilteredNavItems();
+  constructor() {}
+
+  ngOnInit(): void {
+    const isCobrador = this.authService.isCobrador();
+    // Si el usuario es Cobrador (rol 2) y es redirigido al dashboard,
+    // lo enviamos directamente a la página de creación de cobros.
+    console.log('¿Es Cobrador en DefaultLayoutComponent?:', isCobrador);
+    if (isCobrador && this.router.url.includes('/dashboard')) {
+      this.router.navigate(['/cobro/crear-cobro']);
+    }
+  }
 
   private getFilteredNavItems() {
-    if (this.authMockService.isCobrador()) {
+    if (this.authService.isCobrador()) {
       // Cobradores ven cambio de sucursal y registro de cobro
       return [
         {
@@ -75,6 +86,7 @@ export class DefaultLayoutComponent {
         }
       ];
     }
+    console.log('Usuario no es cobrador, mostrando menú de admin.');
     // Admin ve todo el menú
     return [...navItems];
   }

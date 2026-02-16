@@ -9,6 +9,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
 import { UsuarioService, Usuario } from '../../../services/usuario.service';
+import { SucursalContextService } from '../../../services/sucursal-context.service';
 
 @Component({
   selector: 'app-list-usuario',
@@ -36,7 +37,8 @@ export class ListUsuarioComponent implements OnInit {
 
   constructor(
     private router: Router, 
-    private usuarioService: UsuarioService
+    private usuarioService: UsuarioService,
+    private sucursalContextService: SucursalContextService
   ) {}
 
   ngOnInit(): void {
@@ -44,7 +46,9 @@ export class ListUsuarioComponent implements OnInit {
   }
 
   cargarUsuarios(): void {
-    this.usuarioService.getUsuarios().subscribe({
+    const idSucursal = this.sucursalContextService.getSucursalId(); 
+   if (idSucursal !== null) {
+    this.usuarioService.getUsuarios(  idSucursal).subscribe({
       next: (data) => {
         this.usuarios = data;
         console.log('Usuarios cargados:', data);
@@ -53,6 +57,7 @@ export class ListUsuarioComponent implements OnInit {
         console.error('Error al cargar usuarios:', error);
       }
     });
+    }  
   }
 
   crearUsuario(): void {

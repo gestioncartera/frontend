@@ -21,6 +21,7 @@ import { RutasService, Rutas } from '../../../services/rutas.service';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../../shared/confirm-dialog/confirm-dialog.component';
 import { ReplaySubject, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { SucursalContextService } from '../../../services/sucursal-context.service';
 
 @Component({
   selector: 'app-edit-cliente',
@@ -61,7 +62,8 @@ export class EditClienteComponent implements OnInit, OnDestroy {
     private clienteService: ClienteService,
     private rutasService: RutasService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private sucursalContextService: SucursalContextService
   ) {}
 
   ngOnInit() {
@@ -93,7 +95,10 @@ export class EditClienteComponent implements OnInit, OnDestroy {
   // --- LÓGICA DE DATOS ---
 
   cargarRutas() {
-    this.rutasService.getRutas().subscribe({
+    const idSucursal = this.sucursalContextService.getSucursalId();
+    if (!idSucursal) return;
+
+    this.rutasService.getRutas(idSucursal).subscribe({
       next: (data) => {
         this.rutas = data;
         this.filteredRutas.next(this.rutas.slice());
@@ -178,7 +183,7 @@ export class EditClienteComponent implements OnInit, OnDestroy {
       direccion: this.direccion,
       estado: this.estado.toUpperCase(),
       id_ruta: selectedRutaId,
-      sucursal_id: 1 // TODO: Obtener de sesión/usuario
+      sucursal_id: this.sucursalContextService.getSucursalId() || 0
     };
 
     if (this.isEditMode) {
@@ -212,8 +217,11 @@ export class EditClienteComponent implements OnInit, OnDestroy {
   }
 
   private crearCliente(data: Partial<Cliente>) {
+    
+    const idSucursal = this.sucursalContextService.getSucursalId() || 0;
+    if (!idSucursal) return;
     // Asumiendo que tienes un método createCliente en tu servicio
-    this.clienteService.createCliente(data as Cliente).subscribe({
+    this.clienteService.createCliente(idSucursal, data).subscribe({
       next: () => {
         this.snackBar.open('Cliente creado exitosamente', 'Cerrar', {
           duration: 3000,

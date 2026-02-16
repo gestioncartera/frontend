@@ -15,6 +15,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { ClienteService, Cliente } from '../../../services/cliente.service';
 import { Location } from '@angular/common';
+import { SucursalContextService } from '../../../services/sucursal-context.service';
 
 @Component({
   selector: 'app-list-cliente',
@@ -54,7 +55,8 @@ export class ListClienteComponent implements OnInit {
     private responsive: BreakpointObserver, 
     private router: Router,
     private clienteService: ClienteService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private sucursalContextService: SucursalContextService
   ) {}
 
   ngOnInit(): void {
@@ -109,7 +111,9 @@ export class ListClienteComponent implements OnInit {
   }
 
   loadClientes() {
-    this.clienteService.getClientes().subscribe({
+    const idSucursal = this.sucursalContextService.getSucursalId();
+    if (!idSucursal) return;
+    this.clienteService.getClientes(idSucursal).subscribe({
       next: (data) => {
         this.allClientes = data;
         this.dataSource.data = data;

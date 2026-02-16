@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -35,7 +35,7 @@ import { AuthService } from '../../../services/auth.service';
   templateUrl: './crear-cobro.component.html',
   styleUrls: ['./crear-cobro.component.scss']
 })
-export class CrearCobroComponent implements OnInit {
+export class CrearCobroComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = ['nombrecliente', 'direccioncliente', 'telefonocliente', 'acciones'];
   dataSource: MatTableDataSource<ClienteCobro>;
   isMobile = false;
@@ -58,30 +58,36 @@ export class CrearCobroComponent implements OnInit {
     this.cargarClientes();
   }
 
+  ngAfterViewInit() {
+    this.dataSource.paginator = this.paginator;
+  }
+
   detectMobile() {
     this.responsive.observe([Breakpoints.Handset]).subscribe((result) => {
       this.isMobile = result.matches;
     });
   }
 
-  cargarClientes(): void {    
-    const userId = this.authService.getCurrentUserValue()?.id;
-    console.log('--- Depuración cargarClientes ---');
-    console.log('ID del usuario logueado:', userId);
-    console.log('Tipo de dato del ID:', typeof userId);
+  cargarClientes(): void {
+    const user = this.authService.getCurrentUserValue();
+    // Intenta obtener 'id' (frontend/mock) o 'usuario_id' (backend real)
+    const userId = user?.id || (user as any)?.usuario_id;
+    
     if (userId) {
       this.clienteService.getClientesByRuta(userId).subscribe({
         next: (data) => {
+          console.log('Clientes cargados:', data);
           this.dataSource.data = data;
-          this.dataSource.paginator = this.paginator;
-          
+          if (this.paginator) {
+            this.dataSource.paginator = this.paginator;
+          }
         },
         error: (err) => {
           console.error('Error al cargar clientes:', err);
         }
       });
     } else {
-      console.error('No usuario logueado');
+      console.error('No se encontró usuario logueado o ID válido. Objeto usuario:', user);
     }
   }
 

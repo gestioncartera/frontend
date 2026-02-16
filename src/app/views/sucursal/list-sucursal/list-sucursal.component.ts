@@ -159,7 +159,9 @@ export class ListSucursalComponent implements OnInit {
         this.loadSucursales(); // Recargamos la lista desde la API
       },
       error: (error) => {
+        console.error('id sucursal', row.sucursal_id);
         console.error('Error al eliminar:', error);
+
         // Extraemos el mensaje exacto que envía el backend (si existe)
         const msg = error.error?.error || error.error?.message || (typeof error.error === 'string' ? error.error : 'No se pudo eliminar la sucursal. Verifique que no tenga datos asociados.');
         this.snackBar.open(

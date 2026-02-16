@@ -13,6 +13,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Rutas, RutasService } from '../../../services/rutas.service';
+import { SucursalContextService } from '../../../services/sucursal-context.service';
 
 @Component({
   selector: 'app-seleccionar-ruta-cobros',
@@ -52,14 +53,17 @@ export class SeleccionarRutaCobrosComponent implements OnInit, AfterViewInit {
   constructor(
     private router: Router,
     private rutaService: RutasService,
-    private responsive: BreakpointObserver
+    private responsive: BreakpointObserver,
+    private sucursalContextService: SucursalContextService
   ) {
     this.dataSource = new MatTableDataSource(this.rutas);
   }
 
   ngOnInit(): void {
     this.detectMobile();
-    this.getRutasActivas();
+    this.sucursalContextService.sucursalActual$.subscribe(() => {
+      this.getRutasActivas();
+    });
   }
 
   ngAfterViewInit() {
@@ -77,7 +81,12 @@ export class SeleccionarRutaCobrosComponent implements OnInit, AfterViewInit {
   }
 
   getRutasActivas() {
-    this.rutaService.getRutas().subscribe({
+    const idSucursal = this.sucursalContextService.getSucursalId();
+    if (!idSucursal) {
+      return;
+    }
+
+    this.rutaService.getRutas(idSucursal).subscribe({
       next: (data: Rutas[]) => {
         
         

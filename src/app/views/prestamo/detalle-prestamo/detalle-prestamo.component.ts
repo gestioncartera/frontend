@@ -17,6 +17,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'; // <--- AGREGAR ESTO
  import { TipoPrestamo, TipoPrestamoService } from '../../../services/tipoPrestamo.service';
 import { CobroService } from '../../../services/cobro.service';
+import { SucursalContextService } from '../../../services/sucursal-context.service';
 
 @Component({
   selector: 'app-detalle-prestamo',
@@ -51,7 +52,9 @@ export class DetallePrestamoComponent implements OnInit {
     private prestamoService: PrestamoService,
     private tipoPrestamoService: TipoPrestamoService,
     private location: Location,
-    private cobroService: CobroService ) {}
+    private cobroService: CobroService,
+    private sucursalContextService: SucursalContextService,  
+  ) {}
 
   ngOnInit(): void {
     this.cargarTiposPrestamo();
@@ -79,7 +82,10 @@ export class DetallePrestamoComponent implements OnInit {
   }
     
   cargarTiposPrestamo() {
-    this.tipoPrestamoService.getTiposPrestamo().subscribe(data => {
+      const idSucursal = this.sucursalContextService.getSucursalId();
+    if (!idSucursal) return;
+    
+    this.tipoPrestamoService.getTiposPrestamo(idSucursal).subscribe(data => {
       // Normalizamos los datos para asegurar que tengan id_tipo_prestamo
       this.tiposPrestamo = data.map((t: any) => {
         if (!t.id_tipo_prestamo) {

@@ -16,6 +16,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
 import { AsignarRutaService,RutaCobro } from '../../../services/asignarRuta.service';
+import { SucursalContextService } from '../../../services/sucursal-context.service';
 @Component({
   selector: 'app-edit-ruta',
   standalone: true,
@@ -56,6 +57,7 @@ export class EditRutaComponent implements OnInit {
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private asignarRutaService:AsignarRutaService,
+    private sucursalContextService: SucursalContextService
   ) {}
 
   ngOnInit() {
@@ -70,7 +72,9 @@ export class EditRutaComponent implements OnInit {
   }
 
   cargarCobradores(): void {
-    this.usuarioService.getUsuarios().subscribe({
+    const idSucursal = this.sucursalContextService.getSucursalId(); 
+   if (idSucursal !== null) {
+    this.usuarioService.getUsuarios(idSucursal).subscribe({
       next: (usuarios: Usuario[]) => {
         // Filtrar solo usuarios con tipo_usuario = 2 (cobradores)
         this.cobradores = usuarios.filter(u => u.tipo_usuario === 2);
@@ -85,6 +89,7 @@ export class EditRutaComponent implements OnInit {
         );
       }
     });
+    }
   }
 
   filtrarCobradores(): void {

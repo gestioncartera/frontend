@@ -11,6 +11,7 @@ import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { TipoPrestamo, TipoPrestamoService } from '../../../services/tipoPrestamo.service';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../../shared/confirm-dialog/confirm-dialog.component';
+import { SucursalContextService } from '../../../services/sucursal-context.service';
 
 @Component({
   selector: 'app-list-tipo',
@@ -40,7 +41,8 @@ export class ListTipoComponent implements OnInit {
     private tipoPrestamoService: TipoPrestamoService,
     private router: Router,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private sucursalContextService: SucursalContextService,
   ) {}
 
   ngOnInit(): void {
@@ -48,13 +50,20 @@ export class ListTipoComponent implements OnInit {
   }
 
   cargarTipos() {
-    this.tipoPrestamoService.getTiposPrestamo().subscribe({
+    const idSucursal = this.sucursalContextService.getSucursalId();
+    console.log('ID de Sucursal actual:', idSucursal); // Depuración
+    if (idSucursal !== null) {
+    this.tipoPrestamoService.getTiposPrestamo(idSucursal).subscribe({
       next: (data) => {
         this.dataSource.data = data;
         this.dataSource.paginator = this.paginator;
       },
       error: (err) => console.error('Error cargando tipos de préstamo', err)
     });
+  } else {
+    console.warn('No se puede cargar: No hay sucursal seleccionada');
+    this.dataSource.data = []; // Limpiamos la tabla si no hay sucursal
+  }
   }
 
   eliminarTipo(id: number) {

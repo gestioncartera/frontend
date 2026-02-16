@@ -1,19 +1,43 @@
 <div class="route-container">
-  <header class="route-header">
+  <div class="selection-card shadow-sm">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Seleccionar Ruta para Organizar</mat-label>
+      <mat-select [(value)]="idRutaActual" (selectionChange)="onRutaChange($event.value)">
+        <mat-option *ngFor="let ruta of listaRutas" [value]="ruta.ruta_id">
+          {{ ruta.nombre_ruta }}
+        </mat-option>
+      </mat-select>
+      <mat-hint *ngIf="!idRutaActual">Selecciona una ruta para ver los clientes asignados</mat-hint>
+    </mat-form-field>
+  </div>
+
+  <header class="route-header" *ngIf="idRutaActual">
     <div class="title-section">
-      <h1>Orden de Visita: {{ nombreRuta }}</h1>
-      <span class="count-badge">{{ clientesAsignados.length }} Clientes</span>
+      <h1 class="m-0">{{ nombreRuta }}</h1>
+      <span class="count-badge">{{ clientesAsignados.length }} Clientes en lista</span>
     </div>
+    
     <button mat-flat-button color="primary" (click)="abrirModalClientes()">
       <mat-icon>person_add</mat-icon>
-      Agregar Cliente
+      <span class="d-none d-sm-inline">Agregar Cliente</span>
     </button>
   </header>
 
   <div cdkDropList 
-       class="drag-list" 
+       class="drag-list shadow-sm" 
+       [class.loading-opacity]="loading"
        (cdkDropListDropped)="onDrop($event)">
     
+    <div class="loading-overlay" *ngIf="loading && clientesAsignados.length === 0">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Cargando clientes...</p>
+    </div>
+
+    <div class="empty-state" *ngIf="clientesAsignados.length === 0 && !loading">
+      <mat-icon>map</mat-icon>
+      <p>{{ idRutaActual ? 'No hay clientes en esta ruta' : 'Selecciona una ruta para comenzar' }}</p>
+    </div>
+
     <div class="drag-item" *ngFor="let cliente of clientesAsignados; let i = index" cdkDrag>
       
       <div class="drag-handle" cdkDragHandle>
@@ -24,7 +48,10 @@
 
       <div class="client-info">
         <span class="client-name">{{ cliente.nombres }} {{ cliente.apellidos }}</span>
-        <span class="client-address">{{ cliente.direccion || 'Sin dirección' }}</span>
+        <span class="client-address text-truncate">
+          <mat-icon style="font-size: 14px; width: 14px; height: 14px;">place</mat-icon>
+          {{ cliente.direccion || 'Sin dirección registrada' }}
+        </span>
       </div>
 
       <div class="client-actions">
@@ -34,11 +61,11 @@
         <mat-menu #menu="matMenu">
           <button mat-menu-item (click)="moverAPosicion(i)">
             <mat-icon>swap_vert</mat-icon>
-            <span>Mover a posición...</span>
+            <span>Mover a posición específica</span>
           </button>
           <button mat-menu-item class="text-danger" (click)="quitarDeRuta(i)">
             <mat-icon>person_remove</mat-icon>
-            <span>Quitar de la ruta</span>
+            <span>Quitar de esta ruta</span>
           </button>
         </mat-menu>
       </div>
@@ -47,9 +74,15 @@
     </div>
   </div>
 
-  <div class="footer-actions">
-    <button mat-raised-button color="accent" (click)="guardarOrden()" [disabled]="!ordenModificado">
-      <mat-icon>save</mat-icon> Guardar Nuevo Orden
+  <div class="footer-actions" *ngIf="idRutaActual">
+    <button mat-raised-button 
+            color="accent" 
+            class="save-btn"
+            (click)="guardarOrden()" 
+            [disabled]="!ordenModificado || loading">
+      <mat-icon *ngIf="!loading">save</mat-icon>
+      <mat-spinner diameter="20" *ngIf="loading" class="inline-spinner"></mat-spinner>
+      {{ loading ? 'Guardando cambios...' : 'Guardar Orden de Visita' }}
     </button>
   </div>
 </div>

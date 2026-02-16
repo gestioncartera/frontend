@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
+import { environment } from '../../environments/environment'; 
+
 
 export interface Rutas {
   ruta_id?: number;
@@ -24,9 +25,12 @@ export class RutasService {
 
   constructor(private http: HttpClient) { }    
 
-  getRutas(): Observable<Rutas[]> {
-    return this.http.get<Rutas[]>(`${this.apiUrl}/getRutas`);
-  } 
+ getRutas(idSucursal: number | string): Observable<Rutas[]> { 
+  const url = `${this.apiUrl}/getRutas/${idSucursal}`;
+  
+  return this.http.get<Rutas[]>(url);
+}
+
   getRutasById(id: string): Observable<Rutas[]> {
     return this.http.get<Rutas[]>(`${this.apiUrl}/getRutaById/${id}`);
   } 

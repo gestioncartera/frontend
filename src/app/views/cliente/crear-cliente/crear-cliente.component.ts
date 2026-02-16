@@ -91,7 +91,9 @@ export class CrearClienteComponent implements OnInit, OnDestroy {
   }
 
   cargarRutas() {
-    this.rutasService.getRutas().subscribe({
+    const idSucursal = this.sucursalContextService.getSucursalId();
+    if (!idSucursal) return;
+    this.rutasService.getRutas(idSucursal).subscribe({
       next: (data) => {
         this.rutas = data;
         this.filteredRutas.next(this.rutas.slice());
@@ -182,7 +184,7 @@ export class CrearClienteComponent implements OnInit, OnDestroy {
         }
       });
     } else {
-      this.clienteService.createCliente(clienteData).subscribe({
+      this.clienteService.createCliente(this.sucursalId!, clienteData).subscribe({
         next: () => {
           // window.alert('¡Cliente creado exitosamente!');
           this.cancelar();

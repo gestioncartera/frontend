@@ -22,20 +22,20 @@
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Cliente </th>
           <td mat-cell *matCellDef="let cliente">
             <div class="client-cell">
-              <div class="avatar">{{ cliente.nombrecliente.charAt(0) }}</div>
-              <span>{{ cliente.nombrecliente }}</span>
+              <div class="avatar">{{ (cliente.nombres || '').charAt(0) }}</div>
+              <span>{{ cliente.nombres }}</span>
             </div>
           </td>
         </ng-container>
 
         <ng-container matColumnDef="direccioncliente">
           <th mat-header-cell *matHeaderCellDef> Dirección </th>
-          <td mat-cell *matCellDef="let cliente" class="text-soft">{{ cliente.direccioncliente }}</td>
+          <td mat-cell *matCellDef="let cliente" class="text-soft">{{ cliente.direccion }}</td>
         </ng-container>
 
         <ng-container matColumnDef="telefonocliente">
           <th mat-header-cell *matHeaderCellDef> Teléfono </th>
-          <td mat-cell *matCellDef="let cliente">{{ cliente.telefonocliente }}</td>
+          <td mat-cell *matCellDef="let cliente">{{ cliente.telefono }}</td>
         </ng-container>
 
         <ng-container matColumnDef="acciones">
@@ -56,7 +56,7 @@
     <div *ngIf="isMobile" class="mobile-view">
       <div class="mobile-card" *ngFor="let cliente of dataSource.connect() | async">
         <div class="card-header">
-          <div class="avatar-m">{{ cliente.nombrecliente.charAt(0) }}</div>
+          <div class="avatar-m">{{ (cliente.nombrecliente || '').charAt(0) }}</div>
           <div class="card-titles">
             <h3>{{ cliente.nombrecliente }}</h3>
             <p>{{ cliente.telefonocliente }}</p>
