@@ -21,56 +21,64 @@
             <mat-form-field appearance="outline" class="form-field">
               <mat-label>Nombres</mat-label>
               <input matInput formControlName="nombres" placeholder="Ej. Juan Andrés">
-              <mat-icon matPrefix color="primary">person_outline</mat-icon>
+              <mat-icon matIconPrefix color="primary">person_outline</mat-icon>
               <mat-error *ngIf="nombres?.invalid">{{ getNombresError() }}</mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="form-field">
               <mat-label>Apellidos</mat-label>
               <input matInput formControlName="apellidos" placeholder="Ej. Pérez">
-              <mat-icon matPrefix color="primary">person_outline</mat-icon>
+              <mat-icon matIconPrefix color="primary">person_outline</mat-icon>
               <mat-error *ngIf="apellidos?.invalid">{{ getApellidosError() }}</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>DNI / Documento</mat-label>
+              <input matInput formControlName="dni" placeholder="Ej. 12345678">
+              <mat-icon matIconPrefix color="primary">badge</mat-icon>
+              <mat-error *ngIf="dni?.invalid">DNI requerido (solo números)</mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="form-field">
               <mat-label>Teléfono de contacto</mat-label>
               <input matInput formControlName="telefono" placeholder="300 000 0000">
-              <mat-icon matPrefix color="primary">phone_iphone</mat-icon>
-              <mat-error *ngIf="telefono?.invalid">Mínimo 7 dígitos numéricos</mat-error>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Correo Electrónico</mat-label>
-              <input matInput formControlName="email" type="email" placeholder="usuario@empresa.com">
-              <mat-icon matPrefix color="primary">mail_outline</mat-icon>
-              <mat-error *ngIf="email?.invalid">Ingrese un correo corporativo válido</mat-error>
+              <mat-icon matIconPrefix color="primary">phone_iphone</mat-icon>
             </mat-form-field>
           </div>
 
           <h3 class="section-divider">Configuración de Acceso</h3>
           <div class="form-grid">
             <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Correo Electrónico</mat-label>
+              <input matInput formControlName="email" type="email" placeholder="usuario@empresa.com">
+              <mat-icon matIconPrefix color="primary">mail_outline</mat-icon>
+              <mat-error *ngIf="email?.invalid">{{ getEmailError() }}</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Contraseña Inicial</mat-label>
+              <input matInput formControlName="password" type="password" placeholder="********">
+              <mat-icon matIconPrefix color="primary">lock_open</mat-icon>
+              <mat-error *ngIf="password?.invalid">Mínimo 6 caracteres</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
               <mat-label>Rol de Usuario</mat-label>
               <mat-select formControlName="tipo_usuario">
+                <mat-select-trigger>
+                  <div style="display: flex; align-items: center; gap: 10px;" *ngIf="selectedTipo">
+                    <mat-icon color="primary">{{ selectedTipo.icono }}</mat-icon>
+                    <span>{{ selectedTipo.nombre }}</span>
+                  </div>
+                </mat-select-trigger>
                 <mat-option *ngFor="let tipo of tiposUsuario" [value]="tipo.id">
-                  <div class="option-content">
-                    <mat-icon>admin_panel_settings</mat-icon>
+                  <div class="option-content" style="display: flex; align-items: center; gap: 10px;">
+                    <mat-icon color="primary">{{ tipo.icono }}</mat-icon>
                     <span>{{ tipo.nombre }}</span>
                   </div>
                 </mat-option>
               </mat-select>
-              <mat-icon matPrefix color="primary">assignment_ind</mat-icon>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Estado de Cuenta</mat-label>
-              <mat-select formControlName="estado">
-                <mat-option *ngFor="let est of estados" [value]="est.value">
-                  <span [class]="'status-dot ' + est.value"></span>
-                  {{ est.label }}
-                </mat-option>
-              </mat-select>
-              <mat-icon matPrefix color="primary">verified_user</mat-icon>
+              <mat-icon matIconPrefix color="primary">assignment_ind</mat-icon>
             </mat-form-field>
           </div>
 
@@ -78,12 +86,11 @@
             <button mat-button type="button" class="btn-cancel" (click)="onCancel()">
               Cancelar
             </button>
-            <button mat-flat-button color="primary" [disabled]="loading">
-                <mat-spinner diameter="20" *ngIf="loading" class="white-spinner"></mat-spinner>
-                
-                <mat-icon *ngIf="!loading">save</mat-icon>
-                <span>{{ loading ? 'Guardando...' : 'Guardar Usuario' }}</span>
-              </button>
+            <button mat-flat-button color="primary" class="btn-save" [disabled]="loading || usuarioForm.invalid">
+              <mat-spinner diameter="20" *ngIf="loading" class="white-spinner"></mat-spinner>
+              <mat-icon *ngIf="!loading">save</mat-icon>
+              <span>{{ loading ? 'Guardando...' : 'Guardar Usuario' }}</span>
+            </button>
           </div>
 
         </form>

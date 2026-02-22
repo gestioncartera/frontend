@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, tap, of, delay, throwError } from 'rxjs';
+import { Observable, BehaviorSubject, tap, of, delay, throwError, finalize } from 'rxjs';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 import { SucursalContextService } from './sucursal-context.service';
@@ -34,6 +34,9 @@ export class AuthService {
   private apiUrl = `${environment.apiUrl}/usuario`; // Ajustar si tu backend usa /usuario/login
   private currentUserSubject = new BehaviorSubject<Usuario | null>(this.getUserFromStorage());
   public currentUser$ = this.currentUserSubject.asObservable();
+
+  private isLoadingSubject = new BehaviorSubject<boolean>(false);
+  public isLoading$ = this.isLoadingSubject.asObservable();
   
   // Modo local para desarrollo (cambiar a false cuando la API esté lista)
   private USE_LOCAL_AUTH = false;
@@ -169,8 +172,11 @@ export class AuthService {
 
   // Login
   login(email: string, password: string): Observable<LoginResponse> {
+    this.isLoadingSubject.next(true);
     if (this.USE_LOCAL_AUTH) {
-      return this.loginLocal(email, password); 
+      return this.loginLocal(email, password).pipe(
+        finalize(() => this.isLoadingSubject.next(false))
+      ); 
     }
     
     return this.http.post<LoginResponse>(`${this.apiUrl}/login`, { email, password })
@@ -189,7 +195,8 @@ export class AuthService {
             this.currentUserSubject.next(null);
             console.warn('No se recibió usuario en la respuesta del login');
           }
-        })
+        }),
+        finalize(() => this.isLoadingSubject.next(false))
       );
   }
 
@@ -257,4 +264,3 @@ export class AuthService {
     return this.getRolId() === 2; // Asumiendo que 2 es cobrador
   }
 }
-

@@ -17,6 +17,7 @@ export interface RutaCobro{
 })
 export class AsignarRutaService {  
      private apiUrl = `${environment.apiUrl}/cliente`; 
+          private apiUrlruta = `${environment.apiUrl}/asignacionRuta`; 
 constructor(private http: HttpClient) { }
 
 asignaCobrador(rutaCobro: RutaCobro): Promise<any> {
@@ -25,8 +26,8 @@ asignaCobrador(rutaCobro: RutaCobro): Promise<any> {
     ruta_id: rutaCobro.ruta_id,   // Asegúrate de que estos nombres
     usuario_id: rutaCobro.usuario_id // coincidan con tu API
   };
-
-  return this.http.post<any>(`${this.apiUrl}/createAsignacionRuta`, payload).toPromise();
+  console.log('Enviando asignación al backend:', payload); // Log para verificar el objeto antes de enviarlo
+  return lastValueFrom(this.http.post<any>(`${this.apiUrlruta}/createAsignacionRuta`, payload));
 }
  actualizarOrdenClientes(id_ruta: number, clientes: any[]): Observable<any> {
   // PATCH es correcto porque modificamos la columna 'orden' de registros existentes

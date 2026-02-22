@@ -1,218 +1,274 @@
 /* =========================================
-   CONTENEDOR PRINCIPAL
+   VARIABLES Y PALETA
    ========================================= */
-.container {
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.list-card {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow:
-    0 12px 30px rgba(0, 0, 0, 0.12),
-    0 4px 12px rgba(0, 0, 0, 0.08);
-}
+$primary-blue: #2563eb;
+$bg-dark: #0f172a;
+$danger: #ef4444;
+$success: #166534;
+$warning: #854d0e;
+$text-main: #1e293b;
+$text-soft: #64748b;
+$border-light: #e2e8f0;
+$bg-light-slate: #f8fafc;
 
 /* =========================================
-   HEADER
+   CONTENEDOR Y CABECERA
    ========================================= */
-.header {
+.container { 
+  padding: 2rem 1.5rem; 
+  max-width: 1200px; 
+  margin: 0 auto; 
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.page-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  gap: 20px;
+
+  .title-group {
+    h2 { margin: 0; font-size: 26px; font-weight: 800; color: $bg-dark; }
+    .subtitle { color: $text-soft; font-size: 14px; margin-top: 4px; }
+  }
 }
 
-.header h2 {
-  margin: 0;
-  font-weight: 600;
-  flex: 1;
-  min-width: 200px;
-}
-
-.header button {
-  margin-top: 0;
-  white-space: nowrap;
-}
-
-/* =========================================
-   FILTROS
-   ========================================= */
-.filters {
+.header-actions {
   display: flex;
-  gap: 15px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-}
-
-.filters mat-form-field {
-  flex: 1;
-  min-width: 200px;
-}
-
-/* Iconos de acciones en la tabla */
-mat-icon {
-  font-size: 20px;
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-  margin-right: 12px;
-  transition: transform 0.2s;
-}
-
-mat-icon:hover {
-  transform: scale(1.1);
-}
-
-mat-icon.edit {
-  color: #1565c0;
-}
-
-mat-icon.delete {
-  color: #c62828;
+  align-items: center;
+  gap: 20px;
 }
 
 /* =========================================
-   TABLA DE ESCRITORIO (Estilo "Periodo")
+   WIDGET: TOTAL EN CAJA
    ========================================= */
-table {
-  width: 100%;
-  border-collapse: collapse;
+.cash-summary-card {
+  background: linear-gradient(135deg, $bg-dark, #1e293b);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+
+  .cash-info {
+    .cash-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7; display: block; }
+    .cash-amount { margin: 0; font-size: 22px; font-weight: 700; }
+  }
+
+  .cash-icon {
+    background: rgba(255, 255, 255, 0.1);
+    width: 44px; height: 44px; border-radius: 12px;
+    display: grid; place-items: center;
+    mat-icon { font-size: 24px; width: 24px; height: 24px; }
+  }
 }
 
-/* Encabezado Gris (Igual que en Periodos) */
-th.mat-header-cell {
-  background-color: #f5f5f5;
-  color: #424242;
-  font-weight: 700;
-  font-size: 14px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding: 16px;
+.btn-add {
+  height: 54px; 
+  border-radius: 14px !important;
+  font-weight: 600; 
+  padding: 0 25px !important;
+  background-color: $primary-blue !important;
 }
 
-/* Celdas del cuerpo */
-td.mat-cell {
-  padding: 14px 16px;
-  border-bottom: 1px solid #e0e0e0;
-  color: #333;
-  font-size: 14px;
+/* =========================================
+   FILTROS Y TARJETA
+   ========================================= */
+.list-card {
+  border-radius: 20px !important;
+  border: 1px solid $border-light !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
+  overflow: hidden;
+  background: white;
 }
 
-/* Efecto Hover en las filas */
-tr.mat-row:hover {
-  background-color: #fafafa;
+.filters-row {
+  padding: 1.5rem;
+  background: white;
+  
+  .search-field {
+    width: 100%;
+    max-width: 400px;
+  }
 }
 
-/* ---------- TABLE (Desktop) ---------- */
-.desktop-table {
-  display: block;
+/* =========================================
+   TABLA PROFESIONAL
+   ========================================= */
+.table-container {
   overflow-x: auto;
 }
 
-.desktop-table table {
+.modern-table {
   width: 100%;
-  border-collapse: collapse;
-}
 
-.desktop-table th,
-.desktop-table td {
-  padding: 12px;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
-}
+  th.mat-header-cell {
+    background: $bg-light-slate;
+    color: $text-soft;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    padding: 18px !important;
+  }
 
-.desktop-table th {
-  background-color: #f5f5f5;
-  font-weight: 600;
-}
+  td.mat-cell {
+    padding: 16px 18px !important;
+    color: $text-main;
+    border-bottom: 1px solid $bg-light-slate;
+  }
 
-.desktop-table tr:hover {
-  background-color: #fafafa;
+  tr.row-hover:hover { 
+    background-color: rgba($primary-blue, 0.02); 
+    cursor: pointer; 
+  }
+
+  .date-text { display: block; font-weight: 600; color: $bg-dark; }
+  .time-text { font-size: 11px; color: $text-soft; }
+
+  .amount-cell {
+    font-weight: 700;
+    font-size: 15px;
+    color: $success; // Color por defecto (ingreso)
+    
+    &.negative { color: $danger; }
+  }
 }
 
 /* =========================================
-   VISTA MÓVIL (Tarjetas)
+   BADGES: TIPO Y ESTADO
    ========================================= */
-.mobile-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding-bottom: 20px;
+.type-badge {
+  background-color: #f1f5f9;
+  color: #475569;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid $border-light;
+  text-transform: uppercase;
 }
 
+.status-badge {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+  text-align: center;
+  min-width: 90px;
+
+  /* Colores semánticos según el estado */
+  &.pagado, &.confirmado {
+    background-color: #dcfce7;
+    color: $success;
+  }
+
+  &.pendiente {
+    background-color: #fef9c3;
+    color: $warning;
+  }
+
+  &.anulado {
+    background-color: #fee2e2;
+    color: #991b1b;
+  }
+
+  &.small {
+    padding: 2px 8px;
+    font-size: 10px;
+    min-width: auto;
+  }
+}
+
+/* =========================================
+   ACCIONES
+   ========================================= */
+.btn-edit { color: $primary-blue; &:hover { background: rgba($primary-blue, 0.1); } }
+.btn-delete { color: $danger; &:hover { background: rgba($danger, 0.1); } }
+
+/* =========================================
+   VISTA MÓVIL
+   ========================================= */
 .mobile-card {
-  padding: 16px;
-  border-radius: 10px;
+  border-radius: 16px; 
+  margin: 0 1rem 1rem 1rem;
+  border: 1px solid $bg-light-slate;
   background: white;
-  border: 1px solid #e0e0e0;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  overflow: hidden;
-}
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 
-.mobile-card mat-card-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: #1a237e;
-  margin-bottom: 8px;
-}
+  .card-header {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    padding: 15px;
+    background: $bg-light-slate; 
+    border-bottom: 1px solid $border-light;
 
-.mobile-card mat-card-content p {
-  margin: 6px 0;
-  color: #616161;
-  font-size: 14px;
-  display: flex;
-  justify-content: space-between;
-}
+    .header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      .m-date { font-weight: 700; color: $bg-dark; }
+    }
 
-.mobile-card mat-card-actions {
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px dashed #e0e0e0;
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
+    .m-amount { 
+      font-weight: 800; 
+      font-size: 16px;
+      color: $success;
+      &.negative { color: $danger; }
+    }
+  }
+
+  .card-body {
+    padding: 15px;
+    p { margin: 4px 0; font-size: 14px; color: $text-main; }
+    .m-type { color: $text-soft; font-size: 12px; font-weight: 600; }
+    .m-desc { font-weight: 500; margin-top: 8px; color: $bg-dark; }
+  }
+
+  .card-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding: 8px 15px;
+    border-top: 1px dashed $border-light;
+  }
 }
 
 /* =========================================
-   RESPONSIVE
+   RESPONSIVO
    ========================================= */
-@media (max-width: 768px) {
-  .container {
-    padding: 10px;
-  }
-
-  .header {
-    flex-direction: column;
+@media (max-width: 850px) {
+  .page-header { 
+    flex-direction: column; 
     align-items: stretch;
+    text-align: left;
   }
 
-  .header h2 {
-    font-size: 20px;
-    margin-bottom: 10px;
+  .header-actions { 
+    flex-direction: column; 
+    width: 100%; 
+    align-items: stretch; 
   }
 
-  .header button {
-    width: 100%;
+  .cash-summary-card { 
+    justify-content: space-between; 
   }
 
-  .filters {
-    flex-direction: column;
-  }
+  .btn-add { width: 100%; }
 
-  .filters mat-form-field {
-    width: 100%;
-    min-width: unset;
+  .filters-row .search-field {
+    max-width: 100%;
   }
 }
-
-
-

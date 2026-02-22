@@ -1,0 +1,71 @@
+<div class="fade-in main-page-container">
+  <mat-card class="modern-card">
+    <div class="custom-header">
+      <div class="header-wrapper">
+        <div class="title-section">
+          <div class="icon-circle shadow-sm">
+            <mat-icon>account_balance_wallet</mat-icon>
+          </div>
+          <div class="title-text">
+            <h2>Movimiento de Caja</h2>
+            <p>Registra entradas o salidas de efectivo</p>
+          </div>
+        </div>
+
+        <div class="balance-badge">
+          <div class="balance-content">
+            <span class="label">Saldo Disponible</span>
+            <h3 class="amount">{{ totalCaja | currency }}</h3>
+          </div>
+          <div class="balance-decor">
+            <mat-icon>payments</mat-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <mat-card-content class="pt-4">
+      <form [formGroup]="egresoForm" (ngSubmit)="onSubmit()" class="form-container">
+        
+        <div class="type-selector-wrapper">
+          <label class="section-label">Tipo de Movimiento</label>
+          <mat-button-toggle-group formControlName="tipo" aria-label="Tipo de Movimiento" class="modern-toggle">
+            <mat-button-toggle value="ingreso" class="toggle-ingreso">
+              <mat-icon>add_circle_outline</mat-icon> Ingreso
+            </mat-button-toggle>
+            <mat-button-toggle value="egreso" class="toggle-egreso">
+              <mat-icon>remove_circle_outline</mat-icon> Egreso
+            </mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+
+        <div class="amount-input-wrapper mt-4">
+          <mat-form-field appearance="outline" class="w-100 standard-input">
+            <mat-label>Monto del Movimiento</mat-label>
+            <input matInput type="number" formControlName="monto" placeholder="0.00">
+            <span matPrefix class="currency-symbol">$ &nbsp;</span>
+            <mat-error *ngIf="egresoForm.get('monto')?.hasError('required')">Indique el monto</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="mt-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Concepto o Motivo</mat-label>
+            <textarea matInput formControlName="descripcion" rows="3" placeholder="Ej: Venta del día, Pago de servicios..."></textarea>
+            <mat-icon matSuffix class="text-secondary">note_add</mat-icon>
+          </mat-form-field>
+        </div>
+
+        <div class="actions-wrapper">
+          <button mat-button type="button" (click)="egresoForm.reset()" class="btn-clear">
+            Limpiar campos
+          </button>
+          <button mat-flat-button color="primary" type="submit" [disabled]="egresoForm.invalid" class="btn-submit">
+            <mat-icon>{{ egresoForm.get('tipo')?.value === 'ingreso' ? 'arrow_circle_up' : 'arrow_circle_down' }}</mat-icon> 
+            Confirmar {{ egresoForm.get('tipo')?.value | titlecase }}
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

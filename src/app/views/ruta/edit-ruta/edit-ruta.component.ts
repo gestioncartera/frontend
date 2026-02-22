@@ -239,10 +239,14 @@ private asignarCobradorARuta(): void {
   })
   .catch((err: any) => { // Agregamos ": any" aquí
   console.error('Error al asignar cobrador:', err);
+  
+  // Intentamos extraer el mensaje específico del backend
+  const mensajeError = err.error?.message || err.error?.msg || err.error?.error || 'Hubo un error al asignar el cobrador';
+
   this.snackBar.open(
-    'Ruta actualizada, pero hubo un error al asignar el cobrador',
+    `⚠️ ${mensajeError}`,
     'Cerrar',
-    { duration: 4000 }
+    { duration: 5000 }
   );
   this.router.navigate(['/ruta/list-ruta']);
 });

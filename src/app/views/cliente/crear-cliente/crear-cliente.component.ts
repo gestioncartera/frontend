@@ -184,6 +184,7 @@ export class CrearClienteComponent implements OnInit, OnDestroy {
         }
       });
     } else {
+        console.log('Datos a enviar para creación:', clienteData);
       this.clienteService.createCliente(this.sucursalId!, clienteData).subscribe({
         next: () => {
           // window.alert('¡Cliente creado exitosamente!');

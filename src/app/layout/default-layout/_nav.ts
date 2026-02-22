@@ -22,6 +22,34 @@ export const navItems: INavData[] = [
       },
     ],
   }, 
+   {
+    name: 'Gastos',
+    url: '/gasto',
+    iconComponent: { name: 'cil-calculator' },
+    children: [
+      {
+        name: 'Gastos Sucursal',
+        url: '/gasto/list-gasto',
+        icon: 'nav-icon-bullet',
+      },
+      {
+        name: 'Gastos Diarios',
+        url: '/gasto/registro-egreso-diario',
+        icon: 'nav-icon-bullet',
+      },
+      /*
+      {
+        name: 'Registrar Egreso',
+        url: '/gasto/registro-egreso-suc',
+        icon: 'nav-icon-bullet',
+      },
+      {
+        name: 'Registro Egreso Diario',
+        url: '/gasto/registro-egreso-diario',
+        icon: 'nav-icon-bullet',
+      },  */
+    ],
+  },
 
   {
       name: 'Rutas',
@@ -127,25 +155,9 @@ export const navItems: INavData[] = [
       },
     ],
   },
- /*  
-  {
-    name: 'Gastos',
-    url: '/gasto',
-    iconComponent: { name: 'cil-calculator' },
-    children: [
-      {
-        name: 'Gestión de Gastos',
-        url: '/gasto/list-gasto',
-        icon: 'nav-icon-bullet',
-      },
-      {
-        name: 'Crear Gasto',
-        url: '/gasto/crear-gasto',
-        icon: 'nav-icon-bullet',
-      },
-    ],
-  },
-*/
+  
+ 
+ 
   {
     title: true,
     name: 'Configuración',

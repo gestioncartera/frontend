@@ -46,10 +46,10 @@ interface NotificationItem {
     SidebarToggleDirective, 
     IconDirective, 
     HeaderNavComponent,
-    NavItemComponent,
-    NavLinkDirective, 
-    RouterLink,
-    RouterLinkActive,
+    //NavItemComponent,
+    //NavLinkDirective, 
+    //RouterLink,
+    //RouterLinkActive,
     DropdownComponent, 
     DropdownToggleDirective, 
     AvatarComponent, 
@@ -57,7 +57,7 @@ interface NotificationItem {
     DropdownHeaderDirective, 
     DropdownItemDirective, 
     BadgeComponent, 
-    DropdownDividerDirective
+     
   ]
 })
 export class DefaultHeaderComponent extends HeaderComponent implements OnInit {

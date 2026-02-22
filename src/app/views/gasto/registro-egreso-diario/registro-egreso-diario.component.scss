@@ -1,0 +1,260 @@
+/* Variables de paleta y diseño */
+$primary-dark: #0f172a;
+$primary-blue: #2563eb;
+$text-main: #1e293b;
+$text-soft: #64748b;
+$bg-slate: #f8fafc;
+$border-color: #e2e8f0;
+$success-bg: #dcfce7;
+$success-text: #166534;
+$danger-bg: #fee2e2;
+$danger-text: #991b1b;
+
+/* Animaciones */
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Contenedor Principal */
+.main-page-container {
+  max-width: 900px; // Aumentado un poco para dar espacio a la tabla
+  margin: 2.5rem auto;
+  padding: 0 1.5rem;
+}
+
+/* Tarjeta Moderna */
+.modern-card {
+  border-radius: 20px !important;
+  background: white;
+  border: 1px solid $border-color;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05) !important;
+  overflow: hidden;
+
+  .custom-header {
+    background: $bg-slate;
+    padding: 1.25rem 1.5rem !important;
+    border-bottom: 1px solid $border-color;
+
+    .header-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+  }
+}
+
+/* Sección de Título e Icono */
+.title-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+
+  .icon-circle {
+    background: white;
+    color: $primary-dark;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid $border-color;
+    mat-icon { font-size: 24px; width: 24px; height: 24px; }
+  }
+
+  .title-text {
+    mat-card-title { 
+      font-size: 18px; 
+      font-weight: 800; 
+      color: $primary-dark;
+      margin: 0;
+    }
+    mat-card-subtitle { 
+      margin: 0; 
+      font-size: 12px;
+      color: $text-soft; 
+    }
+  }
+}
+
+/* Selector de Cobrador en Header */
+.cobrador-selector {
+  width: 250px;
+  margin-bottom: -1.25rem; // Ajuste para alinear visualmente con el texto
+  
+  ::ng-deep .mat-mdc-text-field-wrapper {
+    background: white !important;
+    border-radius: 10px !important;
+  }
+}
+
+/* Contenedor del Formulario */
+.form-container {
+  padding: 1.5rem 1rem;
+}
+
+/* Estilos de Inputs */
+.standard-input {
+  ::ng-deep .mat-mdc-text-field-wrapper {
+    background-color: white !important;
+    input {
+      font-size: 1.1rem !important;
+      font-weight: 600 !important;
+      color: $text-main !important;
+    }
+  }
+  .currency-symbol {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: $text-soft;
+  }
+}
+
+.highlight-field {
+  ::ng-deep .mat-mdc-form-field-flex {
+    border-left: 4px solid $primary-blue;
+    border-radius: 4px;
+  }
+}
+
+/* Botones y Acciones */
+.actions-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #f1f5f9;
+
+  .btn-submit {
+    border-radius: 12px !important;
+    height: 48px;
+    padding: 0 24px !important;
+    font-weight: 600;
+    background-color: $primary-blue !important;
+    mat-icon { margin-right: 8px; font-size: 20px; }
+    
+    &:disabled {
+      background-color: #e2e8f0 !important;
+    }
+  }
+
+  .btn-cancel {
+    color: $text-soft !important;
+    font-weight: 500;
+  }
+}
+
+/* Sección de Historial / Tabla */
+.history-section {
+  border-top: 2px dashed $border-color;
+  padding-top: 2rem;
+  margin-top: 2rem;
+
+  .section-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: $primary-dark;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    
+    &::before {
+      content: "";
+      width: 4px;
+      height: 18px;
+      background: $primary-blue;
+      margin-right: 10px;
+      border-radius: 2px;
+    }
+  }
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.modern-table {
+  width: 100%;
+  background: transparent !important;
+  border-collapse: separate;
+  border-spacing: 0 8px; // Crea espacio entre filas
+
+  th { 
+    color: $text-soft; 
+    font-size: 11px; 
+    font-weight: 700; 
+    text-transform: uppercase; 
+    letter-spacing: 0.5px;
+    padding: 12px 16px;
+    border: none;
+  }
+
+  tr.mat-mdc-row {
+    background: white;
+    transition: transform 0.2s;
+    
+    &:hover {
+      background: $bg-slate;
+      transform: scale(1.002);
+    }
+  }
+
+  td { 
+    padding: 16px; 
+    border-bottom: 1px solid #f1f5f9;
+    color: $text-main;
+    font-size: 14px;
+  }
+}
+
+/* Pills de Estado */
+.status-pill {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: capitalize;
+  display: inline-flex;
+  align-items: center;
+
+  &.activo, &.pendiente { 
+    background: $success-bg; 
+    color: $success-text; 
+  }
+  
+  &.anulado, &.cancelado { 
+    background: $danger-bg; 
+    color: $danger-text; 
+  }
+}
+
+/* Responsividad */
+@media (max-width: 600px) {
+  .header-wrapper {
+    flex-direction: column;
+    align-items: flex-start !important;
+    
+    .cobrador-selector { 
+      width: 100%; 
+      margin-bottom: 0;
+    }
+  }
+  
+  .actions-wrapper {
+    flex-direction: column-reverse;
+    .btn-submit, .btn-cancel { width: 100%; }
+  }
+
+  .modern-table {
+    th, td { padding: 10px; font-size: 13px; }
+  }
+}

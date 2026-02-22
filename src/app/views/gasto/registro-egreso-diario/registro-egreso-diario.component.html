@@ -1,0 +1,86 @@
+<div class="fade-in main-page-container">
+  <mat-card class="modern-card">
+    <mat-card-header class="custom-header">
+      <div class="header-wrapper w-100">
+        <div class="title-section">
+          <div class="icon-circle shadow-sm">
+            <mat-icon>person_search</mat-icon>
+          </div>
+          <div class="title-text">
+            <mat-card-title>Egreso para: {{ nombreCobradorSeleccionado || 'Seleccione Cobrador' }}</mat-card-title>
+            <mat-card-subtitle>Asignación de efectivo a ruta</mat-card-subtitle>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <mat-form-field appearance="outline" class="cobrador-selector">
+            <mat-label>Cobrador</mat-label>
+            <mat-select (selectionChange)="onCobradorChange($event.value)" [(value)]="cobradorId">
+              <mat-option *ngFor="let c of cobradores" [value]="c.id">
+                {{ c.nombre }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+    </mat-card-header>
+
+    <mat-card-content class="form-container pt-4">
+      <form [formGroup]="egresoForm" (ngSubmit)="onSubmit()">
+        <div class="row">
+          <div class="col-md-12 mb-2">
+            <mat-form-field appearance="outline" class="w-100 standard-input highlight-field">
+              <mat-label>Monto</mat-label>
+              <span matPrefix class="currency-symbol">$ &nbsp;</span>
+              <input matInput type="number" formControlName="monto" placeholder="0.00">
+            </mat-form-field>
+          </div>           
+        </div>
+
+        <div class="actions-wrapper">
+          <button mat-button type="button" class="btn-cancel" (click)="cancelar()">Limpiar</button>
+          <button mat-flat-button color="primary" type="submit" class="btn-submit" [disabled]="egresoForm.invalid || !cobradorId">
+            <mat-icon>save</mat-icon> Registrar Egreso
+          </button>
+        </div>
+      </form>
+
+      <div class="history-section mt-5" *ngIf="cobradorId">
+        <h3 class="section-title">Últimos movimientos - {{ nombreCobradorSeleccionado }}</h3>
+        
+        <div class="table-responsive">
+          <table mat-table [dataSource]="dataSource" class="modern-table">
+            <ng-container matColumnDef="fecha">
+              <th mat-header-cell *matHeaderCellDef>Fecha</th>
+              <td mat-cell *matCellDef="let m">{{ m.fecha_movimiento | date:'short' }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="concepto">
+              <th mat-header-cell *matHeaderCellDef>Concepto</th>
+              <td mat-cell *matCellDef="let m">{{ m.descripcion }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="monto">
+              <th mat-header-cell *matHeaderCellDef>Monto</th>
+              <td mat-cell *matCellDef="let m" class="text-danger fw-bold">
+                - {{ m.monto | currency }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="estado">
+              <th mat-header-cell *matHeaderCellDef>Estado</th>
+              <td mat-cell *matCellDef="let m">
+                <span class="status-pill" [ngClass]="m.estado_movto.toLowerCase()">
+                  {{ m.estado_movto }}
+                </span>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          </table>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

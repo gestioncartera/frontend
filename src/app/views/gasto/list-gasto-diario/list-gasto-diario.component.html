@@ -1,0 +1,120 @@
+<div class="fade-in main-page-container">
+  <mat-card class="modern-card">
+    <div class="custom-header">
+      <div class="header-wrapper">
+        <div class="title-section">
+          <div class="icon-circle shadow-sm">
+            <mat-icon>history</mat-icon>
+          </div>
+          <div class="title-text">
+            <h2>Movimientos de Caja</h2>
+            <p>Control de efectivo para el día {{ fechaFiltro | date:'dd/MM/yyyy' }}</p>
+          </div>
+        </div>
+
+        <div class="header-right-side">
+          <div class="balance-badge">
+            <div class="balance-content">
+              <span class="label">Total en Caja</span>
+              <h3 class="amount">{{ totalCaja | currency }}</h3>
+            </div>
+            <div class="balance-decor">
+              <mat-icon>account_balance_wallet</mat-icon>
+            </div>
+          </div>
+
+          <button mat-flat-button color="primary" class="btn-add-modern" routerLink="/gasto/registro-egreso-suc">
+            <mat-icon>add</mat-icon> <span class="btn-label">Nuevo Movimiento</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <mat-card-content class="content-wrapper">
+      <div class="filters-container">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-icon matPrefix>search</mat-icon>
+          <mat-label>Buscar movimiento...</mat-label>
+          <input matInput (keyup)="applyFilter($event)" placeholder="Ej: Pago luz, Abono...">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="date-picker-field">
+          <mat-label>Filtrar por fecha</mat-label>
+          <input matInput [matDatepicker]="picker" [(ngModel)]="fechaFiltro" (dateChange)="onFechaChange()">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      <div *ngIf="dataSource.data.length > 0">
+        <div *ngIf="!isMobile" class="table-responsive">
+          <table mat-table [dataSource]="dataSource" matSort class="modern-table">
+            
+            <ng-container matColumnDef="fecha">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Hora</th>
+              <td mat-cell *matCellDef="let item" class="time-cell">
+                <div class="time-stack">
+                  <span class="main-time">{{ item.fecha_movimiento | date:'shortTime' }}</span>
+                  <span class="sub-date">{{ item.fecha_movimiento | date:'dd/MM' }}</span>
+                </div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="tipo">
+              <th mat-header-cell *matHeaderCellDef>Tipo</th>
+              <td mat-cell *matCellDef="let item">
+                <span class="type-badge-modern" [ngClass]="item.tipo_movimiento.toLowerCase()">
+                  {{ item.tipo_movimiento }}
+                </span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="concepto">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Descripción</th>
+              <td mat-cell *matCellDef="let item" class="desc-cell">{{ item.descripcion }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="valor">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Valor</th>
+              <td mat-cell *matCellDef="let item" class="amount-cell-modern" 
+                  [class.negative]="item.tipo_movimiento.toLowerCase() === 'egreso'">
+                {{ item.tipo_movimiento.toLowerCase() === 'egreso' ? '-' : '+' }} {{ item.monto | currency }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="estado">
+              <th mat-header-cell *matHeaderCellDef>Estado</th>
+              <td mat-cell *matCellDef="let item">
+                <span class="status-pill" [ngClass]="item.estado_movto.toLowerCase()">
+                  {{ item.estado_movto | titlecase }}
+                </span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="acciones">
+              <th mat-header-cell *matHeaderCellDef class="text-center">Acciones</th>
+              <td mat-cell *matCellDef="let item" class="text-center">
+                <button mat-icon-button class="action-btn edit" [routerLink]="['/gasto/registro-egreso-suc']" [queryParams]="{id: item.movimiento_id}">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                 
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns" class="row-hover"></tr>
+          </table>
+          <mat-paginator [pageSizeOptions]="[10, 20]" showFirstLastButtons class="custom-paginator"></mat-paginator>
+        </div>
+
+        <div *ngIf="isMobile" class="mobile-grid">
+          </div>
+      </div>
+
+      <div *ngIf="dataSource.data.length === 0" class="no-records-modern">
+        <mat-icon>inbox</mat-icon>
+        <p>No se encontraron movimientos.</p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

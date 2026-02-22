@@ -53,7 +53,7 @@ getCliente(id: number): Observable<Cliente> {
 }
 
 createCliente(idSucursal: number,  cliente: Partial<Cliente>): Observable<Cliente> {
-  return this.http.post<Cliente>(`${this.apiUrl}/createCliente/${idSucursal}`, cliente);
+  return this.http.post<Cliente>(`${this.apiUrl}/createCliente`, cliente);
 }
 
 updateCliente(id: number, cliente: Partial<Cliente>): Observable<Cliente> {
