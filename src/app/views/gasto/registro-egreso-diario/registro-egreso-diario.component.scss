@@ -1,6 +1,9 @@
-/* Variables de paleta y diseño */
+/* ==========================================================================
+   VARIABLES DE PALETA Y DISEÑO
+   ========================================================================== */
 $primary-dark: #0f172a;
 $primary-blue: #2563eb;
+$primary-amber: #f59e0b;
 $text-main: #1e293b;
 $text-soft: #64748b;
 $bg-slate: #f8fafc;
@@ -10,7 +13,9 @@ $success-text: #166534;
 $danger-bg: #fee2e2;
 $danger-text: #991b1b;
 
-/* Animaciones */
+/* ==========================================================================
+   ANIMACIONES
+   ========================================================================== */
 .fade-in {
   animation: fadeIn 0.5s ease-in;
 }
@@ -20,14 +25,18 @@ $danger-text: #991b1b;
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Contenedor Principal */
+/* ==========================================================================
+   CONTENEDOR PRINCIPAL
+   ========================================================================== */
 .main-page-container {
-  max-width: 900px; // Aumentado un poco para dar espacio a la tabla
+  max-width: 1000px; // Ampliado para acomodar mejor la tabla y el header
   margin: 2.5rem auto;
   padding: 0 1.5rem;
 }
 
-/* Tarjeta Moderna */
+/* ==========================================================================
+   TARJETA MODERNA (CARD)
+   ========================================================================== */
 .modern-card {
   border-radius: 20px !important;
   background: white;
@@ -45,12 +54,12 @@ $danger-text: #991b1b;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 1rem;
+      gap: 1.5rem;
     }
   }
 }
 
-/* Sección de Título e Icono */
+/* SECCIÓN DE TÍTULO E ICONO */
 .title-section {
   display: flex;
   align-items: center;
@@ -84,23 +93,66 @@ $danger-text: #991b1b;
   }
 }
 
-/* Selector de Cobrador en Header */
-.cobrador-selector {
-  width: 250px;
-  margin-bottom: -1.25rem; // Ajuste para alinear visualmente con el texto
-  
-  ::ng-deep .mat-mdc-text-field-wrapper {
-    background: white !important;
-    border-radius: 10px !important;
+/* ==========================================================================
+   HEADER ACTIONS (SELECTOR Y CHIP DE SALDO)
+   ========================================================================== */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* BOTÓN INFORMATIVO DE SALDO (CHIP) */
+.balance-info-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  background: white;
+  padding: 8px 16px;
+  border-radius: 12px;
+  border: 1px solid $border-color;
+  min-width: 140px;
+
+  .chip-label {
+    font-size: 10px;
+    font-weight: 800;
+    color: $text-soft;
+    letter-spacing: 0.5px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .chip-value {
+    font-size: 16px;
+    font-weight: 800;
+    color: $primary-blue;
+    line-height: 1;
+
+    &.zero-balance {
+      color: $primary-amber;
+    }
   }
 }
 
-/* Contenedor del Formulario */
+/* SELECTOR DE COBRADOR AMPLIADO */
+.cobrador-selector-wide {
+  width: 350px; // Ancho incrementado
+  margin-bottom: -1.25rem; 
+  
+  ::ng-deep .mat-mdc-text-field-wrapper {
+    background: white !important;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  }
+}
+
+/* ==========================================================================
+   FORMULARIO E INPUTS
+   ========================================================================== */
 .form-container {
   padding: 1.5rem 1rem;
 }
 
-/* Estilos de Inputs */
 .standard-input {
   ::ng-deep .mat-mdc-text-field-wrapper {
     background-color: white !important;
@@ -124,7 +176,7 @@ $danger-text: #991b1b;
   }
 }
 
-/* Botones y Acciones */
+/* BOTONES */
 .actions-wrapper {
   display: flex;
   justify-content: flex-end;
@@ -153,7 +205,9 @@ $danger-text: #991b1b;
   }
 }
 
-/* Sección de Historial / Tabla */
+/* ==========================================================================
+   SECCIÓN DE HISTORIAL Y TABLA
+   ========================================================================== */
 .history-section {
   border-top: 2px dashed $border-color;
   padding-top: 2rem;
@@ -178,15 +232,25 @@ $danger-text: #991b1b;
   }
 }
 
-.table-responsive {
-  overflow-x: auto;
+.badge-total {
+  background: $bg-slate;
+  color: $primary-blue;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid $border-color;
+}
+
+.table-container {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid $border-color;
 }
 
 .modern-table {
   width: 100%;
-  background: transparent !important;
-  border-collapse: separate;
-  border-spacing: 0 8px; // Crea espacio entre filas
+  background: white !important;
 
   th { 
     color: $text-soft; 
@@ -194,18 +258,13 @@ $danger-text: #991b1b;
     font-weight: 700; 
     text-transform: uppercase; 
     letter-spacing: 0.5px;
-    padding: 12px 16px;
-    border: none;
+    padding: 16px;
+    background: $bg-slate;
   }
 
   tr.mat-mdc-row {
-    background: white;
-    transition: transform 0.2s;
-    
-    &:hover {
-      background: $bg-slate;
-      transform: scale(1.002);
-    }
+    transition: background 0.2s;
+    &:hover { background: #fcfcfc; }
   }
 
   td { 
@@ -216,7 +275,7 @@ $danger-text: #991b1b;
   }
 }
 
-/* Pills de Estado */
+/* PILLS DE ESTADO */
 .status-pill {
   padding: 5px 12px;
   border-radius: 20px;
@@ -226,35 +285,44 @@ $danger-text: #991b1b;
   display: inline-flex;
   align-items: center;
 
-  &.activo, &.pendiente { 
+  &.activo, &.pendiente, &.abierta { 
     background: $success-bg; 
     color: $success-text; 
   }
   
-  &.anulado, &.cancelado { 
+  &.anulado, &.cancelado, &.cerrada { 
     background: $danger-bg; 
     color: $danger-text; 
   }
 }
 
-/* Responsividad */
-@media (max-width: 600px) {
+/* ==========================================================================
+   RESPONSIVIDAD
+   ========================================================================== */
+@media (max-width: 850px) {
   .header-wrapper {
     flex-direction: column;
-    align-items: flex-start !important;
+    align-items: stretch !important;
     
-    .cobrador-selector { 
-      width: 100%; 
-      margin-bottom: 0;
+    .header-actions {
+      flex-direction: column-reverse;
+      align-items: stretch;
+      gap: 10px;
+      
+      .balance-info-chip {
+        align-items: center;
+        margin-right: 0;
+      }
+
+      .cobrador-selector-wide { 
+        width: 100%; 
+        margin-bottom: 0;
+      }
     }
   }
-  
+
   .actions-wrapper {
     flex-direction: column-reverse;
     .btn-submit, .btn-cancel { width: 100%; }
-  }
-
-  .modern-table {
-    th, td { padding: 10px; font-size: 13px; }
   }
 }

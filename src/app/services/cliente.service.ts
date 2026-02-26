@@ -25,6 +25,8 @@ export interface ClienteCobro{
   nombrecliente: string;
   direccioncliente: string;
   telefonocliente: string | null;
+  orden?: number;
+   apellidos:string;
    }
 
 
@@ -46,6 +48,10 @@ getClientesByRuta(rutaId: number): Observable<ClienteCobro[]> {
 
 getClientes(id_sucursal: number | string): Observable<Cliente[]> {
   return this.http.get<Cliente[]>(`${this.apiUrl}/getClientes/${id_sucursal}`);
+}
+
+getClientesPrestamo(id_sucursal: number | string): Observable<Cliente[]> {
+  return this.http.get<Cliente[]>(`${this.apiUrl}/getClientesPrestamo/${id_sucursal}`);
 }
 
 getCliente(id: number): Observable<Cliente> {

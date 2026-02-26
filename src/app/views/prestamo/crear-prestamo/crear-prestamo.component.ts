@@ -17,7 +17,8 @@ import { takeUntil } from 'rxjs/operators';
 import { Prestamos, PrestamoService } from '../../../services/prestamo.service';
 import { TipoPrestamo, TipoPrestamoService } from '../../../services/tipoPrestamo.service';
 import { SucursalContextService } from '../../../services/sucursal-context.service';
-
+import { AuthService } from '../../../services/auth.service';
+import Swal from 'sweetalert2';
 @Component({
   selector: 'app-crear-prestamo',
   standalone: true,
@@ -49,7 +50,7 @@ export class CrearPrestamoComponent implements OnInit, OnDestroy {
   clientes: Cliente[] = [];
   tiposPrestamo: TipoPrestamo[] = [];
   selectedTipoPrestamo: TipoPrestamo | null = null;
-
+  iscobrador: boolean = false;
   periodos: any[] = [];
   isEditing = false;
   editingId: number | null = null;
@@ -65,13 +66,16 @@ export class CrearPrestamoComponent implements OnInit, OnDestroy {
     private clienteService: ClienteService,
     private prestamoService: PrestamoService,
     private tipoPrestamoService: TipoPrestamoService,
-    private sucursalContextService: SucursalContextService
+    private sucursalContextService: SucursalContextService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
     this.cargarClientes();
     this.cargarTiposPrestamo();
     this.periodos = JSON.parse(localStorage.getItem('periodos') || '[]');
+     this.iscobrador  = this.authService.isCobrador();
+
 
     this.route.queryParams.subscribe(params => {
       if (params['id']) {
@@ -185,17 +189,23 @@ crear() {
   const totalConInteres = this.valor + interesCalculado;
   const valorCuotaCalculada = totalConInteres / this.selectedTipoPrestamo.cantidad_cuotas;
 const fechaFormateada = this.fecha.toISOString().split('T')[0];
+
+  // Obtener usuario actual de forma robusta (id o usuario_id)
+  const user = this.authService.getCurrentUserValue();
+  const userId = user?.id || (user as any)?.usuario_id || 0;
+
   const datosPrestamo: Partial<Prestamos> = {
-    cliente_id: this.clienteSeleccionado.cliente_id,
-    periodo_id: 2, // O el que manejes por defecto
-    id_tipo_prestamo: tipoId, // <--- AQUÍ SE CORRIGE EL UNDEFINED
+    cliente_id: this.clienteSeleccionado.cliente_id, 
+     tipo_prestamo_id: tipoId, // <--- AQUÍ SE CORRIGE EL UNDEFINED
     monto_prestamo: Number(this.valor),
     valor_intereses: interesCalculado,
     saldo_pendiente: totalConInteres,
     valor_cuota: valorCuotaCalculada,
-    fecha_desembolso: fechaFormateada,
-    estado_prestamo: this.estado || 'ACTIVO'
+    fecha_fin_prestamo: fechaFormateada,
+     sucursal_id: this.sucursalContextService.getSucursalId() || undefined, 
+    id_usuario_creacion: userId
   };
+  console.log( 'usuario', userId) ;
 
   console.log('%c🚀 Datos Finales a Enviar:', 'color: #10b981; font-weight: bold;');
   console.table(datosPrestamo);
@@ -203,13 +213,19 @@ const fechaFormateada = this.fecha.toISOString().split('T')[0];
   // Llamada al servicio...
   this.prestamoService.createPrestamo(datosPrestamo).subscribe({
     next: () => {
-      window.alert('Préstamo creado!');
-      this.cancelar();
+      Swal.fire({
+        title: 'Éxito',
+        text: 'Préstamo creado!',
+        icon: 'success',
+        confirmButtonText: 'Aceptar'
+      }).then(() => {
+        this.cancelar();
+      });
     },
     error: (err) => console.error('Error:', err)
   });
 }
-
+ 
   cancelar() {
     this.clienteSeleccionado = null;
     this.periodoSeleccionado = null;
@@ -221,6 +237,9 @@ const fechaFormateada = this.fecha.toISOString().split('T')[0];
     this.editingId = null;
     this.router.navigate(['/prestamo']);
   }
+ 
+
+ 
 
   // Al entrar al campo, si es 0, lo vaciamos para que el usuario escriba limpio
 limpiarCero(event: any) {

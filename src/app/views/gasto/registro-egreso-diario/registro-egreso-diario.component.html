@@ -7,77 +7,110 @@
             <mat-icon>person_search</mat-icon>
           </div>
           <div class="title-text">
-            <mat-card-title>Egreso para: {{ nombreCobradorSeleccionado || 'Seleccione Cobrador' }}</mat-card-title>
+            <mat-card-title>
+              Egreso para: {{ nombreCobradorSeleccionado || 'Seleccione Cobrador' }}
+            </mat-card-title>
             <mat-card-subtitle>Asignación de efectivo a ruta</mat-card-subtitle>
           </div>
         </div>
 
         <div class="header-actions">
-          <mat-form-field appearance="outline" class="cobrador-selector">
-            <mat-label>Cobrador</mat-label>
-            <mat-select (selectionChange)="onCobradorChange($event.value)" [(value)]="cobradorId">
-              <mat-option *ngFor="let c of cobradores" [value]="c.id">
-                {{ c.nombre }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
+            <div class="balance-info-chip shadow-sm" *ngIf="cobradorId">
+              <div class="chip-label">SALDO BASE</div>
+              <div class="chip-value" [ngClass]="{'zero-balance': balanceDisponible === 0}">
+                {{ balanceDisponible | currency:'USD':'symbol':'1.2-2' }}
+              </div>
+            </div>
+
+            <mat-form-field appearance="outline" class="cobrador-selector-wide">
+              <mat-label>Cobrador</mat-label>
+              <mat-select (selectionChange)="onCobradorChange($event.value)" [(value)]="cobradorId">
+                <mat-option *ngFor="let c of cobradores" [value]="c.id">
+                  {{ c.nombre }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
       </div>
     </mat-card-header>
 
-    <mat-card-content class="form-container pt-4">
+    <mat-card-content class="form-container">
       <form [formGroup]="egresoForm" (ngSubmit)="onSubmit()">
         <div class="row">
           <div class="col-md-12 mb-2">
             <mat-form-field appearance="outline" class="w-100 standard-input highlight-field">
-              <mat-label>Monto</mat-label>
+              <mat-label>Saldo Base</mat-label>
               <span matPrefix class="currency-symbol">$ &nbsp;</span>
               <input matInput type="number" formControlName="monto" placeholder="0.00">
+              <mat-error *ngIf="egresoForm.get('monto')?.hasError('required')">
+                El Saldo es obligatorio
+              </mat-error>
             </mat-form-field>
-          </div>           
+          </div>
         </div>
 
         <div class="actions-wrapper">
-          <button mat-button type="button" class="btn-cancel" (click)="cancelar()">Limpiar</button>
-          <button mat-flat-button color="primary" type="submit" class="btn-submit" [disabled]="egresoForm.invalid || !cobradorId">
-            <mat-icon>save</mat-icon> Registrar Egreso
+          <button mat-button type="button" class="btn-cancel" (click)="cancelar()">
+            Limpiar
+          </button>
+          <button mat-flat-button color="primary" type="submit" class="btn-submit" 
+                  [disabled]="egresoForm.invalid || !cobradorId || loading">
+            <mat-icon *ngIf="!loading">save</mat-icon>
+            <mat-spinner diameter="20" *ngIf="loading" class="btn-spinner"></mat-spinner>
+            {{ loading ? 'Procesando...' : (balanceDisponible === 0 ? 'Registrar Base' : 'Adicionar Base') }}
           </button>
         </div>
       </form>
 
-      <div class="history-section mt-5" *ngIf="cobradorId">
-        <h3 class="section-title">Últimos movimientos - {{ nombreCobradorSeleccionado }}</h3>
+      <div class="history-section" *ngIf="cobradorId">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h3 class="section-title">Últimos movimientos - {{ nombreCobradorSeleccionado }}</h3>
+          <span class="badge-total" *ngIf="dataSource.data.length > 0">
+            {{ dataSource.data.length }} registros hoy
+          </span>
+        </div>
         
-        <div class="table-responsive">
+        <div class="table-container shadow-sm">
           <table mat-table [dataSource]="dataSource" class="modern-table">
+            
             <ng-container matColumnDef="fecha">
               <th mat-header-cell *matHeaderCellDef>Fecha</th>
-              <td mat-cell *matCellDef="let m">{{ m.fecha_movimiento | date:'short' }}</td>
+              <td mat-cell *matCellDef="let m">
+                {{ m.fecha_gasto | date:'dd/MM/yy, h:mm a' }}
+              </td>
             </ng-container>
 
             <ng-container matColumnDef="concepto">
               <th mat-header-cell *matHeaderCellDef>Concepto</th>
-              <td mat-cell *matCellDef="let m">{{ m.descripcion }}</td>
+              <td mat-cell *matCellDef="let m" class="fw-medium">
+                {{ m.concepto }}
+              </td>
             </ng-container>
 
             <ng-container matColumnDef="monto">
               <th mat-header-cell *matHeaderCellDef>Monto</th>
               <td mat-cell *matCellDef="let m" class="text-danger fw-bold">
-                - {{ m.monto | currency }}
+                - {{ m.monto | currency:'USD':'symbol':'1.2-2' }}
               </td>
             </ng-container>
 
             <ng-container matColumnDef="estado">
               <th mat-header-cell *matHeaderCellDef>Estado</th>
               <td mat-cell *matCellDef="let m">
-                <span class="status-pill" [ngClass]="m.estado_movto.toLowerCase()">
-                  {{ m.estado_movto }}
+                <span class="status-pill" [ngClass]="m.estado_egreso.toLowerCase()">
+                  {{ m.estado_egreso }}
                 </span>
               </td>
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+            <tr class="mat-row" *matNoDataRow>
+              <td class="mat-cell text-center py-4" colspan="4">
+                No hay movimientos registrados para hoy.
+              </td>
+            </tr>
           </table>
         </div>
       </div>

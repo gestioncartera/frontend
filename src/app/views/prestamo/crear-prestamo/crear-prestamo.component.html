@@ -1,7 +1,11 @@
 <div class="main-container">
   <header class="page-header">
     <div class="title-section">      
-      <button mat-icon-button (click)="cancelar()" class="back-btn" title="Volver">
+      <button *ngIf="!iscobrador" 
+        mat-icon-button 
+        (click)="cancelar()" 
+        class="back-btn" 
+        title="Volver">
         <mat-icon>arrow_back</mat-icon>
       </button>
       <div>

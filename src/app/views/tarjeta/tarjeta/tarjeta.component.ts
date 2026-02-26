@@ -57,7 +57,7 @@ export class TarjetaComponent implements OnInit {
   cliente = {
     nombre: '',
     prestamoId: '',
-    ruta: 'Centro - Lunes'
+    ruta: ''
   };
 
   // ============================
@@ -86,8 +86,10 @@ export class TarjetaComponent implements OnInit {
 
   ngOnInit(): void {
     // Obtener usuario autenticado
-    const currentUser = this.authService.getCurrentUser();
-    if (!currentUser) {
+    const currentUser = this.authService.getCurrentUserValue();
+    const userId = currentUser?.id || (currentUser as any)?.usuario_id;
+    console.log('Usuario autenticado ID:', userId);   
+    if (!currentUser || !userId) {
       this.snackBar.open('Debe iniciar sesión para realizar cobros', 'Cerrar', {
         duration: 3000,
         horizontalPosition: 'center',
@@ -96,7 +98,8 @@ export class TarjetaComponent implements OnInit {
       this.router.navigate(['/login']);
       return;
     }
-    this.userId = currentUser.id;
+    this.userId = userId;
+    
 
     // Obtener prestamoId de los query params
     this.route.queryParams.subscribe(params => {
@@ -113,6 +116,8 @@ export class TarjetaComponent implements OnInit {
         this.cliente.nombre = data.nombre_cliente;
         this.cliente.prestamoId = `#${data.id_prestamo}`;
         this.clienteId = data.id_prestamo; // Guardar para enviar al crear cobro
+        this.cliente.ruta = data.nombre_ruta ?? 'Sin Ruta';
+       console.log('Datos del préstamo cargados:', data);
 
         // Actualizar resumen
         this.resumen.cuotaDelDia = parseFloat(data.valor_cuota);
@@ -178,62 +183,49 @@ export class TarjetaComponent implements OnInit {
     });
   }
 
-  private guardarCobroConfirmado(): void {
-    const cobroData: CreateCobroDto = {
-      prestamo_id: this.prestamoId,
-      usuario_id: this.userId!,
-      monto_cobrado: this.montoRecibido
-    };
+private guardarCobroConfirmado(): void {
+  const cobroData: CreateCobroDto = {
+    prestamo_id: this.prestamoId,
+    usuario_id: this.userId!,
+    monto_cobrado: this.montoRecibido
+  };
 
-    console.log('Enviando cobro:', cobroData);
-    console.log('URL:', 'https://appgdc.onrender.com/api/cobro/createCobro');
-    console.log('Usuario actual ID:', this.userId);
-    console.log('Préstamo ID:', this.prestamoId);
+  this.cobroService.createCobro(cobroData).subscribe({
+    next: (response: any) => {
+      const msg = response.message || response.msg || 'Cobro guardado exitosamente';
+      
+      this.snackBar.open(msg, 'Cerrar', {
+        duration: 2500,
+        verticalPosition: 'top',
+        horizontalPosition: 'center',
+        panelClass: ['success-snackbar']
+      });
+      
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    },
+    error: (error) => {
+      // EXTRACCIÓN SEGÚN TU CONSOLA: error -> error -> error
+      let errorMsg = 'Error al guardar el cobro';
 
-    this.cobroService.createCobro(cobroData).subscribe({
-      next: (response) => {
-        console.log('Cobro guardado exitosamente:', response);
-        
-        this.snackBar.open('Cobro guardado exitosamente', 'Cerrar', {
-          duration: 2000,
-          horizontalPosition: 'center',
-          verticalPosition: 'top',
-          panelClass: ['success-snackbar']
-        });
-        
-        // Recargar la página después de mostrar el mensaje
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
-      },
-      error: (error) => {
-        console.error('Error completo:', error);
-        console.error('Status:', error.status);
-        console.error('Message:', error.message);
-        console.error('Error body:', error.error);
-        
-        let errorMsg = 'Error al guardar el cobro.';
-        if (error.status === 0) {
-          errorMsg += ' No se puede conectar con el servidor.';
-        } else if (error.status === 404) {
-          errorMsg += ' Ruta no encontrada (404).';
-        } else if (error.status === 403 || error.error?.error?.includes('cobrador asignado')) {
-          errorMsg = 'No tiene permiso para registrar cobros de este préstamo. Solo el cobrador asignado puede hacerlo.';
-        } else if (error.status === 500) {
-          errorMsg += ' Error del servidor (500).';
-        } else if (error.error?.error) {
-          errorMsg += ' ' + error.error.error;
-        }
-        
-        this.snackBar.open(errorMsg, 'Cerrar', {
-          duration: 5000,
-          horizontalPosition: 'center',
-          verticalPosition: 'top',
-          panelClass: ['error-snackbar']
-        });
+      if (error.error && error.error.error) {
+        // Esto captura: "El préstamo tiene cobros pendientes anteriores"
+        errorMsg = error.error.error;
+      } else if (error.error?.message) {
+        errorMsg = error.error.message;
       }
-    });
-  }
+
+      this.snackBar.open(errorMsg, 'ENTENDIDO', {
+        duration: 5000,
+        verticalPosition: 'top', // Aparece arriba para que el cobrador lo vea rápido
+        horizontalPosition: 'center',
+        panelClass: ['error-snackbar']
+      });
+    }
+  });
+}
+
 
   // ============================
   // Volver al menú anterior

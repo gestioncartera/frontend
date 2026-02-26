@@ -23,7 +23,7 @@
           <td mat-cell *matCellDef="let cliente">
             <div class="client-cell">
               <div class="avatar">{{ (cliente.nombres || '').charAt(0) }}</div>
-              <span>{{ cliente.nombres }}</span>
+              <span>{{ cliente.nombres }}  {{ cliente.apellidos }}</span>
             </div>
           </td>
         </ng-container>
@@ -53,26 +53,42 @@
       <mat-paginator [pageSizeOptions]="[10, 20]"></mat-paginator>
     </div>
 
-    <div *ngIf="isMobile" class="mobile-view">
-      <div class="mobile-card" *ngFor="let cliente of dataSource.connect() | async">
-        <div class="card-header">
-          <div class="avatar-m">{{ (cliente.nombrecliente || '').charAt(0) }}</div>
-          <div class="card-titles">
-            <h3>{{ cliente.nombrecliente }}</h3>
-            <p>{{ cliente.telefonocliente }}</p>
-          </div>
-          <mat-icon class="chevron">chevron_right</mat-icon>
-        </div>
+   <div *ngIf="isMobile" class="mobile-view">
+  <div class="mobile-card shadow-sm" *ngFor="let cliente of dataSource.connect() | async">
+    <div class="card-content-wrapper" (click)="verDetalles(cliente)">
+      <div class="card-header">
+        <div class="avatar-m">{{ (cliente.nombrecliente || '').charAt(0) }}</div>
         
-        <div class="card-body">
-          <mat-icon>place</mat-icon>
-          <span>{{ cliente.direccioncliente }}</span>
+        <div class="card-titles">
+          <h3>{{ cliente.nombrecliente }} {{ cliente.apellidos }}</h3>
+          <div class="status-badge">Activo</div>
         </div>
-
-        <div class="card-footer">
-          <button mat-button color="primary" (click)="verDetalles(cliente)">VER DETALLES</button>
+        <mat-icon class="chevron">chevron_right</mat-icon>
+      </div>
+      
+      <div class="info-grid">
+        <div class="info-item">
+          <mat-icon>phone</mat-icon>
+          <span>{{ cliente.telefonocliente || 'Sin teléfono' }}</span>
+        </div>
+        <div class="info-item">
+          <mat-icon>place</mat-icon>
+          <span class="truncate-text">{{ cliente.direccioncliente }}</span>
         </div>
       </div>
     </div>
+
+    <div class="card-actions">
+      <a mat-icon-button [href]="'tel:' + cliente.telefonocliente" class="btn-call">
+        <mat-icon>call</mat-icon>
+      </a>
+      <button mat-flat-button color="primary" class="btn-details" (click)="verDetalles(cliente)">
+        VER EXPEDIENTE
+      </button>
+    </div>
+  </div>
+  
+  <mat-paginator [pageSizeOptions]="[10]" hidePageSize></mat-paginator>
+</div>
   </mat-card>
 </div>

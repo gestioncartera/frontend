@@ -10,6 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select'; // Importante
 import { MatTableModule, MatTableDataSource } from '@angular/material/table'; // Importante
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { SucursalContextService } from '../../../services/sucursal-context.service';
 import { CajaDiario, CajaDiarioService, EgresoOperacion, MovimientoCajadiario } from '../../../services/caja-diario..service';
 import { UsuarioService, Usuario } from '../../../services/usuario.service';
@@ -25,7 +26,7 @@ interface Cobrador {
   imports: [
     CommonModule, ReactiveFormsModule, MatCardModule, MatFormFieldModule,
     MatInputModule, MatButtonModule, MatIconModule, MatSnackBarModule,
-    MatSelectModule, MatTableModule
+    MatSelectModule, MatTableModule, MatProgressSpinnerModule
   ],
   templateUrl: './registro-egreso-diario.component.html',
   styleUrls: ['./registro-egreso-diario.component.scss']
@@ -34,6 +35,7 @@ export class RegistroEgresoDiarioComponent implements OnInit {
   egresoForm: FormGroup;
   sucursalId: number | null = null;
   balanceDisponible: number = 0;
+  cajaId: number | null = null;
   loading: boolean = false;
   
   // Lógica de Cobradores
@@ -62,7 +64,7 @@ export class RegistroEgresoDiarioComponent implements OnInit {
   ngOnInit(): void {
     this.sucursalId = this.sucursalContextService.getSucursalId();
     if (this.sucursalId) {
-      this.loadBalance();
+     
       this.cargarCobradores();
     } else {
       this.snackBar.open('⚠️ No se ha seleccionado una sucursal activa.', 'Cerrar', { duration: 3000 });
@@ -70,17 +72,24 @@ export class RegistroEgresoDiarioComponent implements OnInit {
     }
   }
 
-  loadBalance(): void {
+  loadBalance(cobradorId: number | null = null): void {
     if (!this.sucursalId) return;
-    this.cajaDiarioService.getCaja(this.sucursalId).subscribe({
+    this.cajaDiarioService.getCaja(this.cobradorId!).subscribe({
       next: (res: any) => {
-        this.balanceDisponible = res.saldo || 0;
+        this.balanceDisponible = res?.monto_base_inicial || 0;
+        this.cajaId = res?.caja_diaria_id || null;
+      console.log('Balance disponible cargado:', res); // Depuración
+
         // Actualizar el validador de monto máximo dinámicamente
-        this.egresoForm.get('monto')?.setValidators([
-          Validators.required, 
-          Validators.min(0.01), 
-          Validators.max(this.balanceDisponible)
-        ]);
+        const validators = [Validators.required, Validators.min(0.01)];
+        
+        // Solo validamos el máximo si hay saldo disponible (es decir, no es apertura)
+        if (this.balanceDisponible > 0) {
+          validators.push(Validators.max(this.balanceDisponible));
+        }
+        
+        this.egresoForm.get('monto')?.setValidators(validators);
+        this.egresoForm.get('monto')?.updateValueAndValidity();
       }
     });
   }
@@ -112,6 +121,8 @@ export class RegistroEgresoDiarioComponent implements OnInit {
     this.nombreCobradorSeleccionado = seleccionado ? seleccionado.nombre : '';
     this.cobradorId = id;
     this.cargarHistorialCobrador(id);
+    console.log('Cobrador seleccionado:',    'ID:', id);
+    this.loadBalance(this.cobradorId);
   }
 
   cargarHistorialCobrador(id: number): void {
@@ -120,13 +131,11 @@ export class RegistroEgresoDiarioComponent implements OnInit {
 
   this.cajaDiarioService.getEgresosOperacionPendientes(id).subscribe({
     next: (data: EgresoOperacion[]) => {
-      const hoy = new Date().toLocaleDateString('en-CA');
       console.log('Movimientos obtenidos:', data);
 
-      // Filtramos por ID de usuario y que la fecha coincida con hoy
-      this.dataSource.data = data.filter(m => 
-        m.usuario_id === id && m.fecha_gasto?.startsWith(hoy)
-      );
+      // El backend ya debería devolver solo los egresos pendientes para este usuario.
+      // No es necesario filtrar de nuevo en el frontend.
+      this.dataSource.data = data;
       
       this.loading = false;
     },
@@ -151,14 +160,27 @@ export class RegistroEgresoDiarioComponent implements OnInit {
     this.sucursalId = this.sucursalContextService.getSucursalId();
     if (this.egresoForm.valid && this.sucursalId && this.cobradorId) {
       const monto = this.egresoForm.get('monto')?.value;
-      this.cajaDiarioService.abrirCajaDiaria(this.sucursalId, this.cobradorId, Number(monto)).subscribe({
+      console.log('Monto a guardar:', this.balanceDisponible, monto); // Depuración
+      
+      let request$;
+      if (this.balanceDisponible === 0) {
+        request$ = this.cajaDiarioService.abrirCajaDiaria(
+          this.sucursalId, this.cobradorId, Number(monto));
+      } else if (this.cajaId) {
+        request$ = this.cajaDiarioService.updateCajaDiaria(
+          this.cajaId, Number(monto));
+      } else {
+        return;
+      }
+
+      request$.subscribe({
         next: (res: any) => {
-          this.snackBar.open(res.message || '✅ Egreso registrado correctamente', 'Cerrar', { duration: 3000 });
+          this.snackBar.open(res.message || '✅ Operación realizada correctamente', 'Cerrar', { duration: 3000 });
           this.refreshView();
         },
         error: (err) => {
           console.error('Error al guardar:', err);
-          this.snackBar.open(err.error?.error || err.error?.message || '❌ Error al guardar el egreso', 'Cerrar', { duration: 3000 });
+          this.snackBar.open(err.error?.error || err.error?.message || '❌ Error al guardar', 'Cerrar', { duration: 3000 });
         }
       });
     } else {
@@ -168,11 +190,14 @@ export class RegistroEgresoDiarioComponent implements OnInit {
 
   refreshView(): void {
     this.egresoForm.reset();
-    this.loadBalance();
+    this.loadBalance(this.cobradorId);
     if (this.cobradorId) this.cargarHistorialCobrador(this.cobradorId);
   }
 
   cancelar(): void {
-    this.router.navigate(['/gasto/list-gasto']);
+    this.egresoForm.reset();
+    this.cobradorId = null;
+    this.nombreCobradorSeleccionado = '';
+    this.dataSource.data = [];
   }
 }

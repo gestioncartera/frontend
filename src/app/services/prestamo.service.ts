@@ -7,7 +7,7 @@ export interface Prestamos {
   prestamo_id: number;
   cliente_id: number;         
   periodo_id: number;
-  id_tipo_prestamo: number;    
+  tipo_prestamo_id: number;    
   monto_prestamo: string | number; 
   saldo_pendiente: string | number;
   valor_intereses: string | number;
@@ -17,6 +17,8 @@ export interface Prestamos {
   created_at?: string;       
   estado_prestamo: string; 
   nombre_cliente?: string; 
+  sucursal_id?: number;
+  id_usuario_creacion: number;
 }
 
 export interface PrestamoCliente {
@@ -40,6 +42,7 @@ export interface PrestamoCobros {
   valor_cuota: string;
   fecha_fin_prestamo: string | null;
   data: CobroDetalle[];
+  nombre_ruta?: string;
 }
 
 

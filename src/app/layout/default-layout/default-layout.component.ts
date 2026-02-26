@@ -83,7 +83,20 @@ export class DefaultLayoutComponent implements OnInit {
               icon: 'nav-icon-bullet',
             }
           ]
-        }
+        },
+        {
+    name: 'Préstamos',
+    url: '/prestamo',
+    iconComponent: { name: 'cil-chart-pie' },
+    children: [      
+      {
+        name: 'Crear Préstamo',
+        url: '/prestamo/crear-prestamo',
+        icon: 'nav-icon-bullet',
+      },
+     
+       ],
+       }, 
       ];
     }
     console.log('Usuario no es cobrador, mostrando menú de admin.');

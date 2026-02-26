@@ -67,10 +67,10 @@ export class ListClienteComponent implements OnInit {
         // En modo selección simplificamos la tabla
         this.displayedColumns = ['nombre', 'telefono', 'ruta', 'actions'];
       }
+      this.loadClientes();
     });
     
     this.detectMobile();
-    this.loadClientes(); 
     this.setupRutaFilter();
   }
 
@@ -113,16 +113,22 @@ export class ListClienteComponent implements OnInit {
   loadClientes() {
     const idSucursal = this.sucursalContextService.getSucursalId();
     if (!idSucursal) return;
-    this.clienteService.getClientes(idSucursal).subscribe({
+
+    // Seleccionamos el observable según el modo
+    const request$ = this.mode === 'selectForLoan'
+      ? this.clienteService.getClientesPrestamo(idSucursal)
+      : this.clienteService.getClientes(idSucursal);
+
+    request$.subscribe({
       next: (data) => {
         this.allClientes = data;
         this.dataSource.data = data;
-        // Obtener rutas únicas para el filtro
         this.rutas = [...new Set(this.allClientes.map(c => c.id_ruta))].sort((a, b) => a - b);
         this.dataSource.paginator = this.paginator;
+        console.log('Clientes cargados:', data);
       },
       error: (err) => console.error('Error al cargar clientes', err)
-    }); 
+    });
   }
 
   // --- MÉTODOS DE NAVEGACIÓN ---

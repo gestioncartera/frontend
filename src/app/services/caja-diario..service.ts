@@ -69,18 +69,16 @@ export class CajaDiarioService {
 
  
  getEgresosOperacionPendientes(usuario_id: number): Observable<EgresoOperacion[]> {
-    const url = `${this.URL_EGRESO_OP}/getAllEgresosOperacionPendientes`;
+    const url = `${this.URL_EGRESO_OP}/getAllEgresosOperacionPendientes/${usuario_id}`;
     
-    // NOTA: Recuerda que si el backend espera un body, 
-    // es mejor usar .post para evitar bloqueos del navegador en GET.
-    return this.http.post<EgresoOperacion[]>(url, { usuario_id }).pipe(
-      tap(data => console.log('Datos obtenidos:', data)),
+     return this.http.get<EgresoOperacion[]>(url).pipe(
+      tap(data => console.log('Datos obtenidos de egresos:', data)),
       catchError(err => {
-        // Extraemos el mensaje: err.error suele ser el body enviado por el servidor
+         //captura de error
         const errorMessage = err.error?.error || 'Error desconocido en el servidor';
         console.error('Error del Backend:', errorMessage);
         
-        // Retornamos el error para que el componente lo capture
+        // Retornamos el error completo para que el SnackBar en el componente lo muestre
         return throwError(() => err);
       })
     );
@@ -100,10 +98,29 @@ export class CajaDiarioService {
   /**
    * 4. OBTENER ESTADO DE CAJA
    */
-  getCaja(sucursal_id: number): Observable<CajaDiario | null> {
-    return this.http.get<any>(`${this.URL_CAJA}/getCajasDiarias/${sucursal_id}`).pipe(
+  getCaja(cobra: number): Observable<CajaDiario | null> {
+    return this.http.get<any>(`${this.URL_CAJA}/getCajaDiariaAbiertaByUsuario/${cobra}`).pipe(
       map(res => res ? { ...res, saldo_actual: parseFloat(res.saldo_actual) } : null),
       catchError(() => of(null))
     );
   }
+
+  /**
+ * Actualiza el monto de una caja específica
+ * @param idCaja ID que se envía en la URL
+ * @param nuevaBase Valor numérico que se envía en el body
+ */
+updateCajaDiaria(idCaja: number, nuevaBase: number): Observable<any> {
+  const url = `${this.URL_CAJA}/updateBase/${idCaja}`;
+  
+  // Cambiamos this.http.put por this.http.patch
+  // Usamos la clave 'nuevaBase' que confirmamos en tu imagen de Postman
+  return this.http.patch(url, { nuevaBase }).pipe(
+    catchError(err => {
+      console.error('Error al actualizar monto de caja (PATCH):', err);
+      return throwError(() => err);
+    })
+  );
+}
+
 }

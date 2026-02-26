@@ -1,6 +1,4 @@
 import { Injectable } from '@angular/core';
-import { FormGroup } from '@angular/forms';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { lastValueFrom, Observable } from 'rxjs';
@@ -31,7 +29,7 @@ asignaCobrador(rutaCobro: RutaCobro): Promise<any> {
 }
  actualizarOrdenClientes(id_ruta: number, clientes: any[]): Observable<any> {
   // PATCH es correcto porque modificamos la columna 'orden' de registros existentes
-  return this.http.patch(`${this.apiUrl}/api/cliente/actualizarOrdenClientes/${id_ruta}`, clientes);
+  return this.http.patch(`${this.apiUrl}/actualizarOrdenClientes/${id_ruta}`, clientes);
 }
 
     }   
