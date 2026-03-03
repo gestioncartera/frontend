@@ -81,6 +81,12 @@ export class PrestamoService {
   createPrestamo(prestamo: Partial<Prestamos>): Observable<Prestamos> {
     return this.http.post<Prestamos>(`${this.apiUrl}/createPrestamo`, prestamo);
   } 
+  getPrestamosPendientesBySucursal(sucursalId: number | string): Observable<Prestamos[]> {
+  return this.http.get<Prestamos[]>(`${this.apiUrl}/prestamosPendientes/${sucursalId}`);
+}
 
+confirmarPrestamo(prestamo_id: number): Observable<any> { 
+  return this.http.patch<any>(`${this.apiUrl}/confirmarPrestamo/${prestamo_id}`, {});
+}
   
 }

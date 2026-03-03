@@ -53,6 +53,11 @@ export class ListCobroComponent implements OnInit {
   nombreCobrador: string = '';
   nombreRuta: string = '';
   rutaId: string | null = null;
+  totalRuta: string = '';
+  recaudadoRuta: number = 0;
+  baseInicial: string = '0.00';
+  recaudado: number = 0;
+  egresos: number = 0; 
   
   // Flags de Control
   isMobile = false;
@@ -94,31 +99,44 @@ export class ListCobroComponent implements OnInit {
   }
 
   // CARGA DE DATOS
-  loadCobros() {
-    this.loading = true;
-    const request = (this.isCobrosPorRuta && this.rutaId)
-      ? this.cobroService.getCobrosByRutaId(this.rutaId)
-      : this.cobroService.getCobros();
+loadCobros() {
+  this.loading = true;
+  
+  const request = (this.isCobrosPorRuta && this.rutaId)
+    ? this.cobroService.getCobrosByRutaId(this.rutaId)
+    : this.cobroService.getCobros();
 
-    request.subscribe({
-      next: (data) => {
-        this.cobroData = data.map(cobro => ({
-          ...cobro,
-          idprestamo: cobro.prestamo_id,
-          nombrecliente: cobro.cliente_nombre || cobro.nombrecliente
-        }));
-        
-        this.dataSource.data = this.cobroData;
-        this.dataSource.paginator = this.paginator;
-        this.dataSource.sort = this.sort;
-        this.loading = false;
-      },
-      error: (err) => {
-        console.error('Error al cargar cobros:', err);
-        this.loading = false;
+  request.subscribe({
+    next: (res: any) => {
+      // 1. Extraer los datos según el formato de la imagen
+      const rawCobros = this.isCobrosPorRuta ? res.cobros : res;
+
+      // 2. Si es por ruta, capturamos los totales que mencionas
+      if (this.isCobrosPorRuta) {
+        this.baseInicial = res["Base Inicial"]; // Uso de corchetes por el espacio en el nombre
+        this.recaudado = res.recaudado;
+        this.egresos = res.egresos;
+        this.totalRuta = res.total;
       }
-    });
-  }
+
+      // 3. Mapear los cobros para la tabla
+      this.cobroData = rawCobros.map((cobro: any) => ({
+        ...cobro,
+        idprestamo: cobro.prestamo_id,
+        nombrecliente: cobro.cliente_nombre
+      }));
+
+      this.dataSource.data = this.cobroData;
+      this.dataSource.paginator = this.paginator;
+      this.dataSource.sort = this.sort;
+      this.loading = false;
+    },
+    error: (err) => {
+      console.error('Error al cargar cobros:', err);
+      this.loading = false;
+    }
+  });
+}
 
   obtenerNombreRuta(id: string) {
     this.rutasService.findRuta(id).subscribe({
@@ -185,7 +203,9 @@ export class ListCobroComponent implements OnInit {
               title: '¡Operación Exitosa!',
               text: res.message || 'Los cobros han sido validados.',
               showConfirmButton: false,
-              timer: 1500
+              timer: 1500,
+            }).then(() => {
+              this.router.navigate(['/cobro/seleccionar-ruta']);
             });
             this.loading = false;
           },

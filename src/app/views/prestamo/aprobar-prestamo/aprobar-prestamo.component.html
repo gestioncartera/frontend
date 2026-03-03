@@ -1,0 +1,113 @@
+<div class="container-fluid p-3 p-md-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="text-primary fw-bold mb-0">Préstamos Pendientes</h2>
+    <button mat-mini-fab color="primary" (click)="loadPrestamos()" *ngIf="isMobile">
+      <mat-icon>refresh</mat-icon>
+    </button>
+    <button mat-flat-button color="primary" (click)="loadPrestamos()" *ngIf="!isMobile" class="rounded-pill">
+      <mat-icon>refresh</mat-icon> Actualizar
+    </button>
+  </div>
+
+  <mat-form-field appearance="outline" class="w-100 mb-3">
+    <mat-label>Buscar cliente...</mat-label>
+    <input matInput (keyup)="aplicarFiltro($event)" placeholder="Ej. Sergio Duarte">
+    <mat-icon matSuffix color="primary">search</mat-icon>
+  </mat-form-field>
+
+  <div *ngIf="!isMobile" class="mat-elevation-z2 table-container">
+    <table mat-table [dataSource]="dataSource" matSort>
+      <ng-container matColumnDef="ID">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> ID </th>
+        <td mat-cell *matCellDef="let row"> {{row.prestamo_id}} </td>
+      </ng-container>
+      <ng-container matColumnDef="cliente">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> CLIENTE </th>
+        <td mat-cell *matCellDef="let row"> {{row.cliente}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="cobrador">
+        <th mat-header-cell *matHeaderCellDef> COBRADOR </th>
+        <td mat-cell *matCellDef="let row"> {{row.nombre_cobrador}} </td>
+      </ng-container>
+
+     
+
+      <ng-container matColumnDef="interes">
+        <th mat-header-cell *matHeaderCellDef> % INTERES </th>
+        <td mat-cell *matCellDef="let row"> <span class="badge-interes">{{row.tasa_interes}}%</span> </td>
+      </ng-container>
+
+      <ng-container matColumnDef="monto">
+        <th mat-header-cell *matHeaderCellDef> PRESTADO </th>
+        <td mat-cell *matCellDef="let row"> {{row.monto_prestamo | currency}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="saldo">
+        <th mat-header-cell *matHeaderCellDef> SALDO </th>
+        <td mat-cell *matCellDef="let row" class="text-danger fw-bold"> {{row.saldo_pendiente | currency}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="acciones">
+        <th mat-header-cell *matHeaderCellDef class="text-center"> ACCIONES </th>
+        <td mat-cell *matCellDef="let row" class="text-center">
+          <button mat-icon-button 
+                  color="primary" 
+                  (click)="confirmarAprobacion(row)" 
+                  matTooltip="Aprobar Préstamo">
+            <mat-icon>check_circle</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </div>
+
+  <div *ngIf="isMobile" class="mobile-list">
+  <div *ngFor="let row of dataSource.filteredData" class="mobile-card shadow-sm border mb-3">
+    
+    <div class="card-header d-flex justify-content-between align-items-start p-3 border-bottom bg-light">
+      <div class="d-flex flex-column">
+        <div class="d-flex align-items-center gap-2">
+          <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2">
+            #{{row.prestamo_id}}
+          </span>
+          <div class="fw-bold text-dark fs-6">{{row.cliente}}</div>
+        </div>
+        <small class="text-muted mt-1">
+          <mat-icon style="font-size: 14px; vertical-align: middle;">route</mat-icon> {{row.ruta_nombre}} 
+          • {{row.nombre_cobrador}}
+        </small>
+      </div>
+      <button mat-icon-button color="primary" title="Ver detalle">
+        <mat-icon>visibility</mat-icon>
+      </button>
+    </div>
+
+    <div class="card-body p-3">
+      <div class="d-flex justify-content-between mb-2">
+        <span class="text-muted">Interés:</span>
+        <span class="badge-interes">{{row.tasa_interes}}%</span>
+      </div>
+      <div class="d-flex justify-content-between mb-2">
+        <span class="text-muted">Monto Prestado:</span>
+        <span class="fw-medium text-dark">{{row.monto_prestamo | currency}}</span>
+      </div>
+      <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
+        <span class="fw-bold">SALDO ACTUAL:</span>
+        <span class="text-danger fw-bolder fs-5">{{row.saldo_pendiente | currency}}</span>
+      </div>
+    </div>
+
+    <div class="card-footer p-2 bg-white border-top">
+      <button mat-flat-button color="primary" class="w-100 py-2 rounded-3" (click)="confirmarAprobacion(row)">
+        <mat-icon>check_circle</mat-icon> CONFIRMAR PRÉSTAMO
+      </button>
+    </div>
+  </div>
+</div>
+
+  <mat-paginator [pageSizeOptions]="[5, 10, 25]" class="mt-2"></mat-paginator>
+</div>

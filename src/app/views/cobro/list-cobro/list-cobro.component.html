@@ -41,23 +41,28 @@
       </mat-form-field>
       
       <div class="metrics-actions">
-  <div class="metrics-dashboard">
+    <div class="metrics-dashboard">
+    <div class="metric-item base">
+      <span class="m-label">Base Inicial</span>
+      <span class="m-amount">{{ baseInicial | currency }}</span>
+    </div>
+    <div class="metric-operator"> </div>
     <div class="metric-item income">
       <span class="m-label">Recaudado</span>
-      <span class="m-amount">{{ totalRecaudadoDia | currency }}</span>
+      <span class="m-amount">{{ recaudado | currency }}</span>
     </div>
 
     <div class="metric-operator">−</div>
 
     <div class="metric-item expenses">
       <span class="m-label">Gastos</span>
-      <span class="m-amount">{{ totalGastosDia | currency }}</span> </div>
+      <span class="m-amount">{{ egresos | currency }}</span> </div>
 
     <div class="metric-operator">=</div>
 
     <div class="metric-item net">
       <span class="m-label">Total Neto</span>
-      <span class="m-amount">{{ (totalRecaudadoDia - totalGastosDia) | currency }}</span>
+      <span class="m-amount">{{ totalRuta | currency }}</span>
     </div>
   </div>
 

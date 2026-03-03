@@ -33,6 +33,13 @@ export interface Cobrohistorial {
   estado: string;
   monto: number;
 }
+export interface RespuestaRuta {
+  cobros: Cobro[];
+  "Base Inicial": string;
+  recaudado: number;
+  egresos: number;
+  total: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -44,8 +51,8 @@ export class CobroService {
 
   // NUEVO: Validar múltiples cobros (Aprobar Todo)
   // Usamos PATCH para actualización parcial del estado
-  validarMultiplesCobros(ids: number[]): Observable<{message: string}> {
-    return this.http.patch<{message: string}>(`${this.apiUrl}/validarMultiplesCobros`, { ids });
+  validarMultiplesCobros(cobroIds: number[]): Observable<{message: string}> {
+    return this.http.patch<{message: string}>(`${this.apiUrl}/validarMultiplesCobros`, { cobroIds: cobroIds });
   }
 
   getCobros(): Observable<Cobro[]> {

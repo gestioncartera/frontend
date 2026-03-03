@@ -46,12 +46,19 @@ getClientesByRuta(rutaId: number): Observable<ClienteCobro[]> {
   );
 }
 
+ //clinetes de una ruta
+getClientesByRutaPrestamo(rutaId: number): Observable<ClienteCobro[]> {
+  return this.http.get<ClienteCobro[]>(
+    `${this.apiUrl}/getClientesByRutaPrestamo/${rutaId}`
+  );
+}
+
 getClientes(id_sucursal: number | string): Observable<Cliente[]> {
   return this.http.get<Cliente[]>(`${this.apiUrl}/getClientes/${id_sucursal}`);
 }
 
 getClientesPrestamo(id_sucursal: number | string): Observable<Cliente[]> {
-  return this.http.get<Cliente[]>(`${this.apiUrl}/getClientesPrestamo/${id_sucursal}`);
+  return this.http.get<Cliente[]>(`${this.apiUrl}/getClientesConPrestamosActivos/${id_sucursal}`);
 }
 
 getCliente(id: number): Observable<Cliente> {

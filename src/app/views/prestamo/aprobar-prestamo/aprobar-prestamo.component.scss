@@ -1,0 +1,180 @@
+/* ==========================================================================
+   1. VARIABLES Y ESTILOS GLOBALES
+   ========================================================================== */
+.container-fluid {
+  background-color: #f8fafc;
+  min-height: 100vh;
+  transition: all 0.3s ease;
+  /* Control de espaciado responsivo */
+  padding: 24px; 
+}
+
+@media (max-width: 768px) {
+  .container-fluid {
+    padding: 12px 10px !important; /* Reduce el margen exterior para ensanchar la tarjeta */
+  }
+}
+
+.text-primary { color: #1e3a8a !important; }
+.text-danger { color: #ef4444 !important; }
+.fw-bold { font-weight: 700 !important; }
+
+/* --- BADGES (Etiquetas de Interés e ID) --- */
+.badge-interes {
+  background-color: #fef3c7;
+  color: #92400e;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 1px solid #fde68a;
+}
+
+.bg-primary-subtle {
+  background-color: #e0e7ff !important;
+  color: #1e3a8a !important;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 4px;
+  padding: 2px 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 35px;
+}
+
+/* ==========================================================================
+   2. VISTA ESCRITORIO (ESTILOS DE TABLA)
+   ========================================================================== */
+.table-container {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+table {
+  width: 100%;
+}
+
+th.mat-header-cell {
+  background-color: #f1f5f9;
+  color: #475569;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 16px !important;
+}
+
+td.mat-cell {
+  padding: 14px 16px !important;
+  color: #1e293b;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.element-row:hover {
+  background-color: #f8fafc;
+}
+
+/* ==========================================================================
+   3. VISTA MÓVIL (ESTILOS DE TARJETAS / CARDS)
+   ========================================================================== */
+.mobile-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mobile-card {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  width: 100%; /* Ocupa todo el ancho disponible tras ajustar el padding del padre */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Encabezado de la Tarjeta */
+.card-header {
+  background-color: #ffffff;
+  border-bottom: 1px solid #f1f5f9;
+  padding: 12px !important;
+}
+
+/* Cuerpo de la Tarjeta */
+.card-body {
+  background-color: #ffffff;
+  padding: 12px !important;
+}
+
+.data-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.label {
+  color: #64748b;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.value {
+  color: #1e293b;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* Resaltado del Saldo Actual */
+.saldo-destacado {
+  background-color: #fff5f5;
+  /* Margen negativo para que el color llegue al borde de la tarjeta */
+  margin: 12px -12px -12px -12px; 
+  padding: 15px 12px;
+  border-top: 1px dashed #fecaca;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Footer y Botón de Confirmación */
+.card-footer {
+  padding: 10px !important;
+  background-color: #ffffff;
+}
+
+.card-footer button {
+  height: 48px !important;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  background-color: #1e3a8a !important; /* Azul principal */
+  border-radius: 8px !important;
+}
+
+/* ==========================================================================
+   4. COMPONENTES DE ANGULAR MATERIAL (OVERRIDES)
+   ========================================================================== */
+
+/* Buscador */
+.mat-mdc-form-field ::ng-deep .mat-mdc-text-field-wrapper {
+  background-color: white !important;
+  border-radius: 10px !important;
+}
+
+/* Paginador responsivo */
+.mat-mdc-paginator {
+  background-color: transparent !important;
+}
+
+/* Animación de entrada */
+.mobile-card {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}

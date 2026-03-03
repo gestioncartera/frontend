@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { NgScrollbar } from 'ngx-scrollbar';
-
+import { MatPaginatorModule } from '@angular/material/paginator'; // 1. Importa el módulo
 import {
   ContainerComponent,
   ShadowOnScrollDirective,
@@ -30,6 +30,7 @@ function isOverflown(element: HTMLElement) {
   selector: 'app-dashboard',
   templateUrl: './default-layout.component.html',
   styleUrls: ['./default-layout.component.scss', './logo-constrained.css'],
+  standalone: true,
   imports: [
     SidebarComponent,
     SidebarHeaderComponent,
@@ -45,7 +46,7 @@ function isOverflown(element: HTMLElement) {
     RouterOutlet,
     RouterLink,
     ShadowOnScrollDirective
-  ]
+  ],
 })
 export class DefaultLayoutComponent implements OnInit {
   private authService = inject(AuthService);
@@ -85,6 +86,18 @@ export class DefaultLayoutComponent implements OnInit {
           ]
         },
         {
+          name: 'Caja',
+          url: '/caja',
+          iconComponent: { name: 'cil-money' },
+          children: [
+            {
+              name: 'Cierre de Caja',
+              url: '/caja/cierre-caja',
+              icon: 'nav-icon-bullet',
+            },
+          ],
+        },
+        {
     name: 'Préstamos',
     url: '/prestamo',
     iconComponent: { name: 'cil-chart-pie' },
@@ -94,6 +107,7 @@ export class DefaultLayoutComponent implements OnInit {
         url: '/prestamo/crear-prestamo',
         icon: 'nav-icon-bullet',
       },
+       
      
        ],
        }, 

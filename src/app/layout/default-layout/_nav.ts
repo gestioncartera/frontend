@@ -10,6 +10,24 @@ export const navItems: INavData[] = [
     url: '/cambio-sucursal',
     iconComponent: { name: 'cil-settings' },
   },
+  /*
+{
+    name: 'Caja',
+    url: '/caja', // Prefijo del módulo o grupo
+    iconComponent: { name: 'cil-money' },
+    children: [
+      {
+        name: 'Apertura de Caja',
+        url: '/caja/apertura-caja',
+        icon: 'nav-icon-bullet',
+      },
+      {
+        name: 'Cierre de Caja',
+        url: '/caja/cierre-caja', // <--- Debe coincidir con el path en routes: 'cierre-caja'
+        icon: 'nav-icon-bullet',
+      },
+    ],
+  },*/
    {
     name: 'Sucursales',
     url: '/sucursal',
@@ -94,6 +112,12 @@ export const navItems: INavData[] = [
         url: '/prestamo',
         icon: 'nav-icon-bullet',
       },
+      {
+        name: 'Aprobar Préstamos',
+        url: '/prestamo/aprobar-prestamo',
+        icon: 'nav-icon-bullet',
+      },
+      
       
      
     ],

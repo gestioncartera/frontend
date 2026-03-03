@@ -69,6 +69,14 @@ export const routes: Routes = [
           ),
         data: { title: 'Lista de Tipos de Préstamo' },
       },
+      {
+        path: 'aprobar-prestamo',
+        loadComponent: () =>
+          import('./aprobar-prestamo/aprobar-prestamo.component').then(
+            (m) => m.AprobarPrestamoComponent
+          ),
+        data: { title: 'Aprobar Préstamos' },
+      },
        
     ],
   },

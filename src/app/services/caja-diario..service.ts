@@ -123,4 +123,9 @@ updateCajaDiaria(idCaja: number, nuevaBase: number): Observable<any> {
   );
 }
 
+cerrarCajaDiaria(id: number, montoReal: number): Observable<any> {
+  return this.http.patch<any>(`${this.URL_CAJA}/cerrarCajaDiaria/${id}`, {
+    monto_final_real: montoReal
+  });
+}
 }

@@ -1,0 +1,44 @@
+<mat-card class="apertura-caja-card">
+  <mat-card-header>
+    <div mat-card-avatar>
+      <mat-icon class="header-icon">storefront</mat-icon>
+    </div>
+    <mat-card-title>Apertura de Caja</mat-card-title>
+    <mat-card-subtitle>Iniciar jornada del cobrador</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-divider></mat-divider>
+
+  <mat-card-content>
+    <div class="content-wrapper">
+      <p class="instruction-text">Seleccione el cobrador e ingrese el monto inicial para comenzar la jornada.</p>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Cobrador</mat-label>
+        <mat-select [(ngModel)]="cobradorSeleccionado" [disabled]="loading">
+          <mat-option *ngFor="let cobrador of cobradores" [value]="cobrador">
+            {{ cobrador.nombre }}
+          </mat-option>
+        </mat-select>
+        <mat-hint>Solo se muestran cobradores activos en esta sucursal</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Monto Inicial</mat-label>
+        <input matInput type="number" [(ngModel)]="montoInicial" placeholder="0.00" [disabled]="loading">
+        <span matTextPrefix>$&nbsp;</span>
+      </mat-form-field>
+
+      <div class="spinner-container" *ngIf="loading">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+    </div>
+  </mat-card-content>
+
+  <mat-card-actions align="end">
+    <button mat-raised-button color="primary" (click)="abrirCaja()" [disabled]="!cobradorSeleccionado || loading">
+      <mat-icon>lock_open</mat-icon>
+      Abrir Caja
+    </button>
+  </mat-card-actions>
+</mat-card>

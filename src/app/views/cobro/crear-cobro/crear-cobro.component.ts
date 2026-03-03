@@ -74,7 +74,7 @@ export class CrearCobroComponent implements OnInit, AfterViewInit {
     const userId = user?.id || (user as any)?.usuario_id;
     
     if (userId) {
-      this.clienteService.getClientesByRuta(userId).subscribe({
+      this.clienteService.getClientesByRutaPrestamo(userId).subscribe({
         next: (data) => {
           console.log('Clientes cargados:', data);
           this.dataSource.data = data;
