@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 
@@ -18,15 +18,16 @@ export interface MovimientoCajadiario {
 }
 
 export interface EgresoOperacion {
-  egreso_id: number;
-  usuario_id: number;
-  ruta_id: number;
-  fecha_gasto: string; 
   concepto: string;    
-  monto: string;       
-  descripcion: string;
-  created_at: string;
-  estado_egreso: 'pendiente' | 'confirmado' | 'anulado';
+  monto: number;       
+  sucursal_id?: number;
+  egreso_id?: number;
+  usuario_id?: number;
+  ruta_id?: number;
+  fecha_gasto?: string; 
+  descripcion?: string;
+  created_at?: string;
+  estado_egreso?: 'pendiente' | 'confirmado' | 'anulado';
 }
 
 export interface CajaDiario {
@@ -128,4 +129,36 @@ cerrarCajaDiaria(id: number, montoReal: number): Observable<any> {
     monto_final_real: montoReal
   });
 }
+
+aprobarEgresosCobrador(usuario_Id: number): Observable<any> {
+  // Limpiamos la URL base de barras finales y el endpoint de barras iniciales
+  const baseUrl = this.URL_EGRESO_OP.replace(/\/+$/, '');
+  const endpoint = `confirmarEgresosOperacion/${usuario_Id}`.replace(/^\/+/, '');
+  
+  const fullUrl = `${baseUrl}/${endpoint}`;
+  
+  return this.http.post<any>(fullUrl, {}).pipe(
+    catchError((error: HttpErrorResponse) => {
+      console.error('Error al confirmar egresos:', error);
+      return throwError(() => error);
+    })
+  );
+}
+createEgresoOperacion(egreso: EgresoOperacion): Observable<any> {
+    return this.http.post<any>(`${this.URL_EGRESO_OP}/createEgresoOperacion`, egreso).pipe(
+      catchError((error: HttpErrorResponse) => {
+        // Log para el desarrollador
+        console.error('Error en createEgresoOperacion:', error);
+        
+        // Propagamos el error para que el SnackBar del componente lo capture
+        return throwError(() => error);
+      })
+    );
+  }
+
+  getCajaDiariaAbiertaByUsuario(cobradorId: number): Observable<any> {
+    return this.http.get<any>(`${this.URL_CAJA}/getCajaDiariaAbiertaByUsuario/${ cobradorId}`);
+  }
+
+
 }

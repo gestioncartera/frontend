@@ -31,6 +31,12 @@ export class RutasService {
   return this.http.get<Rutas[]>(url);
 }
 
+ getRutascobro(idSucursal: number | string): Observable<Rutas[]> { 
+  const url = `${this.apiUrl}/getRutasCobros/${idSucursal}`;
+  
+  return this.http.get<Rutas[]>(url);
+}
+
   getRutasById(id: string): Observable<Rutas[]> {
     return this.http.get<Rutas[]>(`${this.apiUrl}/getRutaById/${id}`);
   } 

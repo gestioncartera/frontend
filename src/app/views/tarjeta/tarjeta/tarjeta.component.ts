@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit,NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -14,6 +14,7 @@ import { PrestamoService, PrestamoCobros, CobroDetalle } from '../../../services
 import { CobroService, CreateCobroDto } from '../../../services/cobro.service';
 import { AuthService } from '../../../services/auth.service';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
+ 
 
 interface Pago {
   fecha: string;
@@ -43,7 +44,7 @@ export class TarjetaComponent implements OnInit {
   // ============================
   // Estado UI
   // ============================
-  montoRecibido: number = 0;
+  montoRecibido: number | null = 0;
   prestamoId!: number;
   clienteId!: number;
   userId: number | null = null;
@@ -75,6 +76,7 @@ export class TarjetaComponent implements OnInit {
   pagos: Pago[] = [];
 
   constructor(
+    private ngZone: NgZone,
     private route: ActivatedRoute,
     private router: Router,
     private prestamoService: PrestamoService,
@@ -87,7 +89,7 @@ export class TarjetaComponent implements OnInit {
   ngOnInit(): void {
     // Obtener usuario autenticado
     const currentUser = this.authService.getCurrentUserValue();
-    const userId = currentUser?.id || (currentUser as any)?.usuario_id;
+    const userId = currentUser?.usuario_id || (currentUser as any)?.usuario_id;
     console.log('Usuario autenticado ID:', userId);   
     if (!currentUser || !userId) {
       this.snackBar.open('Debe iniciar sesión para realizar cobros', 'Cerrar', {
@@ -187,42 +189,47 @@ private guardarCobroConfirmado(): void {
   const cobroData: CreateCobroDto = {
     prestamo_id: this.prestamoId,
     usuario_id: this.userId!,
-    monto_cobrado: this.montoRecibido
+    monto_cobrado: this.montoRecibido || 0
   };
 
   this.cobroService.createCobro(cobroData).subscribe({
     next: (response: any) => {
-      const msg = response.message || response.msg || 'Cobro guardado exitosamente';
-      
-      this.snackBar.open(msg, 'Cerrar', {
-        duration: 2500,
-        verticalPosition: 'top',
-        horizontalPosition: 'center',
-        panelClass: ['success-snackbar']
-      });
-      
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000);
+      // Manejo de éxito...
+      this.snackBar.open('Cobro guardado con éxito', 'Cerrar', { duration: 3000, panelClass: ['success-snackbar'] });
+      setTimeout(() => window.location.reload(), 2000);
     },
-    error: (error) => {
-      // EXTRACCIÓN SEGÚN TU CONSOLA: error -> error -> error
+    error: (err) => {
+      console.error('DEBUG:', err);
+      
       let errorMsg = 'Error al guardar el cobro';
+ 
+      if (err.error) {
+        if (typeof err.error === 'string') {
+          errorMsg = err.error;
+        } else if (err.error.message) {
+          errorMsg = Array.isArray(err.error.message) 
+            ? err.error.message.join(', ') 
+            : err.error.message;
+        } else if (err.error.error) {
+          errorMsg = err.error.error;
+        } else if (err.error.msg) {
+          errorMsg = err.error.msg;
+        }
+      }   
+        
 
-      if (error.error && error.error.error) {
-        // Esto captura: "El préstamo tiene cobros pendientes anteriores"
-        errorMsg = error.error.error;
-      } else if (error.error?.message) {
-        errorMsg = error.error.message;
+      this.snackBar.open(`⚠️ ${errorMsg}`, 'Cerrar', {
+        duration: 10000, 
+        verticalPosition: 'bottom',
+          horizontalPosition: 'center',
+    panelClass: ['error-snackbar']
       }
-
-      this.snackBar.open(errorMsg, 'ENTENDIDO', {
-        duration: 5000,
-        verticalPosition: 'top', // Aparece arriba para que el cobrador lo vea rápido
-        horizontalPosition: 'center',
-        panelClass: ['error-snackbar']
-      });
+    
+    
+    
+    );
     }
+    
   });
 }
 

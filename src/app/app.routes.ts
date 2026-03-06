@@ -120,6 +120,10 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./views/tarjeta/routes').then((m) => m.routes),
       },
+      {
+        path: 'caja',
+        loadChildren: () => import('./views/caja/routes').then((m) => m.routes),
+      },
     ],
   },
   {

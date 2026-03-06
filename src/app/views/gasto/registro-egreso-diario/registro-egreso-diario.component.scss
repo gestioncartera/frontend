@@ -176,32 +176,104 @@ $danger-text: #991b1b;
   }
 }
 
-/* BOTONES */
+
+/* ==========================================================================
+   BOTONES Y ACCIONES
+   ========================================================================== */
 .actions-wrapper {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between; // "Limpiar" a la izquierda, el grupo a la derecha
   align-items: center;
   gap: 12px;
   margin-top: 1.5rem;
   padding-top: 1.5rem;
   border-top: 1px solid #f1f5f9;
 
+  // Contenedor interno para agrupar Aprobar y Guardar
+  .button-group-right {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
   .btn-submit {
     border-radius: 12px !important;
     height: 48px;
     padding: 0 24px !important;
     font-weight: 600;
-    background-color: $primary-blue !important;
+    transition: all 0.3s ease;
+    
     mat-icon { margin-right: 8px; font-size: 20px; }
     
+    // Variante Azul (Guardar/Adicionar)
+    &.btn-primary-blue {
+      background-color: $primary-blue !important;
+      color: white !important;
+    }
+
+    // Variante Verde (Aprobar)
+    &.btn-approve {
+      background-color: #10b981 !important; // Un verde esmeralda moderno
+      color: white !important;
+      
+      &:hover:not(:disabled) {
+        background-color: #059669 !important;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+      }
+    }
+
     &:disabled {
       background-color: #e2e8f0 !important;
+      color: #94a3b8 !important;
+      cursor: not-allowed;
     }
   }
 
   .btn-cancel {
     color: $text-soft !important;
     font-weight: 500;
+    border-radius: 10px;
+    
+    &:hover {
+      background-color: #f1f5f9;
+      color: $primary-dark !important;
+    }
+  }
+}
+
+.total-egresos-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 0 15px;
+  border-right: 2px solid $border-color; // Una línea divisoria sutil
+  margin-right: 5px;
+
+  .label {
+    font-size: 10px;
+    font-weight: 700;
+    color: $text-soft;
+    letter-spacing: 0.5px;
+  }
+
+  .value {
+    font-size: 16px;
+    font-weight: 800;
+    color: $danger-text; // Usamos el rojo definido en tus variables para egresos
+  }
+}
+
+// Ajuste para móviles
+@media (max-width: 850px) {
+  .button-group-right {
+    .total-egresos-badge {
+      border-right: none;
+      border-bottom: 1px solid $border-color;
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+      align-items: center;
+      width: 100%;
+    }
   }
 }
 

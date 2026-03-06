@@ -14,7 +14,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { SucursalContextService } from '../../../services/sucursal-context.service';
 import { CajaDiario, CajaDiarioService, EgresoOperacion, MovimientoCajadiario } from '../../../services/caja-diario..service';
 import { UsuarioService, Usuario } from '../../../services/usuario.service';
-
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
 interface Cobrador {
   id: number;
   nombre: string;
@@ -37,6 +38,7 @@ export class RegistroEgresoDiarioComponent implements OnInit {
   balanceDisponible: number = 0;
   cajaId: number | null = null;
   loading: boolean = false;
+  totalegresos: number = 0;
   
   // Lógica de Cobradores
   cobradores: Cobrador[] = [];
@@ -51,6 +53,7 @@ export class RegistroEgresoDiarioComponent implements OnInit {
     private fb: FormBuilder,
     private router: Router,
     private snackBar: MatSnackBar,
+    private dialog: MatDialog,
     private sucursalContextService: SucursalContextService,
     private cajaDiarioService: CajaDiarioService,
     private usuarioService: UsuarioService
@@ -78,6 +81,7 @@ export class RegistroEgresoDiarioComponent implements OnInit {
       next: (res: any) => {
         this.balanceDisponible = res?.monto_base_inicial || 0;
         this.cajaId = res?.caja_diaria_id || null;
+        this.totalegresos = res?.total_egresos || 0;
       console.log('Balance disponible cargado:', res); // Depuración
 
         // Actualizar el validador de monto máximo dinámicamente
@@ -200,4 +204,56 @@ export class RegistroEgresoDiarioComponent implements OnInit {
     this.nombreCobradorSeleccionado = '';
     this.dataSource.data = [];
   }
+
+  // Dentro de la clase RegistroEgresoDiarioComponent
+
+ get totalEgresos(): number {
+  return this.dataSource.data.reduce((acc, current) => {
+    // Forzamos la conversión a número para evitar el error TS2365
+    const monto = Number(current.monto) || 0;
+    return acc + monto;
+  }, 0);
+ }
+aprobarEgresos(): void {
+  if (!this.cobradorId) return;
+
+  // Abrimos tu shared confirm dialog
+  const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+    width: '400px',
+    data: {
+      title: 'Confirmar Aprobación',
+      message: `¿Está seguro de aprobar todos los egresos para ${this.nombreCobradorSeleccionado}? Esta acción no se puede deshacer.`,
+      confirmText: 'Sí, Aprobar',
+      cancelText: 'Cancelar',
+      color: 'primary',
+      icon: 'done_all',
+      type: 'success'
+    }
+  });
+
+  // Escuchamos la respuesta del diálogo
+  dialogRef.afterClosed().subscribe(result => {
+    if (result) {
+      this.ejecutarAprobacion();
+    }
+  });
+}
+
+private ejecutarAprobacion(): void {
+  this.loading = true;
+  this.cajaDiarioService.aprobarEgresosCobrador(this.cobradorId!).subscribe({
+    next: (res: any) => {
+      this.snackBar.open('✅ Egresos aprobados correctamente', 'Cerrar', { 
+        duration: 3000,
+        panelClass: ['success-snackbar'] 
+      });
+      this.refreshView();
+    },
+    error: (err) => {
+      this.loading = false;
+      const msg = err.error?.error || '❌ Error al aprobar egresos';
+      this.snackBar.open(msg, 'Cerrar', { duration: 5000 });
+    }
+  });
+}
 }

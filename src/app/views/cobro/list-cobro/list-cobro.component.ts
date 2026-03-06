@@ -53,9 +53,9 @@ export class ListCobroComponent implements OnInit {
   nombreCobrador: string = '';
   nombreRuta: string = '';
   rutaId: string | null = null;
-  totalRuta: string = '';
+  totalRuta: number = 0 ;
   recaudadoRuta: number = 0;
-  baseInicial: string = '0.00';
+  baseInicial: number = 0;
   recaudado: number = 0;
   egresos: number = 0; 
   
@@ -110,10 +110,10 @@ loadCobros() {
     next: (res: any) => {
       // 1. Extraer los datos según el formato de la imagen
       const rawCobros = this.isCobrosPorRuta ? res.cobros : res;
-
+        console.log('Respuesta del API:', res); // Para depuración y ajuste según el formato real 
       // 2. Si es por ruta, capturamos los totales que mencionas
       if (this.isCobrosPorRuta) {
-        this.baseInicial = res["Base Inicial"]; // Uso de corchetes por el espacio en el nombre
+        this.baseInicial = parseFloat(res.Base_Inicial) || 0;
         this.recaudado = res.recaudado;
         this.egresos = res.egresos;
         this.totalRuta = res.total;

@@ -10,24 +10,8 @@ export const navItems: INavData[] = [
     url: '/cambio-sucursal',
     iconComponent: { name: 'cil-settings' },
   },
-  /*
-{
-    name: 'Caja',
-    url: '/caja', // Prefijo del módulo o grupo
-    iconComponent: { name: 'cil-money' },
-    children: [
-      {
-        name: 'Apertura de Caja',
-        url: '/caja/apertura-caja',
-        icon: 'nav-icon-bullet',
-      },
-      {
-        name: 'Cierre de Caja',
-        url: '/caja/cierre-caja', // <--- Debe coincidir con el path en routes: 'cierre-caja'
-        icon: 'nav-icon-bullet',
-      },
-    ],
-  },*/
+   
+ 
    {
     name: 'Sucursales',
     url: '/sucursal',
@@ -41,10 +25,15 @@ export const navItems: INavData[] = [
     ],
   }, 
    {
-    name: 'Gastos',
+    name: 'Caja',
     url: '/gasto',
     iconComponent: { name: 'cil-calculator' },
     children: [
+       {
+        name: 'Cierre de Caja',
+        url: '/caja/cerrar-caja',
+        icon: 'nav-icon-bullet',
+      },
       {
         name: 'Gastos Sucursal',
         url: '/gasto/list-gasto',
@@ -55,6 +44,11 @@ export const navItems: INavData[] = [
         url: '/gasto/registro-egreso-diario',
         icon: 'nav-icon-bullet',
       },
+      {
+        name: 'Crear Gasto',
+        url: '/gasto/crear-gasto',
+        icon: 'nav-icon-bullet',
+      }
       /*
       {
         name: 'Registrar Egreso',

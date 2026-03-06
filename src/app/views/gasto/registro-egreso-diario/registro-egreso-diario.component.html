@@ -50,16 +50,36 @@
         </div>
 
         <div class="actions-wrapper">
-          <button mat-button type="button" class="btn-cancel" (click)="cancelar()">
-            Limpiar
-          </button>
-          <button mat-flat-button color="primary" type="submit" class="btn-submit" 
-                  [disabled]="egresoForm.invalid || !cobradorId || loading">
-            <mat-icon *ngIf="!loading">save</mat-icon>
-            <mat-spinner diameter="20" *ngIf="loading" class="btn-spinner"></mat-spinner>
-            {{ loading ? 'Procesando...' : (balanceDisponible === 0 ? 'Registrar Base' : 'Adicionar Base') }}
-          </button>
-        </div>
+  <button mat-button type="button" class="btn-cancel" (click)="cancelar()">
+    Limpiar
+  </button>
+
+  <div class="button-group-right">
+    
+    <div class="total-egresos-badge" *ngIf="dataSource.data.length > 0">
+      <span class="label">TOTAL EGRESOS:</span>
+      <span class="value">{{ totalEgresos | currency:'USD':'symbol':'1.2-2' }}</span>
+    </div>
+
+    <button mat-flat-button 
+            type="button" 
+            class="btn-submit btn-approve"
+            (click)="aprobarEgresos()"
+            [disabled]="!cobradorId || dataSource.data.length === 0 || loading">
+      <mat-icon>done_all</mat-icon>
+      Aprobar
+    </button>
+
+    <button mat-flat-button 
+            type="submit" 
+            class="btn-submit btn-primary-blue" 
+            [disabled]="egresoForm.invalid || !cobradorId || loading">
+      <mat-icon *ngIf="!loading">save</mat-icon>
+      <mat-spinner diameter="20" *ngIf="loading" class="btn-spinner"></mat-spinner>
+      {{ loading ? 'Procesando...' : (balanceDisponible === 0 ? 'Registrar Base' : 'Adicionar Base') }}
+    </button>
+  </div>
+</div>
       </form>
 
       <div class="history-section" *ngIf="cobradorId">

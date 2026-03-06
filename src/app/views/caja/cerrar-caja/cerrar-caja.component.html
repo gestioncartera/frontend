@@ -1,0 +1,108 @@
+<c-container fluid class="fade-in pb-4">
+  <c-row class="mb-2">
+    <c-col xs="12">
+      <c-card class="shadow-sm border-top-info border-top-3">
+        <c-card-body class="py-2 px-3">
+          <div class="row align-items-center">
+            <div class="col-auto d-none d-md-block">
+              <div class="icon-avatar-small bg-light text-primary">👤</div>
+            </div>
+            <div class="col">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <label cLabel for="selectCobrador" class="font-bold text-muted x-small text-uppercase mb-0">
+                  Responsable de Ruta <span class="ms-2 text-dark opacity-75">— {{ fechaActual | date:'dd/MM/yyyy' }}</span>
+                </label>
+                <span *ngIf="cobradorId" class="badge bg-light text-primary border shadow-sm x-small">ID: {{ cajaDiariaId }}</span>
+              </div>
+              <select cSelect id="selectCobrador" [(ngModel)]="cobradorId" (change)="onCobradorChange()" class="form-select-sm shadow-sm font-bold">
+                <option [value]="null" disabled selected>Seleccione cobrador...</option>
+                <option *ngFor="let c of listaCobradores" [value]="c.id">{{ c.nombre }} </option>
+              </select>
+            </div>
+          </div>
+        </c-card-body>
+      </c-card>
+    </c-col>
+  </c-row>
+
+  <c-row *ngIf="tieneCobrosPendientes && cobradorId">
+    <c-col xs="12">
+      <div class="alert alert-danger py-1 px-3 mb-2 d-flex align-items-center shadow-sm" style="font-size: 0.75rem;">
+       <span class="me-2">⚠️</span>
+        <span *ngIf="cobrosPendientes > 0" class="me-1">
+          Existen {{ cobrosPendientes }} cobros pendientes.
+        </span>
+
+        <span *ngIf="egresosPendientes > 0">
+          Existen {{ egresosPendientes }} gastos sin liquidar.
+        </span>
+      </div>
+    </c-col>
+  </c-row>
+
+  <c-row *ngIf="cobradorId" class="g-2">
+    <c-col xs="12" md="7">
+      <c-card class="shadow-sm border-0 h-100">
+        <c-card-header class="bg-dark text-white py-1 px-3">
+          <strong class="x-small text-uppercase">Resumen de Operaciones</strong>
+        </c-card-header>
+        <c-card-body class="p-0">
+          <table cTable [striped]="true" class="mb-0 small align-middle">
+            <tbody>
+              <tr>
+                <td class="ps-3 py-2">Monto Apertura</td>
+                <td class="text-end pe-3 font-bold text-primary">{{ montoApertura | currency }}</td>
+              </tr>
+              <tr>
+                <td class="ps-3 py-2">(+) Recaudos del Día</td>
+                <td class="text-end pe-3 font-bold text-success">{{ totalCobrosDia | currency }}</td>
+              </tr>
+              <tr>
+                <td class="ps-3 py-2">(-) Gastos / Vales</td>
+                <td class="text-end pe-3 font-bold text-danger">{{ totalGastosDia | currency }}</td>
+              </tr>
+              <tr class="table-info font-bold">
+                <td class="ps-3 py-2 text-uppercase x-small">Monto Esperado</td>
+                <td class="text-end pe-3" style="font-size: 1rem;">{{ montoEsperado | currency }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </c-card-body>
+      </c-card>
+    </c-col>
+
+    <c-col xs="12" md="5">
+      <c-card class="shadow-sm border-top-primary border-top-3 h-100">
+        <c-card-body class="p-2 d-flex flex-column justify-content-between">
+          <div class="text-center">
+            <label class="font-bold text-muted x-small text-uppercase mb-1 d-block">Efectivo Físico Entregado</label>
+            
+            <div class="input-money-compact mb-2">
+              <span class="currency-label-sm">$</span>
+              <input cFormControl id="montoReal" type="number" [(ngModel)]="montoReal" (input)="actualizarDiferencia()" 
+                     class="input-clean-sm" placeholder="0.00" />
+            </div>
+
+            <div class="diff-mini p-1 rounded border mb-2 transition-all" 
+                 [ngClass]="diferencia >= 0 ? 'bg-light' : 'bg-danger text-white border-danger shadow-sm'">
+              <span class="x-small text-uppercase opacity-75 d-block" style="font-size: 0.6rem;">
+                {{ diferencia < 0 ? 'Faltante' : 'Diferencia' }}
+              </span>
+              <strong class="d-block" style="font-size: 1.1rem;">{{ diferencia | currency }}</strong>
+            </div>
+          </div>
+
+          <div class="d-grid">
+            <button cButton [color]="tieneCobrosPendientes ? 'secondary' : 'primary'" (click)="confirmarCierre()" 
+                    [disabled]="tieneCobrosPendientes || !cobradorId" class="py-2 font-bold text-uppercase btn-sm shadow-sm">
+              {{ tieneCobrosPendientes ? 'Pendientes' : 'Finalizar Cierre' }}
+            </button>
+            <p *ngIf="diferencia < 0" class="text-center text-danger font-bold mt-1 mb-0" style="font-size: 0.6rem;">
+              * Justificar faltante obligatorio
+            </p>
+          </div>
+        </c-card-body>
+      </c-card>
+    </c-col>
+  </c-row>
+</c-container>

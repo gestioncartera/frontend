@@ -74,43 +74,24 @@ export class DefaultLayoutComponent implements OnInit {
           iconComponent: { name: 'cil-settings' },
         },
         {
-          name: 'Cobros',
-          url: '/cobro',
+          name: 'Registro Cobro',
+          url: '/cobro/crear-cobro',
           iconComponent: { name: 'cil-bell' },
-          children: [
-            {
-              name: 'Registro Cobro',
-              url: '/cobro/crear-cobro',
-              icon: 'nav-icon-bullet',
-            }
-          ]
+           
         },
+        
         {
-          name: 'Caja',
-          url: '/caja',
-          iconComponent: { name: 'cil-money' },
-          children: [
-            {
-              name: 'Cierre de Caja',
-              url: '/caja/cierre-caja',
-              icon: 'nav-icon-bullet',
-            },
-          ],
-        },
-        {
-    name: 'Préstamos',
-    url: '/prestamo',
-    iconComponent: { name: 'cil-chart-pie' },
-    children: [      
-      {
-        name: 'Crear Préstamo',
-        url: '/prestamo/crear-prestamo',
-        icon: 'nav-icon-bullet',
-      },
-       
-     
-       ],
+           name: 'Crear Préstamo',
+              url: '/prestamo/crear-prestamo',
+          iconComponent: { name: 'cil-chart-pie' },
+           
        }, 
+       {
+      name: 'Crear Gasto',
+      url: '/gasto/crear-gasto',
+      iconComponent: { name: 'cil-calculator' },    
+     },
+
       ];
     }
     console.log('Usuario no es cobrador, mostrando menú de admin.');

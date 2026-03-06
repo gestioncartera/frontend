@@ -70,7 +70,7 @@ export class RegistroEgresoSucComponent implements OnInit {
 onSubmit(): void {
   if (this.egresoForm.valid && this.sucursalId) {
     const currentUser = this.authService.getCurrentUser();
-    const usuarioId = currentUser?.id;
+    const usuarioId = currentUser?.usuario_id;
 
     if (!usuarioId) {
       this.snackBar.open('Error: No se pudo identificar al usuario. Inicie sesión nuevamente.', 'Cerrar', { duration: 3000 });

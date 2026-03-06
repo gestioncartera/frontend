@@ -11,6 +11,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ClienteService, Cliente } from '../../../services/cliente.service';
 import { ReplaySubject, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -34,7 +35,8 @@ import Swal from 'sweetalert2';
     MatDatepickerModule,
     MatNativeDateModule,
     MatIconModule,
-    NgxMatSelectSearchModule
+    NgxMatSelectSearchModule,
+    MatSnackBarModule
   ],
   templateUrl: './crear-prestamo.component.html',
   styleUrls: ['./crear-prestamo.component.scss'],
@@ -67,7 +69,8 @@ export class CrearPrestamoComponent implements OnInit, OnDestroy {
     private prestamoService: PrestamoService,
     private tipoPrestamoService: TipoPrestamoService,
     private sucursalContextService: SucursalContextService,
-    private authService: AuthService
+    private authService: AuthService,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit() {
@@ -192,7 +195,7 @@ const fechaFormateada = this.fecha.toISOString().split('T')[0];
 
   // Obtener usuario actual de forma robusta (id o usuario_id)
   const user = this.authService.getCurrentUserValue();
-  const userId = user?.id || (user as any)?.usuario_id || 0;
+  const userId = user?.usuario_id || (user as any)?.usuario_id || 0;
 
   const datosPrestamo: Partial<Prestamos> = {
     cliente_id: this.clienteSeleccionado.cliente_id, 
@@ -212,17 +215,26 @@ const fechaFormateada = this.fecha.toISOString().split('T')[0];
 
   // Llamada al servicio...
   this.prestamoService.createPrestamo(datosPrestamo).subscribe({
-    next: () => {
-      Swal.fire({
-        title: 'Éxito',
-        text: 'Préstamo creado!',
-        icon: 'success',
-        confirmButtonText: 'Aceptar'
-      }).then(() => {
-        this.cancelar();
+    next: (res: any) => {
+      const mensaje = res.message || 'Préstamo creado exitosamente';
+      this.snackBar.open(mensaje, 'Aceptar', {
+        duration: 3000,
+        verticalPosition: 'top',
+        horizontalPosition: 'right'
       });
+      this.cancelar();
     },
-    error: (err) => console.error('Error:', err)
+    error: (err) => {
+      console.error('Error:', err);
+      const mensaje = err.message || 'Error al crear el préstamo';
+     this.snackBar.open(`⚠️ ${err.message}`, 'Entendido', {
+        duration: 3000, 
+        horizontalPosition: 'center',
+        verticalPosition: 'bottom',
+        panelClass: ['error-snackbar']
+      
+      });
+    }
   });
 }
  

@@ -58,3 +58,35 @@ body {
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html {
+  @include mat.theme((
+    color: (
+      primary: mat.$azure-palette,
+      tertiary: mat.$blue-palette,
+    ),
+    typography: Roboto,
+    density: 0,
+  ));
+
+  // AGREGA ESTA LÍNEA para asegurar que el SnackBar tenga estilos
+  @include mat.snack-bar-theme((
+    container-color: var(--mat-sys-inverse-surface),
+    text-label-color: var(--mat-sys-inverse-on-surface),
+  ));
+}
+
+/* Clases personalizadas para los colores de éxito y error */
+.error-snackbar {
+  background-color: #d32f2f !important; /* Rojo */
+  color: white !important;
+  --mdc-snackbar-container-color: #d32f2f;
+  --mdc-snackbar-label-text-color: white;
+  --mat-snack-bar-button-color: white;
+}
+
+
+.success-snackbar {
+  --mdc-snackbar-container-color: #4caf50;
+  --mdc-snackbar-label-text-color: white;
+  --mat-snack-bar-button-color: white;
+}

@@ -1,14 +1,21 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+
+// Material Imports
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+
+// Services & Interfaces
+import { SucursalContextService } from '../../../services/sucursal-context.service';
+import { CajaDiarioService, EgresoOperacion } from '../../../services/caja-diario..service';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-crear-gasto',
@@ -22,63 +29,122 @@ import { MatNativeDateModule } from '@angular/material/core';
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
-    MatSelectModule,
     MatButtonModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
+    MatIconModule,
+    MatSnackBarModule,
+    MatProgressSpinnerModule
   ],
 })
-export class CrearGastoComponent {
-  cliente_id: string = '';
-  ruta_id: string = '';
+export class CrearGastoComponent implements OnInit {
+  // Variables de formulario
   concepto: string = '';
-  fecha: Date | null = null;
-  valor: number | null = null;
-  descripcion: string = '';
+  valor: number | null = 0; // Inicializado en 0 para la lógica de UX en el template
+  
+  // Estado y Contexto
+  sucursalId: number | null = null;
+  loading: boolean = false;
+  usuarioId: number = 0; // Placeholder, deberías obtener esto de tu servicio de autenticación
 
-  // Listas para los selectores (deberían cargarse desde un servicio)
-  clientes: any[] = [
-    { id: 1, nombre: 'Juan Pérez' },
-    { id: 2, nombre: 'María López' },
-    { id: 3, nombre: 'Carlos Rodríguez' },
-  ];
+  constructor(
+    private router: Router,
+    private sucursalContextService: SucursalContextService,
+    private cajaDiarioService: CajaDiarioService,
+    private snackBar: MatSnackBar,
+    private authService: AuthService
+  ) {}
 
-  rutas: any[] = [
-    { id: 1, nombre: 'Ruta Centro' },
-    { id: 2, nombre: 'Ruta Norte' },
-    { id: 3, nombre: 'Ruta Sur' },
-  ];
+  ngOnInit(): void {
+    // 1. Obtener la sucursal activa desde el contexto global
+    this.sucursalId = this.sucursalContextService.getSucursalId();
+    
+    // 2. Seguridad: Si no hay sucursal, no permitimos el registro
+    if (!this.sucursalId) {
+      this.snackBar.open('⚠️ No hay una sucursal seleccionada. Redirigiendo...', 'Cerrar', { 
+        duration: 3000,
+        verticalPosition: 'bottom' 
+      });
+      this.router.navigate(['/dashboard']);
+    }
 
-  constructor(private router: Router) {}
+    // Obtener usuario logueado
+    const currentUser = this.authService.getCurrentUserValue();
+    if (currentUser) {
+      console.log('Usuario actual en CrearGastoComponent:', currentUser);
+      this.usuarioId = currentUser.usuario_id
+;
+    }
+  }
 
-  crear() {
-    // Validación mínima
-    if (!this.cliente_id || !this.ruta_id || !this.concepto || !this.fecha || !this.valor) {
-      window.alert('Completa todos los campos obligatorios.');
+  /**
+   * Ejecuta el registro del gasto operativo
+   */
+  crear(): void {
+    // Validación de campos obligatorios y lógica de negocio
+    if (!this.concepto.trim()) {
+      this.mostrarMensaje('⚠️ El concepto es obligatorio', 'error-snackbar');
       return;
     }
 
-    // Aquí iría la lógica real de creación (API). Por ahora guardamos en localStorage como demo.
-    const gasto = {
-      cliente_id: this.cliente_id,
-      ruta_id: this.ruta_id,
-      concepto: this.concepto,
-      fecha: this.fecha,
-      valor: this.valor,
-      descripcion: this.descripcion,
-      createdAt: new Date().toISOString(),
+    if (!this.valor || this.valor <= 0) {
+      this.mostrarMensaje('⚠️ El monto debe ser mayor a cero', 'error-snackbar');
+      return;
+    }
+
+    this.loading = true;
+
+    // Preparar el objeto según la interfaz del servicio
+    const nuevoGasto: EgresoOperacion = { 
+      concepto: this.concepto.trim(),
+      monto: Number(this.valor),
+      usuario_id: this.usuarioId
+      // Asumiendo que no se asigna ruta para gastos operativos
+      // fecha_gasto: new Date().toISOString() // Descomentar si el backend lo requiere
     };
-    const existentes = JSON.parse(localStorage.getItem('gastos') || '[]');
-    existentes.push(gasto);
-    localStorage.setItem('gastos', JSON.stringify(existentes));
-    // Regresar a la lista de gastos
+    console.log('Datos a enviar para nuevo gasto:', nuevoGasto);
+
+    // Llamada al servicio HTTP
+    this.cajaDiarioService.createEgresoOperacion(nuevoGasto).subscribe({
+      next: (res) => {
+        this.loading = false;
+        this.mostrarMensaje(res.message || '✅ Gasto registrado correctamente', 'success-snackbar');
+        this.router.navigate(['/gasto/list-gasto']);
+      },
+      error: (err) => {
+        this.loading = false;
+        
+        // Manejo de error robusto (Captura respuestas JSON o HTML por fallos de ruta/servidor)
+        let mensajeError = 'No se pudo completar el registro';
+        
+        if (err.status === 404) {
+          mensajeError = 'Error 404: La ruta del servidor no fue encontrada.';
+        } else if (typeof err.error === 'string' && err.error.includes('<!DOCTYPE html>')) {
+          mensajeError = 'El servidor respondió con un error de página (HTML).';
+        } else {
+          mensajeError = err.error?.error || err.error?.message || mensajeError;
+        }
+
+        this.mostrarMensaje(`❌ ${mensajeError}`, 'error-snackbar', 6000);
+        console.error('Error detallado:', err);
+      }
+    });
+  }
+
+  /**
+   * Regresa a la lista de gastos sin guardar cambios
+   */
+  cancelar(): void {
     this.router.navigate(['/gasto/list-gasto']);
   }
 
-  cancelar() {
-    this.router.navigate(['/gasto/list-gasto']);
+  /**
+   * Helper para mostrar SnackBars con estilos consistentes
+   */
+  private mostrarMensaje(mensaje: string, clase: string, duracion: number = 3000): void {
+    this.snackBar.open(mensaje, 'Cerrar', {
+      duration: duracion,
+      panelClass: [clase],
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom'
+    });
   }
 }
-
-
-

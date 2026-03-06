@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { catchError, Observable, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 // Interface para crear cobro
@@ -73,9 +73,15 @@ export class CobroService {
     return this.http.get<Cobro[]>(`${this.apiUrl}/getClientesByRuta/1`);
   }
 
-  createCobro(cobro: CreateCobroDto): Observable<Cobro> {
-    return this.http.post<Cobro>(`${this.apiUrl}/createCobro`, cobro);
-  }
+  createCobro(cobro: CreateCobroDto): Observable<any> {
+  return this.http.post<any>(`${this.apiUrl}/createCobro`, cobro).pipe(
+    catchError((error) => {
+      // Retornamos el error tal cual para que el componente lo maneje,
+      // o podemos pre-procesarlo aquí.
+      return throwError(() => error);
+    })
+  );
+}
 
   getCobrosByRutaId(rutaId: number | string): Observable<Cobro[]> {
     return this.http.get<Cobro[]>(`${this.apiUrl}/getCobrosByRutaid/${rutaId}`);

@@ -1,124 +1,119 @@
 <div class="container cobro-container">
 
-  <!-- Botón de retorno -->
   <div class="header-actions">
     <button mat-raised-button color="primary" (click)="volver()">
       <mat-icon>arrow_back</mat-icon> Volver
     </button>
   </div>
 
-  <!-- Indicador de carga -->
   <div *ngIf="isLoading" style="text-align: center; padding: 40px;">
-    <mat-icon style="font-size: 48px; width: 48px; height: 48px;">refresh</mat-icon>
-    <p>Cargando datos...</p>
+    <mat-icon style="font-size: 48px; width: 48px; height: 48px;" class="ani-spin">refresh</mat-icon>
+    <p>Cargando datos del préstamo...</p>
   </div>
 
-  <!-- Contenido principal -->
   <div *ngIf="!isLoading">
-  <!-- =========================
-       ENCABEZADO CLIENTE
-  ========================== -->
-  <div class="header-blue">
-    <p>Cliente: <strong>{{ cliente.nombre }}</strong></p>
-    <p>Préstamo: <strong>{{ cliente.prestamoId }}</strong></p>
-    <p>Ruta: <strong>{{ cliente.ruta }}</strong></p>
+    
+    <div class="header-blue">
+      <p>Cliente: <strong>{{ cliente.nombre }}</strong></p>
+      <p>Préstamo: <strong>{{ cliente.prestamoId }}</strong></p>
+      <p>Ruta: <strong>{{ cliente.ruta }}</strong></p>
+    </div>
+
+    <mat-card class="resumen-card">
+      <div class="resumen-header">Resumen del Cobro</div>
+      <div class="resumen-body">
+        <div class="row">
+          <span>Cuota sugerida:</span>
+          <strong>{{ resumen.cuotaDelDia | currency }}</strong>
+        </div>
+        
+        <hr />
+        
+        <div class="row">
+          <span>Saldo del Préstamo:</span>
+          <strong class="text-danger">{{ resumen.saldoTotalPrestamo | currency }}</strong>
+        </div>
+      </div>
+    </mat-card>
+
+    <mat-card class="list-card">
+      <div class="card-title-internal">Historial de Pagos</div>
+
+      <div class="scroll-container">
+        <table mat-table [dataSource]="pagos" class="full-width-table">
+
+          <ng-container matColumnDef="fecha">
+            <th mat-header-cell *matHeaderCellDef>Fecha</th>
+            <td mat-cell *matCellDef="let p">{{ p.fecha }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="abono">
+            <th mat-header-cell *matHeaderCellDef>Abono</th>
+            <td mat-cell *matCellDef="let p" class="texto-verde">
+              {{ p.abono | currency }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="estado">
+            <th mat-header-cell *matHeaderCellDef>Estado</th>
+            <td mat-cell *matCellDef="let p">
+              <span
+                class="estado-badge"
+                [ngClass]="{
+                  'estado-pagado': p.estado?.toUpperCase() === 'PAGADO',
+                  'estado-pendiente': p.estado?.toUpperCase() === 'PENDIENTE',
+                  'estado-parcial': p.estado?.toUpperCase() === 'PARCIAL'
+                }">
+                {{ p.estado | uppercase }}
+              </span>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </div>
+    </mat-card>
+
+    <mat-card class="payment-card mt-3">
+      <div class="p-3">
+
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Monto Recibido</mat-label>
+          <span matPrefix>$&nbsp;</span>
+          <input
+            matInput
+            type="number"
+            name="montoRecibido"
+            [(ngModel)]="montoRecibido"
+            #montoInput="ngModel"
+            placeholder="0.00"
+            (focus)="montoRecibido === 0 ? montoRecibido = null : null"
+            (blur)="montoRecibido === null ? montoRecibido = 0 : null"
+            required
+          />
+          
+          <mat-hint *ngIf="montoRecibido && montoRecibido > 0 && montoRecibido <= resumen.saldoTotalPrestamo">
+            Saldo restante: {{ (resumen.saldoTotalPrestamo - montoRecibido) | currency }}
+          </mat-hint>
+
+          <mat-error *ngIf="montoRecibido && montoRecibido > resumen.saldoTotalPrestamo">
+            El monto no puede exceder el saldo de {{ resumen.saldoTotalPrestamo | currency }}
+          </mat-error>
+        </mat-form-field>
+
+        <button
+          mat-raised-button
+          color="primary"
+          class="w-100 btn-big mt-2"
+          (click)="guardarCobro()"
+          [disabled]="!montoRecibido || montoRecibido <= 0 || montoRecibido > resumen.saldoTotalPrestamo">
+          <mat-icon>{{ (montoRecibido || 0) > resumen.saldoTotalPrestamo ? 'warning' : 'save' }}</mat-icon>
+          {{ (montoRecibido || 0) > resumen.saldoTotalPrestamo ? 'VALOR EXCEDIDO' : 'GUARDAR COBRO' }}
+        </button>
+
+      </div>
+    </mat-card>
+
   </div>
-
-  <!-- =========================
-       RESUMEN DEL COBRO
-  ========================== -->
-  <mat-card class="resumen-card">
-    <div class="resumen-header">Resumen del Cobro</div>
-    <div class="resumen-body">
-      <div class="row">
-        <span>Cuota sugerida:</span>
-        <strong>{{ resumen.cuotaDelDia | currency }}</strong>
-      </div>
-       
-      <hr />
-      <div class="row">
-        <span>Saldo del Préstamo:</span>
-        <strong>{{ resumen.saldoTotalPrestamo | currency }}</strong>
-      </div>
-    </div>
-  </mat-card>
-
-  <!-- =========================
-       REGISTRO DE PAGOS
-  ========================== -->
-  <mat-card class="list-card">
-    <div class="card-title-internal">Registro de Pagos</div>
-
-    <div class="scroll-container">
-      <table mat-table [dataSource]="pagos" class="full-width-table">
-
-        <!-- Fecha -->
-        <ng-container matColumnDef="fecha">
-          <th mat-header-cell *matHeaderCellDef>Fecha</th>
-          <td mat-cell *matCellDef="let p">
-            {{ p.fecha }}
-          </td>
-        </ng-container>
-
-        <!-- Abono -->
-        <ng-container matColumnDef="abono">
-          <th mat-header-cell *matHeaderCellDef>Abono</th>
-          <td mat-cell *matCellDef="let p" class="texto-verde">
-            {{ p.abono | currency }}
-          </td>
-        </ng-container>
-
-        <!-- Estado -->
-        <ng-container matColumnDef="estado">
-          <th mat-header-cell *matHeaderCellDef>Estado</th>
-          <td mat-cell *matCellDef="let p">
-            <span
-              class="estado-badge"
-              [ngClass]="{
-                'estado-pagado': p.estado?.toUpperCase() === 'PAGADO',
-                'estado-pendiente': p.estado?.toUpperCase() === 'PENDIENTE',
-                'estado-parcial': p.estado?.toUpperCase() === 'PARCIAL'
-              }">
-              {{ p.estado | uppercase }}
-            </span>
-          </td>
-        </ng-container>
-
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-      </table>
-    </div>
-  </mat-card>
-
-  <!-- =========================
-       REGISTRAR PAGO
-  ========================== -->
-  <mat-card class="payment-card mt-3">
-    <div class="p-3">
-
-      <mat-form-field appearance="outline" class="w-100">
-        <mat-label>Monto Recibido</mat-label>
-        <span matPrefix>$&nbsp;</span>
-        <input
-          matInput
-          type="number"
-          [(ngModel)]="montoRecibido"
-          placeholder="Ingrese el monto" />
-      </mat-form-field>
-
-      <button
-        mat-raised-button
-        color="primary"
-        class="w-100 btn-big"
-        (click)="guardarCobro()"
-        [disabled]="montoRecibido <= 0">
-        <mat-icon>save</mat-icon>
-        GUARDAR COBRO
-      </button>
-
-    </div>
-  </mat-card>
-
-  </div> <!-- Fin contenido principal -->
-
 </div>

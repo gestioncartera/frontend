@@ -1,0 +1,51 @@
+.x-small { font-size: 0.7rem; letter-spacing: 0.4px; }
+.font-bold { font-weight: 700; }
+
+.icon-avatar-small {
+  width: 30px; height: 30px;
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.85rem;
+}
+
+/* Input Compacto al nivel de la tabla */
+.input-money-compact {
+  display: flex;
+  background: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  overflow: hidden;
+  height: 38px; /* Misma altura que una fila de tabla */
+
+  .currency-label-sm {
+    background: #321fdb;
+    color: white;
+    padding: 0 12px;
+    font-size: 1rem;
+    font-weight: bold;
+    display: flex; align-items: center;
+  }
+
+  .input-clean-sm {
+    flex: 1;
+    border: none;
+    font-size: 1.1rem;
+    padding: 0 10px;
+    text-align: right;
+    font-weight: 700;
+    outline: none !important;
+    &:focus { background: #fdfdfd; }
+  }
+}
+
+.diff-mini {
+  min-height: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Quitar flechas de input number */
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+  -webkit-appearance: none; margin: 0;
+}

@@ -1,54 +1,62 @@
-<div class="card-container shadow p-4 mx-auto mt-4">
-  <h3 class="mb-4">Crear Nueva Sucursal</h3>
-
-  <form (ngSubmit)="crear()">
-    <div class="mb-3">
-      <label class="form-label fw-semibold">Nombre de la Sucursal</label>
-      <input
-        class="form-control"
-        [(ngModel)]="nombre"
-        name="nombre"
-        placeholder="Ej: Sucursal Centro"
-        required
-      />
+<div class="main-page-container fade-in">
+  <mat-card class="modern-card">
+    
+    <div class="card-header-premium">
+      <div class="header-content">
+        <div class="icon-box">
+          <mat-icon>storefront</mat-icon>
+        </div>
+        <div class="title-group">
+          <h1 class="main-title">Nueva Sucursal</h1>
+          <p class="sub-title">Configuración de punto de recaudo</p>
+        </div>
+      </div>
     </div>
 
-    <div class="mb-3">
-      <label class="form-label fw-semibold">Dirección</label>
-      <input
-        class="form-control"
-        [(ngModel)]="direccion"
-        name="direccion"
-        placeholder="Ej: Cra 10 #20-30"
-        required
-      />
-    </div>
+    <mat-card-content class="form-content-area">
+      <form (ngSubmit)="crear()" class="form-grid">
+        
+        <mat-form-field appearance="outline" class="w-100 custom-field">
+          <mat-label>Nombre de la Sucursal</mat-label>
+          <mat-icon matPrefix>business</mat-icon>
+          <input matInput [(ngModel)]="nombre" name="nombre" placeholder="Ej: Sucursal Norte" required />
+        </mat-form-field>
 
-    <div class="mb-3">
-      <label class="form-label fw-semibold">Teléfono</label>
-      <input
-        class="form-control"
-        [(ngModel)]="telefono"
-        name="telefono"
-        placeholder="Ej: 300 123 4567"
-        required
-      />
-    </div>
+        <mat-form-field appearance="outline" class="w-100 custom-field">
+          <mat-label>Dirección</mat-label>
+          <mat-icon matPrefix>location_on</mat-icon>
+          <input matInput [(ngModel)]="direccion" name="direccion" placeholder="Calle 10 #20..." required />
+        </mat-form-field>
 
-    <div class="mb-3">
-      <label class="form-label fw-semibold">Estado</label>
-      <select class="form-control" [(ngModel)]="estado" name="estado">
-        <option value="ACTIVA">Activa</option>
-        <option value="INACTIVA">Inactiva</option>
-        <option value="MANTENIMIENTO">Mantenimiento</option>
-      </select>
-    </div>
+        <div class="field-row-compact">
+          <mat-form-field appearance="outline" class="flex-2 custom-field">
+            <mat-label>Teléfono</mat-label>
+            <mat-icon matPrefix>phone</mat-icon>
+            <input matInput [(ngModel)]="telefono" name="telefono" placeholder="300 000 0000" required />
+          </mat-form-field>
 
-    <div class="mt-4 d-flex gap-2">
-      <button type="submit" class="btn btn-primary flex-grow-1 py-2">Crear Sucursal</button>
-      <button type="button" class="btn btn-outline-secondary flex-grow-1 py-2" (click)="cancelar()">
-        Cancelar
-      </button>
-    </div>
-  </form>
+          <mat-form-field appearance="outline" class="flex-1 custom-field">
+            <mat-label>Estado</mat-label>
+            <mat-select [(ngModel)]="estado" name="estado">
+              <mat-option value="ACTIVA">Activa</mat-option>
+              <mat-option value="INACTIVA">Inactiva</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="form-actions-bar">
+          <button mat-button type="button" class="btn-cancel-soft" (click)="cancelar()">
+            Cancelar
+          </button>
+          
+          <button mat-flat-button class="btn-primary-gradient" type="submit" [disabled]="loading">
+            <mat-icon *ngIf="!loading">save</mat-icon>
+            <mat-spinner diameter="18" *ngIf="loading"></mat-spinner>
+            <span>{{ loading ? 'Procesando...' : 'Guardar Sucursal' }}</span>
+          </button>
+        </div>
+
+      </form>
+    </mat-card-content>
+  </mat-card>
 </div>

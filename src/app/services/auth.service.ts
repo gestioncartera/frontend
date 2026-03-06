@@ -6,7 +6,7 @@ import { environment } from '../../environments/environment';
 import { SucursalContextService } from './sucursal-context.service';
 
 export interface Usuario {
-  id: number;
+  usuario_id: number  ;
   nombre: string;
   email: string;
   tipoUsuarioId: number;
@@ -41,10 +41,9 @@ export class AuthService {
   // Modo local para desarrollo (cambiar a false cuando la API esté lista)
   private USE_LOCAL_AUTH = false;
 
-  // Usuarios de prueba para desarrollo local
   private mockUsers = [
     {
-      id: 1,
+      usuario_id: 1,
       nombre: 'Administrador',
       email: 'admin@test.com',
       password: '123456',
@@ -53,7 +52,7 @@ export class AuthService {
       sucursalId: 1
     },
     {
-      id: 2,
+      usuario_id: 2,
       nombre: 'Cobrador 1',
       email: 'cobrador@test.com',
       password: '123456',
@@ -62,15 +61,16 @@ export class AuthService {
       sucursalId: 1
     },
     {
-      id: 3,
+      usuario_id: 3,
       nombre: 'Juan Pérez',
       email: 'juan@test.com',
       password: '123456',
       tipoUsuarioId: 2,
       tipoUsuario: 'Cobrador',
-      sucursalId: 2
+      sucursalId: 1
     }
   ];
+
 
   constructor(
     private http: HttpClient,
@@ -142,7 +142,7 @@ export class AuthService {
     }
 
     const newUser = {
-      id: this.mockUsers.length + 1,
+      usuario_id: this.mockUsers.length + 1,
       nombre: data.nombre,
       email: data.email,
       password: data.password,

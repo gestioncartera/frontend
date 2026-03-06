@@ -1,71 +1,74 @@
-<mat-card class="period-card">
-  <mat-card-title>
-    Crear Nuevo Gasto
-  </mat-card-title>
-
-  <form class="period-form">
-
-    <!-- Cliente -->
-    <mat-form-field appearance="outline">
-      <mat-label>Cliente</mat-label>
-      <mat-select [(ngModel)]="cliente_id" name="cliente_id" required>
-        <mat-option value="">Seleccione un cliente</mat-option>
-        <mat-option *ngFor="let cliente of clientes" [value]="cliente.id">
-          {{ cliente.nombre }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <!-- Ruta -->
-    <mat-form-field appearance="outline">
-      <mat-label>Ruta</mat-label>
-      <mat-select [(ngModel)]="ruta_id" name="ruta_id" required>
-        <mat-option value="">Seleccione una ruta</mat-option>
-        <mat-option *ngFor="let ruta of rutas" [value]="ruta.id">
-          {{ ruta.nombre }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <!-- Concepto -->
-    <mat-form-field appearance="outline">
-      <mat-label>Concepto</mat-label>
-      <input matInput [(ngModel)]="concepto" name="concepto" placeholder="Ej: Combustible" required />
-    </mat-form-field>
-
-    <!-- Fecha -->
-    <mat-form-field appearance="outline">
-      <mat-label>Fecha</mat-label>
-      <input matInput [matDatepicker]="picker" [(ngModel)]="fecha" name="fecha" required />
-      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-      <mat-datepicker #picker></mat-datepicker>
-    </mat-form-field>
-
-    <!-- Valor -->
-    <mat-form-field appearance="outline">
-      <mat-label>Valor</mat-label>
-      <input matInput type="number" [(ngModel)]="valor" name="valor" placeholder="Ingrese el valor" required />
-    </mat-form-field>
-
-    <!-- Descripción -->
-    <mat-form-field appearance="outline">
-      <mat-label>Descripción</mat-label>
-      <textarea matInput [(ngModel)]="descripcion" name="descripcion" placeholder="Descripción detallada del gasto" rows="3"></textarea>
-    </mat-form-field>
-
-    <!-- Acciones -->
-    <div class="actions">
-      <button mat-raised-button color="primary" type="button" (click)="crear()">
-        Crear Gasto
-      </button>
-
-      <button mat-stroked-button color="warn" type="button" (click)="cancelar()">
-        Cancelar
-      </button>
+<div class="main-page-container fade-in">
+  <mat-card class="modern-card small-card overflow-visible">
+    <div class="custom-header gradient-bg">
+      <div class="header-wrapper">
+        <div class="title-section">
+          <div class="icon-circle shadow-sm pulse-icon">
+            <mat-icon>account_balance_wallet</mat-icon>
+          </div>
+          <div class="title-text">
+            <mat-card-title>Registrar Gasto</mat-card-title>
+            <mat-card-subtitle>Control operativo de sucursal</mat-card-subtitle>
+          </div>
+        </div>
+      </div>
     </div>
 
-  </form>
-</mat-card>
+    <mat-card-content class="form-container">
+      <div class="transaction-type-indicator">
+        <mat-icon>arrow_downward</mat-icon>
+        <span>Salida de Efectivo</span>
+      </div>
 
+      <form class="period-form">
+        <mat-form-field appearance="outline" class="w-100 standard-input custom-field">
+          <mat-label>Concepto / Motivo</mat-label>
+          <mat-icon matPrefix class="field-icon">label</mat-icon>
+          <input 
+            matInput 
+            [(ngModel)]="concepto" 
+            name="concepto" 
+            placeholder="Ej: Pago de servicios, papelería..." 
+            required />
+        </mat-form-field>
 
+        <mat-form-field appearance="outline" class="w-100 standard-input highlight-field amount-field">
+          <mat-label>Monto del Gasto</mat-label>
+          <span matPrefix class="currency-symbol">$</span>
+          <input 
+            matInput 
+            type="number" 
+            [(ngModel)]="valor" 
+            name="valor" 
+            placeholder="0.00" 
+            required
+            class="amount-input"
+            (focus)="valor === 0 ? valor = null : null"
+            (blur)="valor === null ? valor = 0 : null" />
+          <mat-hint>Ingrese el valor total sin puntos</mat-hint>
+        </mat-form-field>
 
+        <div class="actions-wrapper mt-4">
+          <button mat-button type="button" class="btn-cancel" (click)="cancelar()">
+            Descartar
+          </button>
+          
+          <button 
+            mat-flat-button 
+            class="btn-submit btn-primary-blue shadow-blue" 
+            type="button" 
+            (click)="crear()"
+            [disabled]="!concepto || !valor || valor <= 0 || loading">
+            
+            <div class="btn-content" *ngIf="!loading">
+              <mat-icon>check_circle</mat-icon>
+              <span>Confirmar Gasto</span>
+            </div>
+            
+            <mat-spinner diameter="24" *ngIf="loading" class="white-spinner"></mat-spinner>
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

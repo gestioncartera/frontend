@@ -71,7 +71,7 @@ export class CrearCobroComponent implements OnInit, AfterViewInit {
   cargarClientes(): void {
     const user = this.authService.getCurrentUserValue();
     // Intenta obtener 'id' (frontend/mock) o 'usuario_id' (backend real)
-    const userId = user?.id || (user as any)?.usuario_id;
+    const userId = user?.usuario_id || (user as any)?.usuario_id;
     
     if (userId) {
       this.clienteService.getClientesByRutaPrestamo(userId).subscribe({

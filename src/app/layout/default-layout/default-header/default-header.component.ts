@@ -5,20 +5,15 @@ import { AuthService } from '../../../services/auth.service';
 
 import {
   AvatarComponent,
-  BadgeComponent,
   ColorModeService,
   ContainerComponent,
   DropdownComponent,
-  DropdownDividerDirective,
-  DropdownHeaderDirective,
   DropdownItemDirective,
   DropdownMenuDirective,
   DropdownToggleDirective,
   HeaderComponent,
   HeaderNavComponent,
   HeaderTogglerDirective,
-  NavItemComponent,
-  NavLinkDirective,
   SidebarToggleDirective
 } from '@coreui/angular';
 
@@ -39,7 +34,6 @@ interface NotificationItem {
   templateUrl: './default-header.component.html',
   standalone: true,
   imports: [
-    NgIf,
     CommonModule,
     ContainerComponent, 
     HeaderTogglerDirective, 
@@ -54,9 +48,7 @@ interface NotificationItem {
     DropdownToggleDirective, 
     AvatarComponent, 
     DropdownMenuDirective,
-    DropdownHeaderDirective, 
     DropdownItemDirective, 
-    BadgeComponent, 
      
   ]
 })

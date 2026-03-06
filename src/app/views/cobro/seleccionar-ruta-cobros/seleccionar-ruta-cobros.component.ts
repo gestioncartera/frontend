@@ -86,14 +86,14 @@ export class SeleccionarRutaCobrosComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    this.rutaService.getRutas(idSucursal).subscribe({
+    this.rutaService.getRutascobro(idSucursal).subscribe({
       next: (data: Rutas[]) => {
         
-        
+        console.log('Rutas obtenidas para cobros:', data);
         // Filtrar solo rutas activas (case-insensitive)
         this.rutas = data.filter(ruta => {
-          const estado = ruta.estado?.toLowerCase().trim();
-            return estado === 'activo' || estado === 'activa';
+          const estado = ruta.estado?.toUpperCase().trim();
+            return estado === 'ACTIVO' || estado === 'ACTIVA';
         });
         
          

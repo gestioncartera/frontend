@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { catchError, Observable, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface Prestamos {
@@ -78,9 +78,29 @@ export class PrestamoService {
     return this.http.get<Prestamos>(`${this.apiUrl}/getPrestamoInfoById/${prestamo_id}`);
   }
  
-  createPrestamo(prestamo: Partial<Prestamos>): Observable<Prestamos> {
-    return this.http.post<Prestamos>(`${this.apiUrl}/createPrestamo`, prestamo);
-  } 
+createPrestamo(prestamo: Partial<Prestamos>): Observable<Prestamos> {
+  return this.http.post<Prestamos>(`${this.apiUrl}/createPrestamo`, prestamo).pipe(
+    catchError((error: HttpErrorResponse) => {
+      // Log detallado para depuración
+      console.error('Error en el servicio de préstamos:', error);
+
+      // Si el error es un 404 (como en tu imagen 1), suele venir como HTML string
+      if (error.status === 404) {
+        return throwError(() => ({
+          message: 'La ruta de creación no fue encontrada en el servidor (404).'
+        }));
+      }
+
+      // Si el error es 400 (imágenes 2 y 3), extraemos el mensaje del JSON
+      const serverMessage = error.error?.error || error.error?.message || 'Error inesperado en el servidor';
+      
+      return throwError(() => ({
+        message: serverMessage,
+        status: error.status
+      }));
+    })
+  );
+}
   getPrestamosPendientesBySucursal(sucursalId: number | string): Observable<Prestamos[]> {
   return this.http.get<Prestamos[]>(`${this.apiUrl}/prestamosPendientes/${sucursalId}`);
 }

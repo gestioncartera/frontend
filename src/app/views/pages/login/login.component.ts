@@ -13,7 +13,7 @@ import {
   InputGroupComponent,
   InputGroupTextDirective,
   RowComponent,
-  FormFeedbackComponent
+  FormFeedbackComponent 
 } from '@coreui/angular';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
@@ -40,7 +40,7 @@ import { AuthService } from '../../../services/auth.service';
     FormControlDirective,
     ButtonDirective,
     NgStyle,
-    FormFeedbackComponent
+    FormFeedbackComponent 
   ]
 })
 export class LoginComponent implements OnInit {
@@ -93,7 +93,12 @@ export class LoginComponent implements OnInit {
       next: (response) => {
         console.log('Datos retornados por el backend:', response);
         console.log('Login exitoso, redirigiendo a selección de sucursal...');
-        this.router.navigate(['/cambio-sucursal']);
+        // Mantenemos loading=true mientras navega. Si la navegación falla, lo desactivamos.
+        this.router.navigate(['/cambio-sucursal']).then(success => {
+          if (!success) {
+            this.loading = false;
+          }
+        });
       },
       error: (error) => {
         console.error('Error en login:', error);

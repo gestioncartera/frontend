@@ -2,18 +2,13 @@ import { Routes } from "@angular/router";
 
 export const routes: Routes = [
   {
-    path: '',
-    redirectTo: 'apertura-caja',
+    path: '', // Al estar dentro del padre 'caja', esto representa localhost:4200/caja
+    redirectTo: 'cerrar-caja',
     pathMatch: 'full',
   },
   {
-    path: 'apertura-caja',
-    loadComponent: () =>
-      import('./apertura-caja/apertura-caja.component').then(
-        (m) => m.AperturaCajaComponent
-      ),
-    data: { title: 'Apertura de Caja' },
-  },
-   
-   
+    path: 'cerrar-caja', // Esto completa la URL: /caja/cerrar-caja
+    loadComponent: () => import('./cerrar-caja/cerrar-caja.component').then(m => m.CerrarCajaComponent),
+    data: { title: 'Cierre de Caja' }
+  }
 ];

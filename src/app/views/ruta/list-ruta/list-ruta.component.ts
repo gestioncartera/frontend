@@ -13,12 +13,15 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
 import { Rutas, RutasService } from '../../../services/rutas.service';
 import { ActivatedRoute } from '@angular/router';
 import { AuthMockService } from '../../../services/AuthMockService';
 import { Injectable } from '@angular/core'; 
 import { BehaviorSubject, Observable } from 'rxjs';
 import { SucursalContextService } from '../../../services/sucursal-context.service';
+import Swal from 'sweetalert2';
 
 
 
@@ -39,6 +42,7 @@ import { SucursalContextService } from '../../../services/sucursal-context.servi
     MatSelectModule,
     MatCardModule,
     MatTooltipModule,
+    MatDialogModule
   ],
   templateUrl: './list-ruta.component.html',
   styleUrls: ['./list-ruta.component.scss'],
@@ -70,7 +74,8 @@ export class ListRutaComponent implements OnInit, AfterViewInit {
     private rutaService: RutasService,
     private route: ActivatedRoute,
     private auth: AuthMockService,
-    private sucursalContextService: SucursalContextService
+    private sucursalContextService: SucursalContextService,
+    private dialog: MatDialog
   ) {
     this.dataSource = new MatTableDataSource(this.rutas);
     
@@ -185,22 +190,32 @@ export class ListRutaComponent implements OnInit, AfterViewInit {
     const nuevoEstado = ruta.estado === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO';
     const accion = nuevoEstado === 'INACTIVO' ? 'desactivar' : 'activar';
 
-    if (confirm(`¿Seguro que quieres ${accion} esta ruta?`)) {
-      if (ruta.ruta_id) {
-        const rutaActualizada = { ...ruta, estado: nuevoEstado };
-
-        this.rutaService.editRutas(ruta.ruta_id, rutaActualizada).subscribe({
-          next: () => {
-            window.alert(`Ruta ${accion}da exitosamente.`);
-            this.getRutas();
-          },
-          error: (err) => {
-            console.error(`Error al ${accion} la ruta:`, err);
-            window.alert(`No se pudo ${accion} la ruta.`);
-          },
-        });
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Confirmación',
+        message: `¿Seguro que quieres ${accion} esta ruta?`
       }
-    }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        if (ruta.ruta_id) {
+          const rutaActualizada = { ...ruta, estado: nuevoEstado };
+
+          this.rutaService.editRutas(ruta.ruta_id, rutaActualizada).subscribe({
+            next: () => {
+              // Mantenemos Swal para el mensaje de éxito por ahora
+              Swal.fire('¡Actualizado!', `Ruta ${accion === 'desactivar' ? 'desactivada' : 'activada'} exitosamente.`, 'success');
+              this.getRutas();
+            },
+            error: (err) => {
+              console.error(`Error al ${accion} la ruta:`, err);
+              Swal.fire('Error', `No se pudo ${accion} la ruta.`, 'error');
+            },
+          });
+        }
+      }
+    });
   }
 
   onRowClick(ruta: Rutas) {
