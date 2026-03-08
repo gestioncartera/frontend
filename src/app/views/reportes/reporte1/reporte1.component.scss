@@ -1,0 +1,27 @@
+.x-small {
+  font-size: 0.7rem;
+  letter-spacing: 0.5px;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+// Clases personalizadas de bordes para los KPIs
+.border-top-3 {
+  border-top-width: 3px !important;
+}
+
+.c-card {
+  transition: transform 0.2s ease-in-out;
+  &:hover {
+    transform: translateY(-3px);
+  }
+}
+
+// Estilo para los headers de las tablas
+thead th {
+  color: #8a93a2;
+  border-bottom: 1px solid #d8dbe0;
+  padding: 12px 8px;
+}

@@ -1,0 +1,65 @@
+<c-container fluid class="fade-in">
+  <h5 class="mb-4 text-muted text-uppercase small font-bold">Auditoría de Préstamos y Cartera</h5>
+
+  <c-row class="mb-4">
+    <c-col sm="6" lg="3">
+      <c-card class="border-start-primary border-start-4 shadow-sm mb-3">
+        <c-card-body>
+          <div class="text-muted x-small text-uppercase">Capital en Calle</div>
+          <div class="h4 font-bold">{{ resumenCartera.saldoTotalCapital | currency }}</div>
+        </c-card-body>
+      </c-card>
+    </c-col>
+    <c-col sm="6" lg="3">
+      <c-card class="border-start-success border-start-4 shadow-sm mb-3">
+        <c-card-body>
+          <div class="text-muted x-small text-uppercase">Intereses Proyectados</div>
+          <div class="h4 font-bold">{{ resumenCartera.saldoIntereses | currency }}</div>
+        </c-card-body>
+      </c-card>
+    </c-col>
+    <c-col sm="6" lg="3">
+      <c-card class="border-start-danger border-start-4 shadow-sm mb-3">
+        <c-card-body>
+          <div class="text-muted x-small text-uppercase">Total en Mora</div>
+          <div class="h4 font-bold text-danger">{{ resumenCartera.moraTotal | currency }}</div>
+        </c-card-body>
+      </c-card>
+    </c-col>
+  </c-row>
+
+  <c-card class="shadow-sm border-0">
+    <c-card-header class="bg-dark text-white d-flex justify-content-between align-items-center">
+      <span class="small text-uppercase">Desglose de Saldos Pendientes</span>
+      <button cButton color="info" size="sm" class="text-white">Exportar Excel</button>
+    </c-card-header>
+    <c-card-body class="p-0">
+      <table cTable [responsive]="true" [striped]="true" class="mb-0 small align-middle">
+        <thead class="bg-light">
+          <tr class="x-small text-uppercase">
+            <th class="ps-3">ID</th>
+            <th>Cliente</th>
+            <th class="text-end">Capital Inicial</th>
+            <th class="text-end">Saldo Actual</th>
+            <th class="text-center">Estado</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of prestamosDetalle">
+            <td class="ps-3 font-bold">{{ p.id }}</td>
+            <td>{{ p.cliente }}</td>
+            <td class="text-end">{{ p.capital | currency }}</td>
+            <td class="text-end font-bold text-primary">{{ p.saldo | currency }}</td>
+            <td class="text-center">
+              <c-badge [color]="getBadgeColor(p.estado)">{{ p.estado }}</c-badge>
+            </td>
+            <td class="text-center">
+              <button cButton color="secondary" variant="ghost" size="sm">Historial</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </c-card-body>
+  </c-card>
+</c-container>

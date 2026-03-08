@@ -137,6 +137,23 @@ export const navItems: INavData[] = [
       
     ],
   },
+  {
+    name: 'Reportes',
+    url: '/reportes',
+    iconComponent: { name: 'cil-description' },
+    children: [
+      {
+        name: 'General',
+        url: '/reportes/reporte1',
+        icon: 'nav-icon-bullet',
+      },
+      {
+        name: 'Prestamos',
+        url: '/reportes/reporte2',
+        icon: 'nav-icon-bullet',
+      },
+    ],
+  },
 /*
   {
     name: 'Periodo',

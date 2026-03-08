@@ -124,6 +124,11 @@ export const routes: Routes = [
         path: 'caja',
         loadChildren: () => import('./views/caja/routes').then((m) => m.routes),
       },
+      {
+        path: 'reportes',
+        loadChildren: () =>
+          import('./views/reportes/routes').then((m) => m.routes),
+      },
     ],
   },
   {
