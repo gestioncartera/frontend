@@ -15,6 +15,8 @@ import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dial
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { RouterModule } from '@angular/router';
+import { SucursalContextService } from '../../../services/sucursal-context.service';
+
 @Component({
   selector: 'app-crear-ruta',
   standalone: true,
@@ -35,6 +37,7 @@ import { RouterModule } from '@angular/router';
   styleUrls: ['./crear-ruta.component.scss'],
 })
 export class CrearRutaComponent {
+  
   ruta: Rutas = {
     sucursal_id: 1, // Asignar un valor por defecto o recuperarlo si es necesario
     nombre_ruta: '',
@@ -47,7 +50,13 @@ export class CrearRutaComponent {
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private router: Router,
-    private rutasService: RutasService) {}
+    private rutasService: RutasService,
+    private sucursalContextService: SucursalContextService
+  ) {
+    // Obtener sucursal seleccionada al inicializar
+    const sucursal = this.sucursalContextService.getSucursalActual();
+    this.ruta.sucursal_id = sucursal ? sucursal.id : 1;
+  }
 
   crear(): void {
 
@@ -85,6 +94,8 @@ export class CrearRutaComponent {
 }
 
 private crearRutaConfirmada(): void {
+
+  console.log('Creando ruta con datos:', this.ruta);
   this.rutasService.createRutas(this.ruta).subscribe({
     next: () => {
       this.snackBar.open(

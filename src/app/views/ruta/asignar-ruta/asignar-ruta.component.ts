@@ -149,18 +149,40 @@ export class AsignarRutaComponent implements OnInit {
     });
   }
 
-  moverAPosicion(indexActual: number) {
-    const promptValue = prompt(`Mover a "${this.clientesAsignados[indexActual].nombres}" a la posición:`, (indexActual + 1).toString());
-    if (promptValue) {
-      const nuevaPos = parseInt(promptValue, 10) - 1;
+moverAPosicion(indexActual: number) {
+  const cliente = this.clientesAsignados[indexActual];
+
+  // Abrimos el modal con el diseño moderno
+  const dialogRef = this.dialog.open(ModalClienteComponent, {
+    width: '350px',
+    // Pasamos el nombre para mostrarlo y la posición actual (index + 1)
+    data: { 
+      nombre: cliente.nombres, 
+      posicion: indexActual + 1 
+    }
+  });
+
+  // Al cerrar el modal, procesamos el resultado
+  dialogRef.afterClosed().subscribe(nuevaPosicionUsuario => {
+    // Si el usuario no canceló (hay un valor)
+    if (nuevaPosicionUsuario !== undefined && nuevaPosicionUsuario !== null) {
+      
+      const nuevaPos = parseInt(nuevaPosicionUsuario, 10) - 1;
+
+      // Validamos que la posición esté dentro del rango del array
       if (nuevaPos >= 0 && nuevaPos < this.clientesAsignados.length) {
         moveItemInArray(this.clientesAsignados, indexActual, nuevaPos);
-        this.ordenModificado = true;
+        this.ordenModificado = true; // Habilita el botón de guardar
+        
+        this.snackBar.open(`Se movió a ${cliente.nombres} a la posición ${nuevaPos + 1}`, 'OK', {
+          duration: 2000
+        });
+      } else {
+        this.mostrarError('La posición ingresada no es válida para esta ruta');
       }
     }
-  }   
-    
-   
+  });
+}  
 
   private mostrarError(msg: string) {
     this.snackBar.open(msg, 'Cerrar ', { duration: 5000, panelClass: ['error-snackbar'] });

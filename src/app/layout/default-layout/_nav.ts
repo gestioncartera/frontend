@@ -30,6 +30,11 @@ export const navItems: INavData[] = [
     iconComponent: { name: 'cil-calculator' },
     children: [
        {
+        name: 'Abrir Caja',
+        url: '/caja/abrir-caja',
+        icon: 'nav-icon-bullet',
+      },
+       {
         name: 'Cierre de Caja',
         url: '/caja/cerrar-caja',
         icon: 'nav-icon-bullet',
@@ -79,7 +84,7 @@ export const navItems: INavData[] = [
           icon: 'nav-icon-bullet',
         },
         {
-          name: 'Asignar Ruta',
+          name: 'Ordenar Ruta',
           url: '/ruta/asignar-ruta',
           icon: 'nav-icon-bullet',
         },

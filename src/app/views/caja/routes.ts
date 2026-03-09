@@ -10,5 +10,10 @@ export const routes: Routes = [
     path: 'cerrar-caja', // Esto completa la URL: /caja/cerrar-caja
     loadComponent: () => import('./cerrar-caja/cerrar-caja.component').then(m => m.CerrarCajaComponent),
     data: { title: 'Cierre de Caja' }
+  },
+  {
+    path: 'abrir-caja', // Esto completa la URL: /caja/abrir-caja
+    loadComponent: () => import('./abrir-caja/abrir-caja.component').then(m => m.AbrirCajaComponent),
+    data: { title: 'Abrir Caja' }
   }
 ];

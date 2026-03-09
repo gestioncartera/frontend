@@ -1,25 +1,31 @@
-<h2 mat-dialog-title>Seleccionar Cliente</h2>
+<h2 mat-dialog-title>Reordenar Ruta</h2>
 
 <mat-dialog-content>
+  <p>
+    Mover a <span class="cliente-highlight">{{ data.nombre }}</span> a la posición:
+  </p>
+  
   <mat-form-field appearance="outline" class="full-width">
-    <mat-label>Buscar por nombre o DNI</mat-label>
-    <input matInput (keyup)="filtrarClientes($event)" placeholder="Ej: Juan Pérez">
-    <mat-icon matSuffix>search</mat-icon>
+    <mat-label>Nueva Posición</mat-label>
+    <input 
+      matInput 
+      type="number" 
+      [(ngModel)]="nuevaPosicion" 
+      min="1" 
+      placeholder="Ej. 1">
+    <mat-icon matSuffix color="primary">swap_vert</mat-icon>
   </mat-form-field>
-
-  <mat-action-list class="scrollable-list">
-    <button mat-list-item *ngFor="let cliente of clientesFiltrados" (click)="seleccionar(cliente)">
-      <mat-icon matListItemIcon>person</mat-icon>
-      <div matListItemTitle>{{ cliente.nombres }} {{ cliente.apellidos }}</div>
-      <div matListItemLine>{{ cliente.dni }} | {{ cliente.direccion }}</div>
-    </button>
-    
-    <div class="no-results" *ngIf="clientesFiltrados.length === 0">
-      No se encontraron clientes.
-    </div>
-  </mat-action-list>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close>Cancelar</button>
+  <button mat-button (click)="onCancelar()" color="warn">
+    CANCELAR
+  </button>
+  <button 
+    mat-flat-button 
+    color="primary" 
+    [mat-dialog-close]="nuevaPosicion" 
+    [disabled]="!nuevaPosicion">
+    CONFIRMAR
+  </button>
 </mat-dialog-actions>

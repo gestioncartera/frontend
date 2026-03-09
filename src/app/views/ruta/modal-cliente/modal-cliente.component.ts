@@ -6,8 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
-import { ClienteService } from '../../../services/cliente.service';
-import { SucursalContextService } from '../../../services/sucursal-context.service';
+import { FormsModule } from '@angular/forms'; // 👈 Agregamos esto para el [(ngModel)]
 
 @Component({
   selector: 'app-modal-cliente',
@@ -19,45 +18,34 @@ import { SucursalContextService } from '../../../services/sucursal-context.servi
     MatFormFieldModule,
     MatInputModule,
     MatListModule,
-    MatIconModule
+    MatIconModule,
+    FormsModule,
   ],
   templateUrl: './modal-cliente.component.html',
   styleUrls: ['./modal-cliente.component.scss']
 })
 export class ModalClienteComponent implements OnInit {
-  clientesTotales: any[] = [];
-  clientesFiltrados: any[] = [];
-  idRutaRecibida: number;
+ nuevaPosicion: number;
 
   constructor(
-    private clienteService: ClienteService,
-    private dialogRef: MatDialogRef<ModalClienteComponent>,
-    private sucursalContextService: SucursalContextService,
-    @Inject(MAT_DIALOG_DATA) public data: any
+    public dialogRef: MatDialogRef<ModalClienteComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: { nombre: string, posicion: number }
   ) {
-    this.idRutaRecibida = this.data.id_ruta;
+    // Inicializamos con la posición que viene del componente principal
+    this.nuevaPosicion = data.posicion;
+  }
+  ngOnInit(): void {
+    // Aquí podrías cargar datos adicionales si fuera necesario
   }
 
-  ngOnInit() {
-    console.log('Trabajando con la ruta:', this.idRutaRecibida);
-    const idSucursal = this.sucursalContextService.getSucursalId();
-    if (!idSucursal) return;
-    this.clienteService.getClientesByRuta(this.idRutaRecibida).subscribe(data => {
-      this.clientesTotales = data;
-      this.clientesFiltrados = data;
-    });
+  onCancelar(): void {
+    this.dialogRef.close();
   }
 
-  filtrarClientes(event: any) {
-    const busqueda = event.target.value.toLowerCase();
-    this.clientesFiltrados = this.clientesTotales.filter(c => 
-      (c.nombres && c.nombres.toLowerCase().includes(busqueda)) || 
-      (c.dni && c.dni.includes(busqueda))
-    );
+  onConfirmar(): void {
+    if (this.nuevaPosicion > 0) {
+      this.dialogRef.close(this.nuevaPosicion);
+    }
   }
 
-  seleccionar(cliente: any) {
-    // Al cerrar el modal, devolvemos el cliente seleccionado al componente de la Ruta
-    this.dialogRef.close(cliente);
-  }
 }

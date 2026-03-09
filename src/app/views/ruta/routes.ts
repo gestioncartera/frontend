@@ -55,7 +55,7 @@ export const routes: Routes = [
             (m) => m.AsignarRutaComponent
           ),
         data: {
-          title: 'Asignar Ruta',
+          title: 'Ordenar Ruta',
         },
       },
       {

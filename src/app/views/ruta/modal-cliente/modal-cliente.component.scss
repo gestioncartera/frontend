@@ -1,101 +1,24 @@
-/* Contenedor del título */
-h2[mat-dialog-title] {
-  margin: 0;
-  font-weight: 800;
-  color: #1e293b;
-  border-bottom: 1px solid #f1f5f9;
-  padding-bottom: 16px;
-}
-
-/* Contenido del modal */
+/* Contenedor principal para evitar el scroll y dar espacio */
 mat-dialog-content {
-  padding-top: 20px !important;
-  min-width: 400px;
-  max-width: 500px;
-  max-height: 70vh; // Altura máxima de 70% de la pantalla
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-
-  @media (max-width: 480px) {
-    min-width: 100%;
-  }
+  min-width: 300px;
+  padding: 20px 0;
+  overflow: hidden !important; /* Quita la barra de scroll molesta */
 }
 
-/* Buscador */
+/* Estilo para el nombre del cliente */
+.cliente-highlight {
+  color: #3f51b5; /* Un color que resalte, como el primario */
+  font-weight: 600;
+}
+
+/* Asegura que el input ocupe todo el ancho disponible */
 .full-width {
   width: 100%;
-  
-  ::ng-deep .mat-mdc-text-field-wrapper {
-    background-color: #f8fafc;
-  }
+  margin-top: 15px;
 }
 
-/* Lista con Scroll Interno */
-.scrollable-list {
-  flex: 1;
-  overflow-y: auto; // Activa el scroll solo en la lista
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  margin: 0;
-  padding: 0;
-
-  /* Estilizar la barra de scroll */
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 10px;
-  }
-
-  /* Items de la lista */
-  .mat-mdc-list-item {
-    border-bottom: 1px solid #f8fafc;
-    height: auto !important;
-    padding: 12px 0;
-    
-    &:hover {
-      background-color: #eff6ff;
-    }
-
-    &:last-child {
-      border-bottom: none;
-    }
-
-    [matListItemTitle] {
-      font-weight: 600;
-      color: #0f172a;
-      margin-bottom: 4px;
-    }
-
-    [matListItemLine] {
-      font-size: 12px;
-      color: #64748b;
-    }
-  }
-}
-
-/* Mensaje cuando no hay resultados */
-.no-results {
-  padding: 40px;
-  text-align: center;
-  color: #94a3b8;
-  font-size: 14px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-
-  &::before {
-    content: 'search_off';
-    font-family: 'Material Icons';
-    font-size: 32px;
-  }
-}
-
-/* Acciones finales */
+/* Espaciado para los botones */
 mat-dialog-actions {
-  border-top: 1px solid #f1f5f9;
-  padding: 16px 0 0 0 !important;
+  padding-bottom: 10px;
+  gap: 8px;
 }
