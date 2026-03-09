@@ -144,13 +144,13 @@ export class TipoPrestamoComponent implements OnInit {
     } else {
        const idSucursal = this.sucursalContextService.getSucursalId();
     if (!idSucursal) return;
-      this.tipoPrestamoService.createTipoPrestamo(idSucursal, tipoPrestamoData).subscribe({
+       this.tipoPrestamoService.createTipoPrestamo(idSucursal, tipoPrestamoData).subscribe({
         next: (res: TipoPrestamo) => {
           console.log('Datos a actualizar:', tipoPrestamoData);
           this.snackBar.open('Configuración guardada exitosamente', 'Cerrar', {
             duration: 3000,
             horizontalPosition: 'end',
-            verticalPosition: 'top',
+            verticalPosition: 'bottom',
             panelClass: ['success-snackbar']
           });
           this.cancelar();

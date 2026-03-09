@@ -1,1 +1,49 @@
-<p>abrir-caja works!</p>
+<div class="container-apertura">
+  <mat-card class="card-apertura">
+   <mat-card-header>
+  <mat-card-title class="header-with-date">
+    <span>Apertura de Jornada</span>
+    <span class="fecha-actual">{{ fechaHoy | date:'dd/MM/yyyy' }}</span>
+  </mat-card-title>
+  <mat-card-subtitle>Asignación de base y cobrador</mat-card-subtitle>
+</mat-card-header>
+
+    <mat-divider></mat-divider>
+
+    <mat-card-content>
+      <form [formGroup]="cajaForm" class="form-container">
+        
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Seleccionar Cobrador</mat-label>
+          <mat-select formControlName="cobrador_id">
+            <mat-option *ngFor="let cobrador of listaCobradores" [value]="cobrador.id">
+              {{ cobrador.nombre }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>person</mat-icon>
+          <mat-error *ngIf="cajaForm.get('cobrador_id')?.hasError('required')">
+            Debe asignar un cobrador
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Monto Base Inicial</mat-label>
+          <input matInput type="number" formControlName="base" placeholder="0.00">
+          <span matPrefix>$&nbsp;</span>
+          <mat-icon matSuffix>payments</mat-icon>
+        </mat-form-field>
+
+
+      </form>
+    </mat-card-content>
+
+    <mat-card-actions align="end">
+      <button mat-flat-button color="primary" 
+              (click)="confirmarAperturacaja()"
+              [disabled]="cajaForm.invalid">
+        <mat-icon>check_circle</mat-icon>
+       Abrir Caja
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>
