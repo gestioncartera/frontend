@@ -11,6 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import Swal from 'sweetalert2';
+import { SucursalContextService } from '../../../services/sucursal-context.service';
 @Component({
   selector: 'app-aprobar-prestamo',
   standalone: true,
@@ -34,15 +35,22 @@ export class AprobarPrestamoComponent implements OnInit {
   displayedColumns: string[] = ['ID', 'cliente', 'cobrador','interes', 'monto', 'saldo', 'acciones'];
   dataSource = new MatTableDataSource<any>([]);
   loading: boolean = false;
-  sucursalId: number = 1; // Debería venir de tu sistema de login o ruta
+  sucursalId!: number;
   isMobile: boolean = false;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
   constructor(private prestamoService: PrestamoService,
-     private responsive: BreakpointObserver) {}
+     private responsive: BreakpointObserver,
+     private sucursalContextService: SucursalContextService) {}
 
   ngOnInit(): void {
+    const idSucursal = this.sucursalContextService.getSucursalId();
+    if (idSucursal === null) {
+      console.error("ID de sucursal no encontrado, no se pueden cargar los préstamos.");
+      return;
+    }
+    this.sucursalId = idSucursal;
     this.loadPrestamos();
     this.detectMobile();
   }

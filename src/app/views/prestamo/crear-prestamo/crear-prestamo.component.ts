@@ -247,7 +247,7 @@ const fechaFormateada = this.fecha.toISOString().split('T')[0];
     this.saldoPendiente = 0;
     this.isEditing = false;
     this.editingId = null;
-    this.router.navigate(['/prestamo']);
+    this.router.navigate(['/crear-prestamo']);
   }
  
 

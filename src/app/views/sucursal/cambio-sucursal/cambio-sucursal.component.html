@@ -1,6 +1,14 @@
 <mat-card class="change-card">
-  <mat-card-title>
-    Seleccion de Sucursal
+  <mat-card-title class="d-flex align-items-center">
+    <button *ngIf="showBackButton"
+            mat-icon-button
+            (click)="goBack()"
+            class="me-2"
+            aria-label="Volver a la página anterior"
+            title="Volver">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <span>Selección de Sucursal</span>
   </mat-card-title>
 
   <form class="change-form">

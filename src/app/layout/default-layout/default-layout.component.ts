@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { Router, RouterLink, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterOutlet,NavigationEnd } from '@angular/router';
 import { NgScrollbar } from 'ngx-scrollbar';
 import { MatPaginatorModule } from '@angular/material/paginator'; // 1. Importa el módulo
 import {
@@ -18,6 +18,7 @@ import { DefaultFooterComponent, DefaultHeaderComponent } from './';
 import { navItems } from './_nav';
 import { AuthService } from '../../services/auth.service';
 import { IconSetService } from '@coreui/icons-angular';
+import { filter } from 'rxjs/operators'; 
 
 function isOverflown(element: HTMLElement) {
   return (
@@ -55,6 +56,11 @@ export class DefaultLayoutComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      this.collapseAllMenus(this.navItems);
+    });
     const isCobrador = this.authService.isCobrador();
     // Si el usuario es Cobrador (rol 2) y es redirigido al dashboard,
     // lo enviamos directamente a la página de creación de cobros.
@@ -62,6 +68,15 @@ export class DefaultLayoutComponent implements OnInit {
     if (isCobrador && this.router.url.includes('/dashboard')) {
       this.router.navigate(['/cobro/crear-cobro']);
     }
+  }
+
+  private collapseAllMenus(items: any[]) {
+    items.forEach(item => {
+      if (item.children) {
+        item.attributes = { ...item.attributes, expanded: false }; // Forzamos el cierre
+        this.collapseAllMenus(item.children); // Aplicamos a sub-niveles si existen
+      }
+    });
   }
 
   private getFilteredNavItems() {
@@ -91,7 +106,8 @@ export class DefaultLayoutComponent implements OnInit {
       url: '/gasto/crear-gasto',
       iconComponent: { name: 'cil-calculator' },    
      },
-
+      
+      
       ];
     }
     console.log('Usuario no es cobrador, mostrando menú de admin.');

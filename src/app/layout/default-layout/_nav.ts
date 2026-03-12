@@ -49,12 +49,13 @@ export const navItems: INavData[] = [
         url: '/gasto/registro-egreso-diario',
         icon: 'nav-icon-bullet',
       },
+       /*
       {
         name: 'Crear Gasto',
         url: '/gasto/crear-gasto',
         icon: 'nav-icon-bullet',
       }
-      /*
+     
       {
         name: 'Registrar Egreso',
         url: '/gasto/registro-egreso-suc',

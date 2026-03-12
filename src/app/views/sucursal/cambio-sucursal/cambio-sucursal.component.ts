@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { SucursalService, Sucursal } from '../../../services/sucursal.service';
 import { SucursalContextService } from '../../../services/sucursal-context.service';
@@ -26,12 +27,14 @@ import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dial
     MatFormFieldModule,
     MatSelectModule,
     MatButtonModule,
+    MatIconModule,
     FormsModule,
   ],
 })
 export class CambioSucursalComponent implements OnInit {
   sucursales: Sucursal[] = [];
 
+  showBackButton = false;
   selectedId: number | null = null;
 
   constructor(
@@ -40,7 +43,8 @@ export class CambioSucursalComponent implements OnInit {
     private sucursalContextService: SucursalContextService,
     private authService: AuthService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private location: Location
   ) {
     // Obtener sucursal del contexto
     const sucursalActual = this.sucursalContextService.getSucursalActual();
@@ -48,6 +52,7 @@ export class CambioSucursalComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.showBackButton = !!this.sucursalContextService.getSucursalActual();
     this.getSucursales();
   }
 
@@ -122,5 +127,9 @@ export class CambioSucursalComponent implements OnInit {
         this.router.navigate(['/ruta/list-ruta']);
       }
     }
+  }
+
+  goBack(): void {
+    this.location.back();
   }
 }
