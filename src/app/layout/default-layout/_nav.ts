@@ -95,7 +95,7 @@ export const navItems: INavData[] = [
   {
     name: 'Préstamos',
     url: '/prestamo',
-    iconComponent: { name: 'cil-chart-pie' },
+    iconComponent: { name: 'cil-wallet' },
     children: [
        {
         name: 'Tipo de Préstamo',
@@ -126,7 +126,7 @@ export const navItems: INavData[] = [
   {
     name: 'Cobros',
     url: '/cobro',
-    iconComponent: { name: 'cil-bell' },
+    iconComponent: { name: 'cil-check-circle' },
     children: [
       {
         name: 'Gestión de Cobros',
@@ -146,7 +146,7 @@ export const navItems: INavData[] = [
   {
     name: 'Reportes',
     url: '/reportes',
-    iconComponent: { name: 'cil-description' },
+    iconComponent: { name: 'cil-chart-pie' },
     children: [
       {
         name: 'General',

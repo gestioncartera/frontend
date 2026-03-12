@@ -1,5 +1,5 @@
 <ng-container>
-  <c-container [fluid]="true" class="border-bottom px-4 header-container">
+  <c-container [fluid]="true" class="border-bottom px-4 header-container d-flex align-items-center">
     
     <button
       [cSidebarToggle]="sidebarId()"
@@ -11,66 +11,25 @@
       <svg cIcon name="cilMenu" size="lg"></svg>
     </button>
 
+    <div class="ms-3 d-flex align-items-center branch-container">
+      <div class="vr h-100 mx-3 text-body text-opacity-25 d-none d-md-block" style="height: 24px !important;"></div>
+      <div class="branch-display d-flex align-items-center">
+        <svg cIcon name="cilHome" size="sm" class="text-primary me-2"></svg>
+        <span class="fw-bold text-uppercase branch-text">
+          {{ sucursalNombre }}
+        </span>
+      </div>
+    </div>
+
     <c-header-nav class="ms-auto d-flex align-items-center">
-<!-- Notificaciones 
-      <c-dropdown alignment="end" variant="nav-item">
-        <button [caret]="false" cDropdownToggle class="py-0 border-0 bg-transparent position-relative me-2" aria-label="Open notifications menu">
-          <svg cIcon class="text-secondary" name="cilBell" size="lg"></svg>
-          
-          <c-badge *ngIf="notificationCount > 0" 
-                   class="position-absolute top-0 start-100 translate-middle p-1 border border-light rounded-circle" 
-                   color="danger">
-            <span style="font-size: 0.65rem; padding: 0 3px;">{{ notificationCount }}</span>
-          </c-badge>
-        </button>
-
-        <ul cDropdownMenu class="pt-0 shadow-lg border-0 notification-dropdown-menu">
-          <li>
-            <h6 cDropdownHeader class="bg-primary text-white fw-bold py-3 rounded-top d-flex justify-content-between align-items-center px-3">
-              Notificaciones
-              <c-badge color="light" class="text-primary" shape="rounded-pill">{{ notificationCount }}</c-badge>
-            </h6>
-          </li>
-
-          <div class="notification-list-container">
-            <li *ngFor="let notif of newNotifications">
-              <a cDropdownItem class="d-flex align-items-start py-3 px-3 border-bottom border-light item-interactive">
-                <div class="me-3">
-                  <div [ngClass]="'bg-' + notif.color" 
-                       class="rounded-circle d-flex align-items-center justify-content-center text-white shadow-sm" 
-                       style="width: 40px; height: 40px;">
-                    <svg cIcon [name]="notif.icon" size="lg"></svg>
-                  </div>
-                </div>
-                <div class="flex-grow-1">
-                  <div class="fw-bold text-dark small mb-1">{{ notif.title }}</div>
-                  <div class="text-muted small lh-sm mb-2">{{ notif.description }}</div>
-                  <div class="d-flex align-items-center text-secondary" style="font-size: 0.7rem;">
-                    <svg cIcon name="cilClock" size="sm" class="me-1"></svg> {{ notif.time }}
-                  </div>
-                </div>
-              </a>
-            </li>
-          </div>
-
-          <li>
-            <a cDropdownItem class="text-center fw-bold py-3 small text-primary bg-light rounded-bottom" (click)="viewNotifications()" style="cursor: pointer;">
-              VER TODAS LAS ACTIVIDADES
-            </a>
-          </li>
-        </ul>
-      </c-dropdown>
--->
       <div class="vr h-100 mx-2 text-body text-opacity-25 d-none d-sm-block"></div>
 
       <c-dropdown alignment="end" variant="nav-item">
         <button [caret]="false" cDropdownToggle class="py-0 pe-0 d-flex align-items-center border-0 bg-transparent" aria-label="Open user menu">
-          
           <div class="me-2 text-end d-none d-md-block" style="line-height: 1.2;">
             <div class="fw-bold text-dark small">{{ userName }}</div>
             <div class="small text-muted" style="font-size: 0.7rem;">{{ userRole }}</div>
           </div>
-
           <div class="position-relative">
             <c-avatar
               shape="rounded-circle"
@@ -84,26 +43,6 @@
         </button>
 
         <ul cDropdownMenu class="pt-0 w-auto shadow-sm">
-        <!-- <li>
-            <h6 cDropdownHeader class="bg-body-secondary text-body-secondary fw-semibold py-2 rounded-top">
-              Configuración de cuenta
-            </h6>
-          </li>
-          <li>
-            <a cDropdownItem routerLink="/perfil">
-              <svg cIcon class="me-2 text-secondary" name="cilUser"></svg>
-              Mi Perfil
-            </a>
-          </li>
-          <li>
-            <a cDropdownItem routerLink="/configuracion">
-              <svg cIcon class="me-2 text-secondary" name="cilSettings"></svg>
-              Ajustes
-            </a>
-          </li>
-          <li>
-            <hr cDropdownDivider />
-          </li>  --> 
           <li>
             <a cDropdownItem (click)="onLogout()" class="text-danger fw-bold" style="cursor: pointer;">
               <svg cIcon class="me-2" name="cilAccountLogout"></svg>
@@ -112,7 +51,6 @@
           </li>
         </ul>
       </c-dropdown>
-
     </c-header-nav>
   </c-container>
 </ng-container>

@@ -22,7 +22,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { SucursalContextService } from '../../../services/sucursal-context.service';
 import Swal from 'sweetalert2';
-
+import { MatSnackBar } from '@angular/material/snack-bar'; // 1. Asegúrate de importar esto
 
 
 @Component({
@@ -75,7 +75,8 @@ export class ListRutaComponent implements OnInit, AfterViewInit {
     private route: ActivatedRoute,
     private auth: AuthMockService,
     private sucursalContextService: SucursalContextService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar
   ) {
     this.dataSource = new MatTableDataSource(this.rutas);
     
@@ -187,9 +188,10 @@ export class ListRutaComponent implements OnInit, AfterViewInit {
   } 
 
   toggleEstadoRuta(ruta: Rutas) {
-    const nuevoEstado = ruta.estado === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO';
-    const accion = nuevoEstado === 'INACTIVO' ? 'desactivar' : 'activar';
-
+   const estadoActual = ruta.estado?.toUpperCase();
+  
+  const nuevoEstado = estadoActual === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO';
+  const accion = nuevoEstado === 'INACTIVO' ? 'desactivar' : 'activar'
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
         title: 'Confirmación',
@@ -205,13 +207,22 @@ export class ListRutaComponent implements OnInit, AfterViewInit {
           this.rutaService.editRutas(ruta.ruta_id, rutaActualizada).subscribe({
             next: () => {
               // Mantenemos Swal para el mensaje de éxito por ahora
-              Swal.fire('¡Actualizado!', `Ruta ${accion === 'desactivar' ? 'desactivada' : 'activada'} exitosamente.`, 'success');
-              this.getRutas();
+              this.snackBar.open(
+            `✅ Ruta ${accion === 'desactivar' ? 'desactivada' : 'activada'} correctamente`, 
+            'Cerrar', 
+            {
+              duration: 3000,
+              horizontalPosition: 'end',
+              verticalPosition: 'bottom',
+              panelClass: ['snackbar-success'] // Opcional: para darle color verde en CSS
+            }
+          );
+           this.getRutas();
             },
             error: (err) => {
               console.error(`Error al ${accion} la ruta:`, err);
-              Swal.fire('Error', `No se pudo ${accion} la ruta.`, 'error');
-            },
+             this.snackBar.open(`❌ No se pudo ${accion} la ruta`, 'Cerrar', { duration: 5000 });
+               },
           });
         }
       }

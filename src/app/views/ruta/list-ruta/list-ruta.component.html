@@ -82,9 +82,9 @@
               </button>
               <button mat-icon-button (click)="toggleEstadoRuta(item); $event.stopPropagation()" 
                       [matTooltip]="item.estado === 'ACTIVO' ? 'Desactivar' : 'Activar'">
-                <mat-icon [class.active-icon]="item.estado !== 'ACTIVO'" 
-                          [class.inactive-icon]="item.estado === 'ACTIVO'">
-                  {{ item.estado === 'ACTIVO' ? 'toggle_on' : 'toggle_off' }}
+                <mat-icon [class.active-icon]="item.estado?.toLowerCase() === 'activo'" 
+                          [class.inactive-icon]="item.estado?.toLowerCase() !== 'activo'">
+                  {{ item.estado?.toLowerCase() === 'activo' ? 'toggle_on' : 'toggle_off' }}
                 </mat-icon>
               </button>
             </div>

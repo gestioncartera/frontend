@@ -15,7 +15,10 @@ import {
   cilPuzzle,
   cilSettings,
   cilUser,
-  cilWarning
+  cilWarning,
+  cilWallet,      // Para Cartera/Préstamos
+  cilDescription, // Para Reportes tipo documento
+  cilBarChart
 } from '@coreui/icons';
 
 export const iconSubset = {
@@ -35,5 +38,9 @@ export const iconSubset = {
   cilPuzzle,
   cilSettings,
   cilUser,
-  cilWarning
+  cilWarning,
+  cilWallet,      // Para Cartera/Préstamos
+  cilDescription, // Para Reportes tipo documento
+  cilBarChart,
+   
 };

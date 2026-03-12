@@ -14,11 +14,13 @@ import {
   SidebarTogglerDirective
 } from '@coreui/angular';
 
+
 import { DefaultFooterComponent, DefaultHeaderComponent } from './';
 import { navItems } from './_nav';
 import { AuthService } from '../../services/auth.service';
 import { IconSetService } from '@coreui/icons-angular';
 import { filter } from 'rxjs/operators'; 
+import { SucursalContextService } from '../../services/sucursal-context.service';
 
 function isOverflown(element: HTMLElement) {
   return (
@@ -49,13 +51,25 @@ function isOverflown(element: HTMLElement) {
     ShadowOnScrollDirective
   ],
 })
+
 export class DefaultLayoutComponent implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
-  public navItems = this.getFilteredNavItems();
+  private sucursalContextService = inject(SucursalContextService);
+  
+  public navItems = this.getFilteredNavItems(); 
+  public sucursalNombre: string = 'Cargando...';
+
   constructor() {}
 
   ngOnInit(): void {
+    // 1. Suscripción a la sucursal
+    this.sucursalContextService.sucursalActual$.subscribe(sucursal => {
+      this.sucursalNombre = sucursal ? sucursal.nombre : 'Sin Sucursal';
+      console.log('Sucursal actual en DefaultLayoutComponent:', this.sucursalNombre);
+    });
+
+    // 2. Lógica para contraer menús al navegar
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe(() => {

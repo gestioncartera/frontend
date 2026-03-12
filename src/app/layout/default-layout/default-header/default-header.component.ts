@@ -1,5 +1,5 @@
 import { NgIf, CommonModule } from '@angular/common';
-import { Component, computed, inject, input, OnInit } from '@angular/core';
+import { Component, computed, inject, Input, input, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 
@@ -53,7 +53,7 @@ interface NotificationItem {
   ]
 })
 export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
-
+  @Input() sucursalNombre: string = 'Sin Sucursal';
   readonly #colorModeService = inject(ColorModeService);
   readonly colorMode = this.#colorModeService.colorMode;
   private authService = inject(AuthService);
@@ -128,7 +128,7 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
     if (userStr) {
       try {
         const user = JSON.parse(userStr);
-        this.userName = user.nombres || user.nombre || user.email || 'Usuario';
+        this.userName = user.nombres + ' ' + user.apellidos || user.nombre || user.email || 'Usuario';
         
         const roleId = user.tipo_usuario || user.rol;
         if (roleId === 1) {
