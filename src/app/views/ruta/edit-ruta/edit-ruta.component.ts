@@ -63,7 +63,7 @@ export class EditRutaComponent implements OnInit {
   ngOnInit() {
     this.id = this.route.snapshot.paramMap.get('id');
     this.cargarCobradores();
-    if (this.id) {
+    if (this.id) { 
       this.cargarRuta(this.id);
     } else {
       console.error('No se proporcionó ID de ruta para editar.');
@@ -79,6 +79,7 @@ export class EditRutaComponent implements OnInit {
         // Filtrar solo usuarios con tipo_usuario = 2 (cobradores)
         this.cobradores = usuarios.filter(u => u.tipo_usuario === 2);
         this.cobradoresFiltrados = [...this.cobradores];
+        console.log('Cobradores cargados:', this.cobradoresFiltrados);
       },
       error: (err) => {
         console.error('Error al cargar cobradores:', err);
@@ -113,6 +114,9 @@ export class EditRutaComponent implements OnInit {
 
       if (rutaData && rutaData.ruta_id) {
         this.ruta = rutaData;
+        // Asignamos el cobrador que ya tiene la ruta para que se muestre en el selector
+        this.cobradorSeleccionadoId = rutaData.usuario_id || '';
+        console.log('Ruta cargada:', rutaData);
         return;
       }
 

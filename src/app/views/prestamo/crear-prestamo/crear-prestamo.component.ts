@@ -12,14 +12,15 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { ClienteService, Cliente } from '../../../services/cliente.service';
-import { ReplaySubject, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { ClienteService,  Cliente } from '../../../services/cliente.service';
+import { ReplaySubject, Subject, Observable } from 'rxjs';
+import { takeUntil, map } from 'rxjs/operators';
 import { Prestamos, PrestamoService } from '../../../services/prestamo.service';
 import { TipoPrestamo, TipoPrestamoService } from '../../../services/tipoPrestamo.service';
 import { SucursalContextService } from '../../../services/sucursal-context.service';
 import { AuthService } from '../../../services/auth.service';
 import Swal from 'sweetalert2';
+import { Usuario } from '../../../services/usuario.service';
 @Component({
   selector: 'app-crear-prestamo',
   standalone: true,
@@ -57,7 +58,7 @@ export class CrearPrestamoComponent implements OnInit, OnDestroy {
   isEditing = false;
   editingId: number | null = null;
   tipoPrestamo: string = 'DIARIO'; // Mantener por compatibilidad si es necesario, o eliminar
-
+ ruta_id: number | null = null; // Para filtrar clientes por ruta si es necesario
   public clienteFilterCtrl: FormControl<string | null> = new FormControl<string | null>('');
   public filteredClientes: ReplaySubject<Cliente[]> = new ReplaySubject<Cliente[]>(1);
   protected _onDestroy = new Subject<void>();
@@ -74,10 +75,11 @@ export class CrearPrestamoComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    this.iscobrador  = this.authService.isCobrador();
     this.cargarClientes();
     this.cargarTiposPrestamo();
     this.periodos = JSON.parse(localStorage.getItem('periodos') || '[]');
-     this.iscobrador  = this.authService.isCobrador();
+     
 
 
     this.route.queryParams.subscribe(params => {
@@ -97,14 +99,47 @@ export class CrearPrestamoComponent implements OnInit, OnDestroy {
   }
 
   cargarClientes() {
+    const user = this.authService.getCurrentUserValue();
     const idSucursal = this.sucursalContextService.getSucursalId();
-    if (!idSucursal) return;
-    this.clienteService.getClientes(idSucursal).subscribe({
+
+    if (!idSucursal) {
+      this.snackBar.open('No se ha seleccionado una sucursal.', 'Cerrar', { duration: 3000 });
+      return;
+    }
+
+    let clientesObservable: Observable<Cliente[]>;
+    console.log('cobrador:', this.iscobrador);
+    if (this.iscobrador) {
+     
+      const userId = user?.usuario_id || (user as any)?.usuario_id;
+      if (!userId) {
+        console.error('ID de usuario cobrador no encontrado.');
+        this.snackBar.open('No se pudo identificar al cobrador.', 'Cerrar', { duration: 3000 });
+        return;
+      }
+      clientesObservable = this.clienteService.getClientesRutaUser(userId);
+      console.log('Cargando clientes para el usuario ID:', idSucursal, user);
+    } else {
+      clientesObservable = this.clienteService.getClientesRutaUser(8);
+      //clientesObservable = this.clienteService.getClientes(idSucursal);
+      console.log('Cargando clientes para sucursal ID:', idSucursal,user);
+    }
+    
+
+    clientesObservable.subscribe({
       next: (data) => {
         this.clientes = data;
         this.filteredClientes.next(this.clientes.slice());
+        console.log('Clientes cargados:', this.clientes);
       },
-      error: (err) => console.error('Error cargando clientes', err)
+      error: (err) => {
+        const mensaje = err.error?.message || 'Error al cargar los clientes.';
+        this.snackBar.open(mensaje, 'Cerrar', {
+          duration: 5000,
+          panelClass: ['error-snackbar']
+        });
+        console.error('Error cargando clientes', err);
+      }
     });
   }
 
@@ -134,8 +169,7 @@ export class CrearPrestamoComponent implements OnInit, OnDestroy {
     this.filteredClientes.next(
       this.clientes.filter(cliente => 
         cliente.nombres.toLowerCase().indexOf(search!) > -1 || 
-        cliente.apellidos.toLowerCase().indexOf(search!) > -1 ||
-        cliente.numero_identificacion.indexOf(search!) > -1
+        cliente.apellidos.toLowerCase().indexOf(search!) > -1  
       )
     );
   }

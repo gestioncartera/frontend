@@ -97,11 +97,7 @@ export class DefaultLayoutComponent implements OnInit {
     if (this.authService.isCobrador()) {
       // Cobradores ven cambio de sucursal y registro de cobro
       return [
-        {
-          name: 'Cambio de Sucursal',
-          url: '/cambio-sucursal',
-          iconComponent: { name: 'cil-settings' },
-        },
+        
         {
           name: 'Registro Cobro',
           url: '/cobro/crear-cobro',

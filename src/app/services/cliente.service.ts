@@ -16,6 +16,7 @@ export interface Cliente{
   estado: string;
   created_at: Date;
   id_ruta: number;
+  
 }
  
  
@@ -27,6 +28,8 @@ export interface ClienteCobro{
   telefonocliente: string | null;
   orden?: number;
    apellidos:string;
+   
+   
    }
 
 
@@ -45,6 +48,10 @@ getClientesByRuta(rutaId: number): Observable<ClienteCobro[]> {
     `${this.apiUrl}/getClientesByRuta/${rutaId}`
   );
 }
+getClientesRutaUser(user_id: number): Observable<Cliente[]> {
+  return this.http.get<Cliente[]>(
+    `${this.apiUrl}/getClientesRutaUser/${user_id}` );
+}
 
  //clinetes de una ruta
 getClientesByRutaPrestamo(rutaId: number): Observable<ClienteCobro[]> {
@@ -52,6 +59,7 @@ getClientesByRutaPrestamo(rutaId: number): Observable<ClienteCobro[]> {
     `${this.apiUrl}/getClientesByRutaPrestamo/${rutaId}`
   );
 }
+ 
 
 getClientes(id_sucursal: number | string): Observable<Cliente[]> {
   return this.http.get<Cliente[]>(`${this.apiUrl}/getClientes/${id_sucursal}`);

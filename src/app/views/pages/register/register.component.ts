@@ -94,9 +94,9 @@ export class RegisterComponent implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
 
-    const { nombre, email, password, tipoUsuarioId } = this.registerForm.value;
+    const { nombre, email, password, tipo_usuario } = this.registerForm.value;
 
-    this.authService.register({ nombre, email, password, tipoUsuarioId: +tipoUsuarioId }).subscribe({
+    this.authService.register({ nombre, email, password, tipo_usuario, sucursal_id: 1 }).subscribe({
       next: () => {
         this.successMessage = '¡Registro exitoso! Redirigiendo...';
         setTimeout(() => {

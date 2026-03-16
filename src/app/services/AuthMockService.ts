@@ -15,7 +15,7 @@ export class AuthMockService {
     } 
     // tipoUsuarioId: 1 = admin, 2 = cobrador
     // Intentamos leer tipoUsuarioId (Frontend/Mock) o tipo_usuario (Backend común)
-    const rolId = user.tipoUsuarioId || (user as any).tipo_usuario;
+    const rolId = user.tipo_usuario;
     return isNaN(Number(rolId)) ? 1 : Number(rolId);
   }
 

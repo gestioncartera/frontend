@@ -6,12 +6,13 @@ import { environment } from '../../environments/environment';
 import { SucursalContextService } from './sucursal-context.service';
 
 export interface Usuario {
-  usuario_id: number  ;
+  usuario_id: number;
   nombre: string;
-  email: string;
-  tipoUsuarioId: number;
-  tipoUsuario?: string;
-  sucursalId?: number;
+  apellidos?: string;     // Para consistencia con otros componentes
+  email: string; 
+  tipo_usuario?: number;   // 📍 Formato Real del Backend  
+  sucursal_id?: number;   // El backend suele usar snake_case también aquí
+  nombre_sucursal?: string; // Nombre de la sucursal para el contexto
 }
 
 export interface LoginResponse {
@@ -23,8 +24,8 @@ export interface RegisterData {
   nombre: string;
   email: string;
   password: string;
-  tipoUsuarioId: number;
-  sucursalId?: number;
+  tipo_usuario: number;
+  sucursal_id: number;
 }
 
 @Injectable({
@@ -46,28 +47,25 @@ export class AuthService {
       usuario_id: 1,
       nombre: 'Administrador',
       email: 'admin@test.com',
-      password: '123456',
-      tipoUsuarioId: 1,
-      tipoUsuario: 'Administrador',
-      sucursalId: 1
+      password: '123456', 
+      tipo_usuario: 1,
+      sucursal_id: 1
     },
     {
       usuario_id: 2,
       nombre: 'Cobrador 1',
       email: 'cobrador@test.com',
       password: '123456',
-      tipoUsuarioId: 2,
-      tipoUsuario: 'Cobrador',
-      sucursalId: 1
+      tipo_usuario: 2, 
+      sucursal_id: 1
     },
     {
       usuario_id: 3,
       nombre: 'Juan Pérez',
       email: 'juan@test.com',
       password: '123456',
-      tipoUsuarioId: 2,
-      tipoUsuario: 'Cobrador',
-      sucursalId: 1
+      tipo_usuario: 2, 
+      sucursal_id: 1
     }
   ];
 
@@ -146,9 +144,8 @@ export class AuthService {
       nombre: data.nombre,
       email: data.email,
       password: data.password,
-      tipoUsuarioId: data.tipoUsuarioId,
-      tipoUsuario: data.tipoUsuarioId === 1 ? 'Administrador' : 'Cobrador',
-      sucursalId: data.sucursalId || 1
+      tipo_usuario: data.tipo_usuario, 
+      sucursal_id: data.sucursal_id || 1
     };
 
     this.mockUsers.push(newUser);
@@ -219,13 +216,13 @@ export class AuthService {
   }
 
   // Logout
-  logout(): void {
-    localStorage.clear(); // Limpia todo el localStorage (tokens, usuario, temas, etc.)
-    sessionStorage.clear(); // Limpiar también sessionStorage para el token
-    this.currentUserSubject.next(null);
-    this.sucursalContextService.clearSucursal(); // Limpiar sucursal al cerrar sesión
-    this.router.navigate(['/login']);
-  }
+logout(): void {
+  localStorage.removeItem('currentUser');
+  sessionStorage.removeItem('token'); // Donde guardas el token ahora
+  this.currentUserSubject.next(null);
+  this.sucursalContextService.clearSucursal();
+  this.router.navigate(['/login']);
+}
 
   // Verificar si el usuario está autenticado
   isAuthenticated(): boolean {
@@ -245,22 +242,31 @@ export class AuthService {
 
   // Helper para obtener el rol de forma segura
   private getRolId(): number | null {
-    const user = this.getCurrentUser();
+    const user = this.getCurrentUser(); 
     if (!user) return null;
 
     // Intentamos leer tipoUsuarioId (frontend/mock) o tipo_usuario (backend real)
-    const rolId = user.tipoUsuarioId ?? (user as any).tipo_usuario;
-    const numericRolId = Number(rolId);
-    return isNaN(numericRolId) ? null : numericRolId;
+  const rolId = user.tipo_usuario ;
+   console.log(`[Auth] Usuario: ${user.nombre}, Rol detectado: ${rolId}`);
+
+  const numericRolId = Number(rolId);
+  return isNaN(numericRolId) ? null : numericRolId;
   }
 
   // Verificar si es admin
   isAdmin(): boolean {
     return this.getRolId() === 1; // Asumiendo que 1 es admin
   }
-
+/*
   // Verificar si es cobrador
   isCobrador(): boolean {
+    
     return this.getRolId() === 2; // Asumiendo que 2 es cobrador
-  }
+  }   */
+  isCobrador(): boolean {
+  const rolId = this.getRolId();
+  const resultado = Number(rolId) === 2;
+  console.log(`[DEBUG] Comparando: ${rolId} (tipo: ${typeof rolId}) con 2. Resultado: ${resultado}`);
+  return resultado;
+}
 }

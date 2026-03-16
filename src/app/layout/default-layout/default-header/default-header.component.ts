@@ -128,7 +128,7 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
     if (userStr) {
       try {
         const user = JSON.parse(userStr);
-        this.userName = user.nombres + ' ' + user.apellidos || user.nombre || user.email || 'Usuario';
+        this.userName = user.nombre + ' ' + user.apellidos || user.nombre || user.email || 'Usuario';
         
         const roleId = user.tipo_usuario || user.rol;
         if (roleId === 1) {

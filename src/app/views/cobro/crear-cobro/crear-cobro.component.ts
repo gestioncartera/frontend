@@ -39,7 +39,7 @@ export class CrearCobroComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = ['nombrecliente', 'direccioncliente', 'telefonocliente', 'acciones'];
   dataSource: MatTableDataSource<ClienteCobro>;
   isMobile = false;
-  rutaId: number = 1;
+  
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 

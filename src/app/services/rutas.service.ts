@@ -10,6 +10,7 @@ export interface Rutas {
   nombre_ruta: string;
   descripcion?: string;
   cobrador?: string;
+  usuario_id?: number;
   zona?: string;
   fecha_creacion?: Date;
   estado?: string;
