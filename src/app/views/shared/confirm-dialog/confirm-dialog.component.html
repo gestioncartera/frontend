@@ -1,22 +1,30 @@
-<h2 mat-dialog-title class="dialog-title">
-  <mat-icon [ngClass]="data.type">{{ data.icon }}</mat-icon>
-  {{ data.title }}
-</h2>
+<div class="dialog-wrapper" [ngClass]="data.type || 'info'">
+  <h2 mat-dialog-title class="dialog-header">
+    <mat-icon [ngClass]="data.type" class="header-icon">
+      {{ data.icon || 'info' }}
+    </mat-icon>
+    <span class="title-text">{{ data.title }}</span>
+  </h2>
 
-<mat-dialog-content class="dialog-content">
-  <p [innerHTML]="data.message"></p>
-</mat-dialog-content>
+  <mat-dialog-content class="dialog-body">
+    <p [innerHTML]="data.message"></p>
+  </mat-dialog-content>
 
-<mat-dialog-actions align="end">
-  <button mat-stroked-button (click)="cancelar()">
-    {{ data.cancelText || 'Cancelar' }}
-  </button>
+  <mat-dialog-actions align="end" class="dialog-footer">
+    <button 
+      mat-stroked-button 
+      (click)="cancelar()" 
+      *ngIf="data.cancelText"
+      class="btn-cancel">
+      {{ data.cancelText }}
+    </button>
 
-  <button
-    mat-flat-button
-    [color]="data.color || 'primary'"
-    (click)="confirmar()">
-    {{ data.confirmText || 'Confirmar' }}
-  </button>
-</mat-dialog-actions>
-
+    <button 
+      mat-flat-button 
+      [color]="data.color || 'primary'" 
+      (click)="confirmar()"
+      class="btn-confirm">
+      {{ data.confirmText || 'Aceptar' }}
+    </button>
+  </mat-dialog-actions>
+</div>

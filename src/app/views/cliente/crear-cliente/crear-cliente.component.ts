@@ -9,6 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { ClienteService, Cliente } from '../../../services/cliente.service';
 import { RutasService, Rutas } from '../../../services/rutas.service'; // Nueva importación
 import { SucursalContextService } from '../../../services/sucursal-context.service';
@@ -31,7 +32,8 @@ import { takeUntil } from 'rxjs/operators';
     MatSelectModule,
     MatIconModule,
     MatDialogModule,
-    NgxMatSelectSearchModule // Agregado
+    NgxMatSelectSearchModule, // Agregado
+    MatSnackBarModule
   ],
   templateUrl: './crear-cliente.component.html',
   styleUrls: ['./crear-cliente.component.scss'],
@@ -61,7 +63,8 @@ export class CrearClienteComponent implements OnInit, OnDestroy {
     private clienteService: ClienteService,
     private rutasService: RutasService, // Inyección del servicio
     private sucursalContextService: SucursalContextService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit() {
@@ -134,7 +137,19 @@ export class CrearClienteComponent implements OnInit, OnDestroy {
     const selectedRutaId = this.rutaCtrl.value; 
 
     if (!this.nombre || !this.apellido || !this.identificacion || !this.telefono || !this.direccion || !selectedRutaId || !this.sucursalId) {
-      window.alert('Completa todos los campos obligatorios (incluyendo sucursal).');
+     this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Campos Incompletos',
+        message: 'Por favor, <b>completa todos los campos obligatorios</b> antes de continuar. Asegúrate de haber seleccionado una ruta y que la sucursal esté activa.',
+        confirmText: 'Entendido',
+        // Ocultamos el cancelar para que parezca una alerta simple de "OK"
+        cancelText: '', 
+        type: 'warning',
+        icon: 'priority_high',
+        color: 'primary' 
+      }
+    });
       return;
     }
 

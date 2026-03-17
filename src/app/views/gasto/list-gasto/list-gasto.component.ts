@@ -15,6 +15,8 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import Swal from 'sweetalert2';
 import { CajaService, MovimientoCajaSucursal } from '../../../services/caja-sucursal.service';
 import { SucursalContextService } from '../../../services/sucursal-context.service';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-list-gasto',
@@ -33,7 +35,8 @@ import { SucursalContextService } from '../../../services/sucursal-context.servi
     MatSortModule,
     MatSelectModule,
     MatCardModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatDialogModule
   ],
 })
 export class ListGastoComponent implements OnInit, AfterViewInit {
@@ -53,7 +56,8 @@ export class ListGastoComponent implements OnInit, AfterViewInit {
     private router: Router, 
     private responsive: BreakpointObserver,
     private cajaService: CajaService,
-    private sucursalContextService: SucursalContextService
+    private sucursalContextService: SucursalContextService,
+    private dialog: MatDialog
   ) {
     this.dataSource = new MatTableDataSource(this.movimientosData);
   }
@@ -67,8 +71,21 @@ export class ListGastoComponent implements OnInit, AfterViewInit {
       this.loadBalance();
       this.setupFilter();
     } else {
-      Swal.fire('Advertencia', 'No ha seleccionado una sucursal.', 'warning');
-      this.router.navigate(['/cambio-sucursal']);
+     this.dialog.open(ConfirmDialogComponent, {
+        width: '400px',
+        data: {
+          title: 'Advertencia',
+          message: 'No ha seleccionado una sucursal activa.',
+          confirmText: 'Ir a Selección',
+          cancelText: '', // Solo un botón para forzar la navegación
+          type: 'warning',
+          icon: 'storefront',
+          color: 'primary'
+        }
+      }).afterClosed().subscribe(() => {
+        this.router.navigate(['/cambio-sucursal']);
+      });
+    
     }
   }
 
@@ -87,7 +104,16 @@ export class ListGastoComponent implements OnInit, AfterViewInit {
       },
       error: (err) => {
         console.error('Error al cargar movimientos', err);
-        Swal.fire('Error', 'No se pudieron cargar los movimientos.', 'error');
+        this.dialog.open(ConfirmDialogComponent, {
+          data: {
+            title: 'Error de Carga',
+            message: 'No se pudieron recuperar los movimientos de caja.',
+            confirmText: 'Reintentar',
+            type: 'error',
+            icon: 'cloud_off',
+            color: 'warn'
+          }
+        });
       }
     });
   }
@@ -130,39 +156,54 @@ export class ListGastoComponent implements OnInit, AfterViewInit {
   }
 
   delete = async (item: MovimientoCajaSucursal): Promise<void> => {
-    const confirm = await Swal.fire({
-      title: '¿Eliminar registro?',
-      text: `Se eliminará el movimiento: ${item.descripcion}`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#2563eb',
-      cancelButtonColor: '#ef4444',
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar',
-      reverseButtons: true
+   const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '420px',
+      data: {
+        title: '¿Eliminar registro?',
+        message: `¿Está seguro de eliminar el movimiento: <b>${item.descripcion}</b>? Esta acción afectará el saldo actual de caja.`,
+        confirmText: 'Sí, eliminar',
+        cancelText: 'Cancelar',
+        type: 'error',
+        icon: 'delete_forever',
+        color: 'warn'
+      }
     });
 
-    if (confirm.isConfirmed) {
-      this.cajaService.deleteMovimiento(item.movimiento_id).subscribe({
-        next: () => {
-          Swal.fire({
-            icon: 'success',
-            title: 'Eliminado',
-            text: 'El movimiento ha sido eliminado.',
-            timer: 1500,
-            showConfirmButton: false
-          });
-          // Recargar datos después de la eliminación
-          this.loadMovimientos();
-          this.loadBalance();
-        },
-        error: (err) => {
-          
-          console.error('Error al eliminar el movimiento', err);
-          Swal.fire('Error', 'No se pudo eliminar el movimiento.', 'error');
-        }
-      });
-    }
+   dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.cajaService.deleteMovimiento(item.movimiento_id).subscribe({
+          next: () => {
+            // Alerta de éxito (opcional, podrías usar un SnackBar aquí para que sea menos intrusivo)
+            this.dialog.open(ConfirmDialogComponent, {
+              width: '350px',
+              data: {
+                title: 'Eliminado',
+                message: 'El registro ha sido removido exitosamente.',
+                confirmText: 'Aceptar',
+                cancelText: '',
+                type: 'success',
+                icon: 'check_circle',
+                color: 'primary'
+              }
+            });
+            this.loadMovimientos();
+            this.loadBalance();
+          },
+          error: (err) => {
+            this.dialog.open(ConfirmDialogComponent, {
+              data: {
+                title: 'Error',
+                message: 'No se pudo completar la eliminación del registro.',
+                confirmText: 'Entendido',
+                type: 'error',
+                icon: 'error',
+                color: 'warn'
+              }
+            });
+          }
+        });
+      }
+    });
   };
 
   

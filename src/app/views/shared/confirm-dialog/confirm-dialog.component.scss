@@ -1,17 +1,65 @@
-.dialog-title {
+.dialog-wrapper {
+  padding: 8px;
+  min-width: 320px;
+}
+
+.dialog-header {
   display: flex;
   align-items: center;
   gap: 12px;
+  margin: 0;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 1.25rem;
+  font-weight: 600;
+
+  .header-icon {
+    font-size: 30px;
+    width: 30px;
+    height: 30px;
+    
+    /* Colores dinámicos para el icono */
+    &.success { color: #2e7d32; } // Verde: Éxito
+    &.warning { color: #ed6c02; } // Naranja: Advertencia de campos
+    &.error   { color: #d32f2f; } // Rojo: Error de sistema o caja
+    &.info    { color: #0288d1; } // Azul: Información general
+  }
 }
 
-mat-icon.warning {
-  color: #ef6c00;
+.dialog-body {
+  padding: 20px 0 !important;
+  font-size: 15px;
+  color: #4a4a4a;
+  line-height: 1.6;
+
+  /* Estilo para cuando uses <b> dentro del mensaje */
+  b {
+    color: #000;
+    font-weight: 700;
+  }
 }
 
-mat-icon.error {
-  color: #c62828;
+.dialog-footer {
+  padding: 12px 0 4px 0 !important;
+  gap: 10px;
+
+  button {
+    padding: 0 20px;
+    height: 40px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+  }
+
+  .btn-cancel {
+    color: #666;
+    border-color: #ddd;
+  }
 }
 
-mat-icon.info {
-  color: #1565c0;
-}
+/* Opcional: Agregar un borde superior de color según el tipo */
+.success { border-top: 4px solid #2e7d32; }
+.warning { border-top: 4px solid #ed6c02; }
+.error   { border-top: 4px solid #d32f2f; }
+.info    { border-top: 4px solid #0288d1; }
