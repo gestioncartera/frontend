@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
+import { SucursalService } from './sucursal.service';
 
 export interface SucursalContext {
   id: number;
@@ -15,7 +17,7 @@ export class SucursalContextService {
   private sucursalActualSubject = new BehaviorSubject<SucursalContext | null>(this.getSucursalFromStorage());
   public sucursalActual$ = this.sucursalActualSubject.asObservable();
 
-  constructor() {}
+  constructor(private sucursalService: SucursalService) {}
 
   // Obtener sucursal del localStorage
   private getSucursalFromStorage(): SucursalContext | null {
@@ -55,5 +57,26 @@ export class SucursalContextService {
   clearSucursal(): void {
     localStorage.removeItem(this.STORAGE_KEY);
     this.sucursalActualSubject.next(null);
+  }
+
+  getSucursal(): Observable<SucursalContext | null> {
+    const sucursalId = this.getSucursalId();
+    if (!sucursalId) {
+      return of(null);
+    }
+    return this.sucursalService.getSucursalById(sucursalId).pipe(
+      map(sucursal => {
+        if (sucursal) {
+          // Mapea la interfaz Sucursal a SucursalContext
+          return {
+            id: sucursal.sucursal_id,
+            nombre: sucursal.nombre,
+            direccion: sucursal.direccion
+          };
+        }
+        return null;
+      }),
+      catchError(() => of(null)) // En caso de error, devuelve null
+    );
   }
 }

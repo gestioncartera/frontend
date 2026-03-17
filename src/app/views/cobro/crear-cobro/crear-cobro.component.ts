@@ -13,6 +13,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Cliente, ClienteCobro, ClienteService } from '../../../services/cliente.service';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthService } from '../../../services/auth.service';
 
 @Component({
@@ -31,6 +32,7 @@ import { AuthService } from '../../../services/auth.service';
     MatSortModule,
     MatFormFieldModule,
     MatInputModule,
+    MatSnackBarModule,
   ],
   templateUrl: './crear-cobro.component.html',
   styleUrls: ['./crear-cobro.component.scss']
@@ -47,7 +49,8 @@ export class CrearCobroComponent implements OnInit, AfterViewInit {
     private router: Router,
     private clienteService: ClienteService,
     private responsive: BreakpointObserver,
-    private authService: AuthService
+    private authService: AuthService,
+    private snackBar: MatSnackBar
   ) {
     this.dataSource = new MatTableDataSource<ClienteCobro>([]);
   }
@@ -84,10 +87,19 @@ export class CrearCobroComponent implements OnInit, AfterViewInit {
         },
         error: (err) => {
           console.error('Error al cargar clientes:', err);
+          const errorMsg = err.error?.message || 'No se pudieron cargar los clientes.';
+          this.snackBar.open(`⚠️ ${errorMsg}`, 'Cerrar', {
+            duration: 5000,
+            panelClass: ['error-snackbar']
+          });
         }
       });
     } else {
       console.error('No se encontró usuario logueado o ID válido. Objeto usuario:', user);
+      this.snackBar.open('⚠️ No se pudo identificar al usuario. Por favor, inicie sesión de nuevo.', 'Cerrar', {
+        duration: 5000,
+        panelClass: ['error-snackbar']
+      });
     }
   }
 

@@ -232,6 +232,14 @@ private guardarCobroConfirmado(): void {
     
   });
 }
+confirmarEdicionRapida(pago: any) {
+  console.log('Nuevo abono a guardar:', pago.abono);  
+}
+
+validarAbonoTemporal(pago: any) {
+  if (pago.abono < 0) pago.abono = 0;
+  // Opcional: validar que no exceda el saldo total
+}
 
 
   // ============================

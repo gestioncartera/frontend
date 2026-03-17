@@ -38,4 +38,7 @@ export class SucursalService {
   deleteSucursal(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/deleteSucursal/${id}`);
   }
+  getSucursalById(id: number): Observable<Sucursal> {
+    return this.http.get<Sucursal>(`${this.apiUrl}/getSucursalById/${id}`);
+  } 
 }

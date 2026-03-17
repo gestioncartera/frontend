@@ -48,11 +48,25 @@
           </ng-container>
 
           <ng-container matColumnDef="abono">
-            <th mat-header-cell *matHeaderCellDef>Abono</th>
-            <td mat-cell *matCellDef="let p" class="texto-verde">
-              {{ p.abono | currency }}
-            </td>
-          </ng-container>
+              <th mat-header-cell *matHeaderCellDef>Abono</th>
+              <td mat-cell *matCellDef="let p" class="texto-verde">
+                
+              <div *ngIf="p.estado?.toUpperCase() === 'PENDIENTE'; else vistaNormal" class="edit-container">
+                <input 
+                  type="number" 
+                  [(ngModel)]="p.abono" 
+                  class="input-tabla-editable"
+                  (change)="validarAbonoTemporal(p)"
+                >
+                <mat-icon class="icon-save-mini" (click)="confirmarEdicionRapida(p)">check_circle</mat-icon>
+                </div>
+
+                <ng-template #vistaNormal>
+                  {{ p.abono | currency }}
+                </ng-template>
+
+              </td>
+            </ng-container>
 
           <ng-container matColumnDef="estado">
             <th mat-header-cell *matHeaderCellDef>Estado</th>

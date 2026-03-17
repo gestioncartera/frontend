@@ -19,6 +19,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { AuthService, Usuario } from '../../../services/auth.service';
 import { SucursalContextService } from '../../../services/sucursal-context.service';
+import { SucursalService } from '../../../services/sucursal.service';
 
 @Component({
   selector: 'app-login',
@@ -49,13 +50,16 @@ export class LoginComponent implements OnInit {
   loading = false;
   errorMessage = '';
   returnUrl = '';
+  nombreSucursal: string = ''; 
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
     private route: ActivatedRoute,
-    private sucursalContextService: SucursalContextService
+    private sucursalContextService: SucursalContextService,
+    private sucursalService: SucursalService
+    
   ) {}
 
   ngOnInit(): void {
@@ -91,38 +95,36 @@ onSubmit(): void {
 
   this.authService.login(email, password).subscribe({
     next: (response) => {
-      console.log('Respuesta Login:', response);
+      const user = response.usuario;
 
-      let targetUrl: string;
-
-      // 1. Verificación de Rol
+      // 1. Caso Cobrador: Redirección ASÍNCRONA (dentro del segundo subscribe)
       if (this.authService.isCobrador()) {
-        const user = response.usuario;
-
-        // 2. Control de Sucursal: Forzamos el ingreso a su sucursal asignada
         if (user && user.sucursal_id) {
-          this.sucursalContextService.setSucursalActual({
-            id: user.sucursal_id,
-            nombre: user.nombre_sucursal || 'Mi Sucursal'
+          this.sucursalService.getSucursalById(user.sucursal_id).subscribe({
+            next: (sucursal: any) => {
+              this.sucursalContextService.setSucursalActual({
+                id: user.sucursal_id!,
+                nombre: sucursal.nombre
+              });
+              // Redirigimos directamente aquí y salimos
+              this.router.navigate(['/crear-cobro']);
+            },
+            error: () => {
+              this.errorMessage = 'Error al verificar sucursal.';
+              this.loading = false;
+            }
           });
-          
-          console.log('Sucursal bloqueada para cobrador:', user.sucursal_id);
-          targetUrl = '/crear-cobro';
         } else {
-          // Si el cobrador no tiene sucursal en DB, bloqueamos el acceso
-          this.errorMessage = 'Error: Su cuenta de cobrador no tiene una sucursal asignada.';
+          this.errorMessage = 'Error: Su cuenta no tiene una sucursal asignada.';
           this.loading = false;
-          return;
         }
-      } else {
-        // Si es Admin u otro rol, va a la selección de sucursal o returnUrl
-        targetUrl = this.returnUrl;
+      } 
+      // 2. Caso Otros Roles: Redirección SINCRÓNICA
+      else {
+        this.router.navigate([this.returnUrl]).then(success => {
+          if (!success) this.loading = false;
+        });
       }
-
-      // 3. Redirección final
-      this.router.navigate([targetUrl]).then(success => {
-        if (!success) this.loading = false;
-      });
     },
     error: (error) => {
       console.error('Error en login:', error);

@@ -158,3 +158,36 @@
   font-size: 15px;
   margin-top: 10px;
 }
+
+/* Contenedor del input en la celda */
+.edit-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Input minimalista para la tabla */
+.input-tabla-editable {
+  width: 80px;
+  border: 1px solid #1976d2;
+  border-radius: 4px;
+  padding: 4px;
+  font-weight: 700;
+  color: #2e7d32;
+  outline: none;
+  background-color: #f0f7f0;
+}
+
+/* Icono de guardado rápido */
+.icon-save-mini {
+  color: #2e7d32;
+  cursor: pointer;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  transition: transform 0.2s;
+}
+
+.icon-save-mini:hover {
+  transform: scale(1.2);
+}

@@ -40,12 +40,12 @@ export const navItems: INavData[] = [
         icon: 'nav-icon-bullet',
       },
       {
-        name: 'Gastos Sucursal',
+        name: 'Movimientos Sucursal',
         url: '/gasto/list-gasto',
         icon: 'nav-icon-bullet',
       },
       {
-        name: 'Gastos Diarios',
+        name: 'Movimientos Diarios',
         url: '/gasto/registro-egreso-diario',
         icon: 'nav-icon-bullet',
       },
