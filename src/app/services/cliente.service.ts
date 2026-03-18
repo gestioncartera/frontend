@@ -16,6 +16,7 @@ export interface Cliente{
   estado: string;
   created_at: Date;
   id_ruta: number;
+  nombre_ruta: string;
   
 }
  

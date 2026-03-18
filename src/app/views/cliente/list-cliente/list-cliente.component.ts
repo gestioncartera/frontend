@@ -44,7 +44,7 @@ export class ListClienteComponent implements OnInit {
   dataSource = new MatTableDataSource<Cliente>([]);
   allClientes: Cliente[] = [];
   rutaFilter = new FormControl('');
-  rutas: number[] = [];
+  rutas: string[] = [];
   mode: string = 'normal'; 
   isMobile = false;
 
@@ -123,7 +123,7 @@ export class ListClienteComponent implements OnInit {
       next: (data) => {
         this.allClientes = data;
         this.dataSource.data = data;
-        this.rutas = [...new Set(this.allClientes.map(c => c.id_ruta))].sort((a, b) => a - b);
+        this.rutas = [...new Set(this.allClientes.map(c => c.nombre_ruta))].sort((a, b) => a.localeCompare(b));
         this.dataSource.paginator = this.paginator;
         console.log('Clientes cargados:', data);
       },
