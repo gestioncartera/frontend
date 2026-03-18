@@ -12,6 +12,8 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { SucursalContextService } from '../../../services/sucursal-context.service';
 import { CajaService } from '../../../services/caja-sucursal.service';
 import { AuthService } from '../../../services/auth.service';
+import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-registro-egreso-suc',
@@ -41,7 +43,8 @@ export class RegistroEgresoSucComponent implements OnInit {
     private snackBar: MatSnackBar,
     private cajaService: CajaService,
     private sucursalContextService: SucursalContextService,
-    private authService: AuthService
+    private authService: AuthService,
+     private dialog: MatDialog
   ) {
     this.egresoForm = this.fb.group({
       tipo: ['egreso', Validators.required],
@@ -73,15 +76,21 @@ onSubmit(): void {
     const usuarioId = currentUser?.usuario_id;
 
     if (!usuarioId) {
-      this.snackBar.open('Error: No se pudo identificar al usuario. Inicie sesión nuevamente.', 'Cerrar', { duration: 3000 });
+      this.dialog.open(ConfirmDialogComponent, {
+        data: {
+          title: 'Sesión Expirada',
+          message: 'No se pudo identificar al usuario. Inicie sesión nuevamente.',
+          type: 'error', icon: 'lock', color: 'warn', confirmText: 'Aceptar'
+        }
+      });
       return;
     }
 
     const data = {
       ...this.egresoForm.value,
-      caja_sucursal_id: this.sucursalId, // Usar el ID de la sucursal seleccionada
-      usuario_responsable_id: usuarioId, // Requerido según tu imagen
-      tipo_movimiento: this.egresoForm.value.tipo // 'ingreso' o 'egreso'
+      caja_sucursal_id: this.sucursalId,
+      usuario_responsable_id: usuarioId,
+      tipo_movimiento: this.egresoForm.value.tipo
     };
 
     this.cajaService.createMovimiento(data).subscribe({
@@ -90,7 +99,23 @@ onSubmit(): void {
         this.router.navigate(['/gasto/list-gasto']);
       },
       error: (err) => {
-        this.snackBar.open('Error: ' + (err.error?.msg || 'No se pudo guardar'), 'Cerrar', { duration: 5000 });
+        console.error('Error detallado:', err);
+
+        // EXTRAER EL MENSAJE: Según tu imagen, el mensaje viene en err.error.error
+        const mensajeServidor = err.error?.error || 'No se pudo completar la operación.';
+
+        this.dialog.open(ConfirmDialogComponent, {
+          width: '400px',
+          data: {
+            title: 'Movimiento Rechazado',
+            message: `El sistema indica: <b>${mensajeServidor}</b>`,
+            confirmText: 'Corregir',
+            cancelText: '', // Ocultamos cancelar porque es un error de regla de negocio
+            type: 'error',
+            icon: 'account_balance_wallet',
+            color: 'warn'
+          }
+        });
       }
     });
   }
