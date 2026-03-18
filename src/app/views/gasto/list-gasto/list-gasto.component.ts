@@ -190,10 +190,11 @@ export class ListGastoComponent implements OnInit, AfterViewInit {
             this.loadBalance();
           },
           error: (err) => {
+            const errorMessage = err.error?.message || err.error?.error || 'No se pudo completar la eliminación del registro.';
             this.dialog.open(ConfirmDialogComponent, {
               data: {
                 title: 'Error',
-                message: 'No se pudo completar la eliminación del registro.',
+                message: errorMessage,
                 confirmText: 'Entendido',
                 type: 'error',
                 icon: 'error',

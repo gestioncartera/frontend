@@ -121,20 +121,7 @@ onSubmit(): void {
   }
 }
 
-  eliminar(id: number): void {
-    if (confirm('¿Está seguro de que desea eliminar este registro?')) {
-      this.cajaService.deleteMovimiento(id).subscribe({
-        next: () => {
-          this.snackBar.open('Registro eliminado correctamente', 'Cerrar', { duration: 3000 });
-          // Redirigir a la lista después de eliminar
-          this.router.navigate(['/gasto/list-gasto']);
-        },
-        error: (err) => {
-          this.snackBar.open('Error al eliminar: ' + (err.error?.msg || 'No se pudo eliminar'), 'Cerrar', { duration: 3000 });
-        }
-      });
-    }
-  }
+ 
 
   loadBalance(): void {
     if (!this.sucursalId) return;

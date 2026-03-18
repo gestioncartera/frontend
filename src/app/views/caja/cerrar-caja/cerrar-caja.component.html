@@ -79,7 +79,10 @@
             
             <div class="input-money-compact mb-2">
               <span class="currency-label-sm">$</span>
-              <input cFormControl id="montoReal" type="number" [(ngModel)]="montoReal" (input)="actualizarDiferencia()" 
+              <input cFormControl id="montoReal" type="number" 
+              [(ngModel)]="montoReal" 
+              (input)="actualizarDiferencia()" 
+              (focus)="$event.target.select()"
                      class="input-clean-sm" placeholder="0.00" />
             </div>
 

@@ -29,11 +29,11 @@ export const navItems: INavData[] = [
     url: '/gasto',
     iconComponent: { name: 'cil-calculator' },
     children: [
-       {
+       /*{
         name: 'Abrir Caja',
         url: '/caja/abrir-caja',
         icon: 'nav-icon-bullet',
-      },
+      },*/
        {
         name: 'Cierre de Caja',
         url: '/caja/cerrar-caja',
