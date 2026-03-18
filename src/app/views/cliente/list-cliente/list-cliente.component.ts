@@ -101,7 +101,7 @@ export class ListClienteComponent implements OnInit {
         this.dataSource.data = this.allClientes;
       } else {
         this.dataSource.data = this.allClientes.filter(
-          (c) => c.id_ruta === Number(rutaId)
+          (c) => c.nombre_ruta ===  (rutaId)
         );
       }
       if (this.dataSource.paginator) {

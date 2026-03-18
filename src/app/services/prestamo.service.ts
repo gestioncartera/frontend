@@ -108,5 +108,9 @@ createPrestamo(prestamo: Partial<Prestamos>): Observable<Prestamos> {
 confirmarPrestamo(prestamo_id: number): Observable<any> { 
   return this.http.patch<any>(`${this.apiUrl}/confirmarPrestamo/${prestamo_id}`, {});
 }
+
+rechazarPrestamo(id: number) {
+  return this.http.patch(`${this.apiUrl}/rechazarPrestamo/${id}`, {  });
+}
   
 }

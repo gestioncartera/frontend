@@ -103,8 +103,8 @@ export class TipoPrestamoComponent implements OnInit {
     if (this.cantidadCuotas === null || this.porcentaje === null) {
       this.snackBar.open('Por favor, completa todos los campos.', 'Cerrar', {
         duration: 3000,
-        horizontalPosition: 'end',
-        verticalPosition: 'top',
+        horizontalPosition: 'center',
+        verticalPosition: 'bottom',
         panelClass: ['warning-snackbar']
       });
       return;
@@ -113,7 +113,7 @@ export class TipoPrestamoComponent implements OnInit {
        const tipoPrestamoData = {
     cantidad_cuotas: Number(this.cantidadCuotas),
     porcentaje: Number(this.porcentaje),
-    // CAMBIO AQUÍ: Asegúrate que la propiedad se llame 'nombre' 
+    sucursal_id: this.sucursalContextService.getSucursalId(),
     // porque tu backend hace: tipoPrestamo.nombre
     nombre: this.nombrePlan 
   };
@@ -149,7 +149,7 @@ export class TipoPrestamoComponent implements OnInit {
           console.log('Datos a actualizar:', tipoPrestamoData);
           this.snackBar.open('Configuración guardada exitosamente', 'Cerrar', {
             duration: 3000,
-            horizontalPosition: 'end',
+            horizontalPosition: 'center',
             verticalPosition: 'bottom',
             panelClass: ['success-snackbar']
           });

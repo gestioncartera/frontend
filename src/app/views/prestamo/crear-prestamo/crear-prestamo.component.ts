@@ -256,7 +256,9 @@ const fechaFormateada = this.fecha.toISOString().split('T')[0];
         verticalPosition: 'top',
         horizontalPosition: 'right'
       });
-      this.cancelar();
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     },
     error: (err) => {
       console.error('Error:', err);

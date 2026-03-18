@@ -57,6 +57,13 @@
                   matTooltip="Aprobar Préstamo">
             <mat-icon>check_circle</mat-icon>
           </button>
+          <button mat-icon-button 
+            color="warn" 
+            (click)="eliminarPrestamo(row)" 
+            matTooltip="Eliminar Préstamo"
+            [disabled]="row.estado === 'APROBADO'">
+          <mat-icon>delete_outline</mat-icon>
+        </button>
         </td>
       </ng-container>
 

@@ -12,6 +12,9 @@ import { MatCardModule } from '@angular/material/card';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import Swal from 'sweetalert2';
 import { SucursalContextService } from '../../../services/sucursal-context.service';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
 @Component({
   selector: 'app-aprobar-prestamo',
   standalone: true,
@@ -27,7 +30,8 @@ import { SucursalContextService } from '../../../services/sucursal-context.servi
     MatCardModule,
     MatButtonModule,
     MatIconModule,
- 
+    MatDialogModule,
+    MatSnackBarModule
   ],
 })
 export class AprobarPrestamoComponent implements OnInit {
@@ -42,7 +46,9 @@ export class AprobarPrestamoComponent implements OnInit {
 
   constructor(private prestamoService: PrestamoService,
      private responsive: BreakpointObserver,
-     private sucursalContextService: SucursalContextService) {}
+     private sucursalContextService: SucursalContextService,
+     private dialog: MatDialog,
+     private snackBar: MatSnackBar) {}
 
   ngOnInit(): void {
     const idSucursal = this.sucursalContextService.getSucursalId();
@@ -120,6 +126,39 @@ export class AprobarPrestamoComponent implements OnInit {
           console.error(err);
           Swal.fire('Error', 'No se pudo confirmar el préstamo.', 'error');
           this.loading = false;
+        }
+      });
+    }
+  });
+}
+
+
+eliminarPrestamo(row: any) {
+  const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+    width: '400px',
+    data: {
+      title: '¿Eliminar Solicitud?',
+      message: `¿Estás seguro de eliminar el préstamo de <b>${row.cliente}</b> por valor de <b>$${row.saldo_pendiente}</b>?`,
+      confirmText: 'Sí, eliminar',
+      cancelText: 'Cancelar',
+      type: 'error', // Esto pondrá el icono de advertencia rojo
+      icon: 'delete_forever',
+      color: 'warn'
+    }
+  });
+
+  dialogRef.afterClosed().subscribe(result => {
+    if (result) {
+      // Aquí llamas a tu servicio para eliminar/anular
+      this.prestamoService.rechazarPrestamo(row.prestamo_id).subscribe({
+        next: () => {
+          this.snackBar.open('Préstamo rechazado correctamente', 'Cerrar', { duration: 3000 });
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        },
+        error: (err) => {
+          this.snackBar.open('Error al rechazar: ' + err.error.message, 'Cerrar', { duration: 5000 });
         }
       });
     }

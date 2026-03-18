@@ -35,7 +35,7 @@ export class TipoPrestamoService {
 
   // Crear un nuevo tipo de préstamo
   createTipoPrestamo(sucursalId: number,data: Partial<TipoPrestamo>): Observable<TipoPrestamo> {
-    return this.http.post<TipoPrestamo>(`${this.apiUrl}/createTipoPrestamo/${sucursalId}`, data);
+    return this.http.post<TipoPrestamo>(`${this.apiUrl}/createTipoPrestamo`, data);
   }
 
 
