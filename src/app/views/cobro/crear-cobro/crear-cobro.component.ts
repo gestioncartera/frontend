@@ -12,7 +12,7 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Cliente, ClienteCobro, ClienteService } from '../../../services/cliente.service';
+import { Cliente,  ClienteService } from '../../../services/cliente.service';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthService } from '../../../services/auth.service';
 
@@ -39,7 +39,7 @@ import { AuthService } from '../../../services/auth.service';
 })
 export class CrearCobroComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = ['nombrecliente', 'direccioncliente', 'telefonocliente', 'acciones'];
-  dataSource: MatTableDataSource<ClienteCobro>;
+  dataSource: MatTableDataSource<Cliente>;
   isMobile = false;
   
 
@@ -52,7 +52,7 @@ export class CrearCobroComponent implements OnInit, AfterViewInit {
     private authService: AuthService,
     private snackBar: MatSnackBar
   ) {
-    this.dataSource = new MatTableDataSource<ClienteCobro>([]);
+    this.dataSource = new MatTableDataSource<Cliente>([]);
   }
 
  
@@ -112,7 +112,7 @@ export class CrearCobroComponent implements OnInit, AfterViewInit {
     }
   }
 
-  verDetalles(cliente: ClienteCobro): void {
+  verDetalles(cliente: Cliente): void {
     // Navegar a la vista de préstamos del cliente
     console.log('Navegando a préstamos del cliente:', cliente.cliente_id);
     this.router.navigateByUrl(`/prestamo/prestamos-cliente/${cliente.cliente_id}`).catch(err => {

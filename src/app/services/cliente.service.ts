@@ -55,8 +55,8 @@ getClientesRutaUser(user_id: number): Observable<Cliente[]> {
 }
 
  //clinetes de una ruta
-getClientesByRutaPrestamo(id_usuario: number): Observable<ClienteCobro[]> {
-  return this.http.get<ClienteCobro[]>(
+getClientesByRutaPrestamo(id_usuario: number): Observable<Cliente[]> {
+  return this.http.get<Cliente[]>(
     `${this.apiUrl}/getClientesByRutaPrestamo/${id_usuario}`
   );
 }

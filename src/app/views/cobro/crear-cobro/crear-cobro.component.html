@@ -57,10 +57,10 @@
   <div class="mobile-card shadow-sm" *ngFor="let cliente of dataSource.connect() | async">
     <div class="card-content-wrapper" (click)="verDetalles(cliente)">
       <div class="card-header">
-        <div class="avatar-m">{{ (cliente.nombrecliente || '').charAt(0) }}</div>
+        <div class="avatar-m">{{ (cliente.nombres || '').charAt(0) }}</div>
         
         <div class="card-titles">
-          <h3>{{ cliente.nombrecliente }} {{ cliente.apellidos }}</h3>
+          <h3>{{ cliente.nombres }} {{ cliente.apellidos }}</h3>
           <div class="status-badge">Activo</div>
         </div>
         <mat-icon class="chevron">chevron_right</mat-icon>
@@ -69,21 +69,21 @@
       <div class="info-grid">
         <div class="info-item">
           <mat-icon>phone</mat-icon>
-          <span>{{ cliente.telefonocliente || 'Sin teléfono' }}</span>
+          <span>{{ cliente.telefono || 'Sin teléfono' }}</span>
         </div>
         <div class="info-item">
           <mat-icon>place</mat-icon>
-          <span class="truncate-text">{{ cliente.direccioncliente }}</span>
+          <span class="truncate-text">{{ cliente.direccion}}</span>
         </div>
       </div>
     </div>
 
     <div class="card-actions">
-      <a mat-icon-button [href]="'tel:' + cliente.telefonocliente" class="btn-call">
+      <a mat-icon-button [href]="'tel:' + cliente.telefono" class="btn-call">
         <mat-icon>call</mat-icon>
       </a>
       <button mat-flat-button color="primary" class="btn-details" (click)="verDetalles(cliente)">
-        VER EXPEDIENTE
+        Ver Detalles
       </button>
     </div>
   </div>
