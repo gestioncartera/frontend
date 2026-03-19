@@ -23,7 +23,7 @@
 
     <c-header-nav class="ms-auto d-flex align-items-center">
 
-      <a [routerLink]="['/gasto/registro-egreso-diario']" class="btn btn-light border d-flex align-items-center gap-2 shadow-sm total-egresos-badge" style="text-decoration: none; cursor: pointer;">
+      <a *ngIf="userRole === 'Cobrador'" [routerLink]="['/gasto/registro-egreso-diario']" class="btn btn-light border d-flex align-items-center gap-2 shadow-sm total-egresos-badge" style="text-decoration: none; cursor: pointer;">
          <span class="label fw-bold text-secondary small">DISPONIBLE:</span>
           <span class="value status-success fw-bold text-success">
             {{ totalEgresos | currency:'USD':'symbol':'1.2-2' }}
