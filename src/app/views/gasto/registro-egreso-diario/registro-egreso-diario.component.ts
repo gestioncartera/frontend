@@ -39,6 +39,7 @@ export class RegistroEgresoDiarioComponent implements OnInit {
   cajaId: number | null = null;
   loading: boolean = false;
   totalegresos: number = 0;
+  monto_final_esperado: number = 0;
   
   // Lógica de Cobradores
   cobradores: Cobrador[] = [];
@@ -78,10 +79,11 @@ export class RegistroEgresoDiarioComponent implements OnInit {
   loadBalance(cobradorId: number | null = null): void {
     if (!this.sucursalId) return;
     this.cajaDiarioService.getCaja(this.cobradorId!).subscribe({
-      next: (res: any) => {
+      next: (res: any) => { 
         this.balanceDisponible = res?.monto_base_inicial || 0;
         this.cajaId = res?.caja_diaria_id || null;
         this.totalegresos = res?.total_egresos || 0;
+        this.monto_final_esperado = res?.monto_final_esperado || 0;
       console.log('Balance disponible cargado:', res); // Depuración
 
         // Actualizar el validador de monto máximo dinámicamente

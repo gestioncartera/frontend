@@ -99,12 +99,30 @@ export class CajaDiarioService {
   /**
    * 4. OBTENER ESTADO DE CAJA
    */
-  getCaja(cobra: number): Observable<CajaDiario | null> {
-    return this.http.get<any>(`${this.URL_CAJA}/getCajaDiariaAbiertaByUsuario/${cobra}`).pipe(
-      map(res => res ? { ...res, saldo_actual: parseFloat(res.saldo_actual) } : null),
-      catchError(() => of(null))
-    );
-  }
+ getCaja(cobra: number): Observable<CajaDiario | null> {
+  return this.http.get<any>(`${this.URL_CAJA}/getCajaDiariaAbiertaByUsuario/${cobra}`).pipe(
+    map(res => {
+      if (!res) return null;
+
+      // Extraemos el valor, si viene nulo o undefined usamos "0"
+      let saldoRaw = res.saldo_actual || "0";
+
+      // Si el saldo es un string, quitamos símbolos de moneda, comas y espacios
+      if (typeof saldoRaw === 'string') {
+        saldoRaw = saldoRaw.replace(/[^0-9.-]+/g, ""); 
+      }
+
+      const saldoNumerico = parseFloat(saldoRaw);
+
+      return { 
+        ...res, 
+        // Si el parseo falla (NaN), devolvemos 0 para no romper el pipe currency
+        saldo_actual: isNaN(saldoNumerico) ? 0 : saldoNumerico 
+      };
+    }),
+    catchError(() => of(null))
+  );
+}
 
   /**
  * Actualiza el monto de una caja específica

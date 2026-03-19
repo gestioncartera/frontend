@@ -55,12 +55,19 @@
   </button>
 
   <div class="button-group-right">
-    
     <div class="total-egresos-badge" *ngIf="dataSource.data.length > 0">
-      <span class="label">TOTAL EGRESOS:</span>
-      <span class="value">{{ totalEgresos | currency:'USD':'symbol':'1.2-2' }}</span>
-    </div>
+  <span class="label">TOTAL DISPONIBLE:</span>
+          <span class="value status-success">
+            {{ monto_final_esperado | currency:'USD':'symbol':'1.2-2' }}
+          </span>
+        </div>
 
+        <div class="total-egresos-badge" *ngIf="dataSource.data.length > 0">
+          <span class="label">TOTAL EGRESOS:</span>
+          <span class="value status-danger">
+            {{ totalEgresos | currency:'USD':'symbol':'1.2-2' }}
+          </span>
+        </div>
     <button mat-flat-button 
             type="button" 
             class="btn-submit btn-approve"
@@ -89,6 +96,8 @@
             {{ dataSource.data.length }} registros hoy
           </span>
         </div>
+
+        
         
         <div class="table-container shadow-sm">
           <table mat-table [dataSource]="dataSource" class="modern-table">

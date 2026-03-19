@@ -33,22 +33,24 @@ export const navItems: INavData[] = [
         name: 'Abrir Caja',
         url: '/caja/abrir-caja',
         icon: 'nav-icon-bullet',
-      },*/
-       {
-        name: 'Cierre de Caja',
-        url: '/caja/cerrar-caja',
-        icon: 'nav-icon-bullet',
-      },
+      },*/ 
       {
         name: 'Movimientos Sucursal',
         url: '/gasto/list-gasto',
         icon: 'nav-icon-bullet',
-      },
+      }, 
       {
         name: 'Movimientos Diarios',
         url: '/gasto/registro-egreso-diario',
         icon: 'nav-icon-bullet',
       },
+       {
+        name: 'Cierre de Caja',
+        url: '/caja/cerrar-caja',
+        icon: 'nav-icon-bullet',
+      },
+     
+     
        /*
       {
         name: 'Crear Gasto',

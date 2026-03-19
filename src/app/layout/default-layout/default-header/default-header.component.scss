@@ -1,28 +1,108 @@
-.branch-container {
-  .branch-display {
-    background-color: rgba(52, 116, 225, 0.08); // Azul muy suave
-    padding: 6px 14px;
-    border-radius: 8px;
-    border: 1px solid rgba(52, 116, 225, 0.15);
-    
-    .branch-text {
-      font-size: 0.85rem;
-      color: #2c3e50;
-      letter-spacing: 0.5px;
-      white-space: nowrap;
+// Variables de fuerza
+$font-heavy: 800;
+$font-bold: 700;
+
+.header-main-container {
+  height: 64px !important;
+  background-color: #ffffff;
+  border-bottom: 2px solid #f1f5f9;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+
+  // PONER TODO EL HEADER EN NEGRITA
+  * {
+    font-weight: $font-bold !important;
+  }
+}
+
+// Estilo de la Sucursal
+.branch-pill {
+  background: #f8fafc;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1.5px solid #e2e8f0;
+  color: #1e293b;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+}
+
+// DISEÑO DE SALDO MEJORADO
+.balance-card {
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 4px 12px;
+  min-width: 130px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+
+  &:hover {
+    border-color: #3474e1;
+    background: #f0f7ff;
+  }
+
+  .balance-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    line-height: 1.1;
+
+    .balance-tag {
+      font-size: 0.6rem !important;
+      color: #64748b;
+      letter-spacing: 1px;
+    }
+
+    .balance-amount {
+      font-size: 1.1rem !important;
+      font-weight: $font-heavy !important; // Más negrita aún
+      
+      &.text-pos { color: #166534 !important; } // Verde oscuro profesional
+      &.text-neg { color: #991b1b !important; } // Tu rojo profundo
     }
   }
 }
 
-// Ocultar o simplificar en móviles para que no choque con el avatar
-@media (max-width: 576px) {
-  .branch-container {
-    .branch-text {
-      font-size: 0.7rem;
-      max-width: 100px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .vr { display: none; }
+// Estilo del Usuario
+.user-info-text {
+  text-align: right;
+  white-space: nowrap;
+
+  .u-name {
+    font-size: 0.9rem !important;
+    color: #0f172a;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
+
+  .u-role {
+    font-size: 0.7rem !important;
+    color: #3474e1; // Azul para resaltar el rol
+    text-transform: uppercase;
+  }
+}
+
+.user-avatar {
+  border: 2px solid #3474e1 !important;
+}
+
+.header-divider {
+  width: 2px !important;
+  background-color: #e2e8f0 !important;
+  opacity: 1;
+}
+
+// RESPONSIVE: Evitar que se rompa en móvil
+@media (max-width: 576px) {
+  .balance-card {
+    border: none;
+    padding: 0;
+    min-width: auto;
+    background: transparent !important;
+    
+    .balance-tag { font-size: 0.55rem !important; }
+    .balance-amount { font-size: 0.9rem !important; }
+  }
+  
+  .header-divider { margin: 0 8px !important; }
 }

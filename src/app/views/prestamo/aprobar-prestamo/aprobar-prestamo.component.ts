@@ -120,6 +120,9 @@ export class AprobarPrestamoComponent implements OnInit {
             timer: 1500,
             showConfirmButton: false
           });
+           setTimeout(() => {
+            window.location.reload();
+          }, 1000);
           this.loadPrestamos(); // Recargar la lista para que desaparezca o cambie de estado
         },
         error: (err) => {

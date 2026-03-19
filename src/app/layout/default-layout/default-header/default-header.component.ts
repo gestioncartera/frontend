@@ -18,6 +18,9 @@ import {
 } from '@coreui/angular';
 
 import { IconDirective } from '@coreui/icons-angular';
+import { Validators } from '@angular/forms';
+import { SucursalContextService } from '../../../services/sucursal-context.service';
+import { CajaDiarioService } from '../../../services/caja-diario..service';
 
 // --- INTERFAZ PARA CORREGIR EL ERROR TS2339 ---
 interface NotificationItem {
@@ -27,6 +30,8 @@ interface NotificationItem {
   icon: string;
   color: string;
   time: string;
+  sucursalId: number | null ;// Agregado para evitar error de propiedad no encontrada
+  totalEgresos?: number; // Agregado para evitar error de propiedad no encontrada
 }
 
 @Component({
@@ -42,7 +47,7 @@ interface NotificationItem {
     HeaderNavComponent,
     //NavItemComponent,
     //NavLinkDirective, 
-    //RouterLink,
+    RouterLink,
     //RouterLinkActive,
     DropdownComponent, 
     DropdownToggleDirective, 
@@ -57,12 +62,15 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
   readonly #colorModeService = inject(ColorModeService);
   readonly colorMode = this.#colorModeService.colorMode;
   private authService = inject(AuthService);
-
+  
   // Propiedades de usuario
   public userName: string = 'Usuario';
   public userRole: string = 'Cobrador';
   public userAvatar: string = './assets/images/avatars/8.jpg'; 
   
+  public totalEgresos: number = 0;
+  public userId: number | null = null;
+  public sucursalId: number | null = null;
   public notificationCount = 0;
   sidebarId = input('sidebar1');
 
@@ -79,48 +87,20 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
   });
 
   // --- ARREGLO DE NOTIFICACIONES CORREGIDO ---
-  public newNotifications: NotificationItem[] = [
-    { 
-      id: 0, 
-      title: 'Cobro por Aprobar', 
-      description: 'Ruta 1: Nuevo pago de $50.00', 
-      icon: 'cilMoney', 
-      color: 'success',
-      time: '2 min'
-    },
-    { 
-      id: 1, 
-      title: 'Préstamo Vencido', 
-      description: 'Cliente: María Sosa excedió el plazo', 
-      icon: 'cilWarning', 
-      color: 'danger',
-      time: '15 min'
-    },
-    { 
-      id: 2, 
-      title: 'Nueva Ruta', 
-      description: 'Se te asignó el Sector Centro', 
-      icon: 'cilMap', 
-      color: 'info',
-      time: '1 hora'
-    },
-    { 
-      id: 3, 
-      title: 'Cierre de Caja', 
-      description: 'Sucursal Norte cerró con éxito', 
-      icon: 'cilCheckCircle', 
-      color: 'primary',
-      time: '2 horas'
-    }
-  ];
-
-  constructor() {
+  public dataSource: NotificationItem[] = [];
+ 
+  constructor(
+    private sucursalContextService: SucursalContextService,
+    private cajaDiarioService: CajaDiarioService
+  ) {
     super();
   }
 
   ngOnInit(): void {
+    this.sucursalId = this.sucursalContextService.getSucursalId();
     this.loadUserData();
-    this.notificationCount = this.newNotifications.length;
+    this.notificationCount =0;// this.newNotifications.length;
+    this.loadBalance();
   }
 
   private loadUserData(): void {
@@ -129,12 +109,13 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
       try {
         const user = JSON.parse(userStr);
         this.userName = user.nombre + ' ' + user.apellidos || user.nombre || user.email || 'Usuario';
+        this.userId = user.usuario_id;
         
         const roleId = user.tipo_usuario || user.rol;
         if (roleId === 1) {
           this.userRole = 'Administrador';
         } else if (roleId === 2) {
-          this.userRole = 'Contador';
+          this.userRole = 'Cobrador';
         } else {
           this.userRole = user.tipoUsuario || 'Personal';
         }
@@ -151,6 +132,32 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
   onLogout(): void {
     this.authService.logout();
   }
+
+  loadBalance(): void {
+  if (!this.userId) {
+    console.warn('No hay userId disponible para cargar el balance.');
+    return;
+  }
+  
+  this.cajaDiarioService.getCaja(this.userId).subscribe({
+    next: (res: any) => { 
+      this.totalEgresos = res?.monto_final_esperado || 0;
+     // this.monto_final_esperado = res?.monto_actual || res?.saldo_disponible || 0;
+      
+      console.log('Resumen de caja en header:', res);
+    },
+    error: (err) => {
+      if (err.status === 404) {
+        // El usuario no tiene caja abierta hoy: valores en cero
+        this.totalEgresos = 0;
+        //this.monto_final_esperado = 0;
+      } else {
+        console.error('Error crítico al cargar datos de caja:', err);
+      }
+    }
+  });
+}
+  
 
   // Se mantienen para compatibilidad si los usas en otras partes
   public newMessages = [
