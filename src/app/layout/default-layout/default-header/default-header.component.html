@@ -1,57 +1,53 @@
 <ng-container>
-  <c-container [fluid]="true" class="border-bottom px-4 header-container d-flex align-items-center">
+  <c-container [fluid]="true" class="border-bottom px-3 header-container d-flex align-items-center bg-white shadow-sm">
     
-    <button
-      [cSidebarToggle]="sidebarId()"
-      cHeaderToggler
-      class="btn border-0 shadow-none ps-0"
-      toggle="visible"
-      aria-label="Toggle sidebar navigation"
-    >
-      <svg cIcon name="cilMenu" size="lg"></svg>
-    </button>
+    <div class="d-flex align-items-center">
+      <button [cSidebarToggle]="sidebarId()" cHeaderToggler class="btn border-0 shadow-none ps-0 py-0" toggle="visible">
+        <svg cIcon name="cilMenu" size="lg"></svg>
+      </button>
 
-    <div class="ms-3 d-flex align-items-center branch-container">
-      <div class="vr h-100 mx-3 text-body text-opacity-25 d-none d-md-block" style="height: 24px !important;"></div>
-      <div class="branch-display d-flex align-items-center">
-        <svg cIcon name="cilHome" size="sm" class="text-primary me-2"></svg>
-        <span class="fw-bold text-uppercase branch-text">
-          {{ sucursalNombre }}
-        </span>
+      <div class="ms-2 d-flex align-items-center branch-container">
+        <div class="vr mx-2 text-body text-opacity-25 d-none d-md-block" style="height: 20px;"></div>
+        <div class="branch-display d-flex align-items-center">
+          <svg cIcon name="cilHome" size="sm" class="text-primary me-1 d-none d-sm-block"></svg>
+          <span class="fw-bold text-uppercase branch-text small">
+            {{ sucursalNombre.replace('SUCURSAL ', '') }}
+          </span>
+        </div>
       </div>
     </div>
 
     <c-header-nav class="ms-auto d-flex align-items-center">
 
-      <a *ngIf="userRole === 'Cobrador'" [routerLink]="['/gasto/registro-egreso-diario']" class="btn btn-light border d-flex align-items-center gap-2 shadow-sm total-egresos-badge" style="text-decoration: none; cursor: pointer;">
-         <span class="label fw-bold text-secondary small">DISPONIBLE:</span>
-          <span class="value status-success fw-bold text-success">
+      <a *ngIf="userRole === 'Cobrador'" 
+         [routerLink]="['/gasto/registro-egreso-diario']" 
+         class="d-flex align-items-center gap-1 balance-text-link" 
+         style="text-decoration: none;">
+          <span class="fw-bold text-secondary d-none d-md-inline" style="font-size: 0.7rem;">DISPONIBLE:</span>
+          <span class="fw-bold text-success value-amount">
             {{ totalEgresos | currency:'USD':'symbol':'1.2-2' }}
           </span>
       </a>
-      <div class="vr h-100 mx-2 text-body text-opacity-25 d-none d-sm-block"></div>
+
+      <div class="vr mx-3 text-body text-opacity-25" style="height: 20px;"></div>
 
       <c-dropdown alignment="end" variant="nav-item">
-        <button [caret]="false" cDropdownToggle class="py-0 pe-0 d-flex align-items-center border-0 bg-transparent" aria-label="Open user menu">
-          <div class="me-2 text-end d-none d-md-block" style="line-height: 1.2;">
+        <button [caret]="false" cDropdownToggle class="p-0 border-0 bg-transparent d-flex align-items-center">
+          <div class="me-2 text-end d-none d-md-block" style="line-height: 1.1;">
             <div class="fw-bold text-dark small">{{ userName }}</div>
-            <div class="small text-muted" style="font-size: 0.7rem;">{{ userRole }}</div>
+            <div class="fw-bold text-primary" style="font-size: 0.65rem; text-transform: uppercase;">{{ userRole }}</div>
           </div>
-          <div class="position-relative">
-            <c-avatar
-              shape="rounded-circle"
-              size="md"
-              [src]="'https://ui-avatars.com/api/?name=' + userName + '&background=f0f2f5&color=636f83&font-size=0.33'"
-              status="success"
-              alt="Avatar de usuario"
-              class="shadow-sm border"
-            />
-          </div>
+          <c-avatar
+            shape="rounded-circle"
+            [src]="'https://ui-avatars.com/api/?name=' + userName + '&background=f0f2f5&color=3474e1&bold=true'"
+            status="success"
+            class="custom-avatar shadow-sm border"
+          />
         </button>
 
-        <ul cDropdownMenu class="pt-0 w-auto shadow-sm">
+        <ul cDropdownMenu class="pt-0 shadow-sm border-0">
           <li>
-            <a cDropdownItem (click)="onLogout()" class="text-danger fw-bold" style="cursor: pointer;">
+            <a cDropdownItem (click)="onLogout()" class="text-danger fw-bold py-2" style="cursor: pointer;">
               <svg cIcon class="me-2" name="cilAccountLogout"></svg>
               Cerrar Sesión
             </a>

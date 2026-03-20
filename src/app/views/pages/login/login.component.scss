@@ -1,0 +1,61 @@
+.login-background {
+  // Un degradado sutil para que no sea blanco plano
+  background: radial-gradient(circle at top right, #f8fafc, #e2e8f0) !important;
+}
+
+.login-card {
+  border-radius: 16px !important;
+  overflow: hidden;
+  
+  .form-control:focus {
+    border-color: #3474e1;
+    box-shadow: none;
+  }
+}
+
+.logo-placeholder {
+  width: 60px;
+  height: 60px;
+  background: #eff6ff;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.btn-login {
+  letter-spacing: 1px;
+  transition: transform 0.2s ease;
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    background-color: #2563eb !important;
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+ 
+c-input-group-text {
+    border-right: none !important;
+    background-color: white !important;
+}
+
+.login-container {
+  background: linear-gradient(135deg, #f0f2f5 0%, #c9d6ff 100%) !important;
+}
+
+.card {
+  border-radius: 15px !important;
+  
+  .c-input-group-text {
+    background-color: #f8f9fa;
+  }
+}
+
+.btn-primary {
+  border-radius: 8px;
+  letter-spacing: 0.5px;
+}

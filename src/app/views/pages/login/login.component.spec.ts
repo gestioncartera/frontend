@@ -1,10 +1,15 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ReactiveFormsModule } from '@angular/forms';
+import { RouterTestingModule } from '@angular/router/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
-import { ButtonModule, CardModule, FormModule, GridModule } from '@coreui/angular';
-import { LoginComponent } from './login.component';
-import { IconModule } from '@coreui/icons-angular';
-import { IconSetService } from '@coreui/icons-angular';
+// CoreUI & Icons
+import { ButtonModule, CardModule, FormModule, GridModule, SpinnerModule } from '@coreui/angular';
+import { IconModule, IconSetService } from '@coreui/icons-angular';
 import { iconSubset } from '../../../icons/icon-subset';
+
+import { LoginComponent } from './login.component';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
@@ -13,10 +18,22 @@ describe('LoginComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    imports: [FormModule, CardModule, GridModule, ButtonModule, IconModule, LoginComponent],
-    providers: [IconSetService]
-})
-    .compileComponents();
+      // LoginComponent ahora es Standalone, se importa aquí
+      imports: [
+        LoginComponent, 
+        ReactiveFormsModule, 
+        RouterTestingModule, 
+        HttpClientTestingModule,
+        NoopAnimationsModule,
+        FormModule, 
+        CardModule, 
+        GridModule, 
+        ButtonModule, 
+        IconModule,
+        SpinnerModule
+      ],
+      providers: [IconSetService]
+    }).compileComponents();
   });
 
   beforeEach(() => {
@@ -30,5 +47,16 @@ describe('LoginComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('debe inicializar el formulario con campos vacíos', () => {
+    const loginForm = component.loginForm;
+    expect(loginForm.get('email')?.value).toEqual('');
+    expect(loginForm.get('password')?.value).toEqual('');
+  });
+
+  it('el formulario debe ser inválido si los campos están vacíos', () => {
+    component.loginForm.setValue({ email: '', password: '' });
+    expect(component.loginForm.invalid).toBeTrue();
   });
 });

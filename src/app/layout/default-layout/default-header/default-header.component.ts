@@ -83,7 +83,7 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
 
   readonly icons = computed(() => {
     const currentMode = this.colorMode();
-    return this.colorModes.find(mode => mode.name === currentMode)?.icon ?? 'cilSun';
+    return this.colorModes.filter(mode => mode.name === currentMode)[0]?.icon ?? 'cilSun';
   });
 
   // --- ARREGLO DE NOTIFICACIONES CORREGIDO ---

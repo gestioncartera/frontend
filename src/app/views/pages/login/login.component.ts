@@ -13,7 +13,8 @@ import {
   InputGroupComponent,
   InputGroupTextDirective,
   RowComponent,
-  FormFeedbackComponent 
+  FormFeedbackComponent, 
+  SpinnerModule
 } from '@coreui/angular';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
@@ -42,6 +43,7 @@ import { SucursalService } from '../../../services/sucursal.service';
     FormControlDirective,
     ButtonDirective,
     NgStyle,
+    SpinnerModule,
     FormFeedbackComponent 
   ]
 })

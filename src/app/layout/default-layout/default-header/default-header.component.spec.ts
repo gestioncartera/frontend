@@ -22,8 +22,8 @@ describe('DefaultHeaderComponent', () => {
   let fixture: ComponentFixture<DefaultHeaderComponent>;
   let iconSetService: IconSetService;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
+  beforeEach(() => {
+    return TestBed.configureTestingModule({
     imports: [GridModule, HeaderModule, IconModule, NavModule, BadgeModule, AvatarModule, DropdownModule, BreadcrumbModule, SidebarModule, ProgressModule, ButtonGroupModule, ReactiveFormsModule, DefaultHeaderComponent],
     providers: [IconSetService, provideRouter([])]
 })

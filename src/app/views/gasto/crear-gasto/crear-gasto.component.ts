@@ -132,9 +132,10 @@ export class CrearGastoComponent implements OnInit {
   /**
    * Regresa a la lista de gastos sin guardar cambios
    */
-  cancelar(): void {
-    this.router.navigate(['/gasto/list-gasto']);
-  }
+  cancelar(): void { 
+  this.concepto = '';
+  this.valor = 0;  
+}
 
   /**
    * Helper para mostrar SnackBars con estilos consistentes

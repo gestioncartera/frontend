@@ -1,21 +1,92 @@
-<div class="bg-light dark:bg-transparent min-vh-100 d-flex flex-row align-items-center">
+<div class="bg-light dark:bg-transparent min-vh-100 d-flex flex-row align-items-center login-background">
   <c-container>
     <c-row class="justify-content-center">
-      <c-col md="6">
-        <span class="clearfix">
-          <h1 class="float-start display-3 me-4">500</h1>
-          <h4 class="pt-3">Houston, we have a problem!</h4>
-          <p class="text-body-secondary float-start">
-            The page you are looking for is temporarily unavailable.
-          </p>
-        </span>
-        <c-input-group class="input-prepend">
-          <span cInputGroupText>
-            <svg cIcon name="cilMagnifyingGlass"></svg>
-          </span>
-          <input cFormControl placeholder="What are you looking for?" type="text" />
-          <button cButton color="info">Search</button>
-        </c-input-group>
+      <c-col md="8" lg="6" xl="5">
+        <c-card-group>
+          <c-card class="p-4 shadow-lg border-0 login-card">
+            <c-card-body>
+              <form cForm [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+                <div class="text-center mb-4">
+                  <div class="logo-placeholder mb-3">
+                    <svg cIcon name="cilLockLocked" size="xl" class="text-primary"></svg>
+                  </div>
+                  <h1 class="fw-bold">Sistema de Cobros</h1>
+                  <p class="text-body-secondary">Gestión de rutas y préstamos</p>
+                </div>
+
+                <div class="alert alert-info border-0 shadow-sm" role="alert" style="font-size: 0.85rem;">
+                  <div class="d-flex align-items-center mb-1">
+                    <svg cIcon name="cilInfo" class="me-2"></svg>
+                    <strong>Modo Desarrollo</strong>
+                  </div>
+                  <code class="d-block text-dark">Admin: admin1@email.com / 12345</code>
+                  <code class="d-block text-dark">Cobrador: cobrador1@email.com / 12345</code>
+                </div>
+
+                <div *ngIf="errorMessage" class="alert alert-danger border-0 animate__animated animate__shakeX" role="alert">
+                  {{ errorMessage }}
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label small fw-bold text-secondary">Correo Electrónico</label>
+                  <c-input-group>
+                    <span cInputGroupText class="bg-white border-end-0">
+                      <svg cIcon name="cilUser"></svg>
+                    </span>
+                    <input
+                      cFormControl
+                      placeholder="ejemplo@correo.com"
+                      type="email"
+                      formControlName="email"
+                      class="border-start-0 ps-0 shadow-none"
+                    />
+                  </c-input-group>
+                  <c-form-feedback *ngIf="email?.invalid && (email?.dirty || email?.touched)" [valid]="false">
+                    <span class="small" *ngIf="email?.errors?.['required']">El email es requerido</span>
+                  </c-form-feedback>
+                </div>
+
+                <div class="mb-4">
+                  <label class="form-label small fw-bold text-secondary">Contraseña</label>
+                  <c-input-group>
+                    <span cInputGroupText class="bg-white border-end-0">
+                      <svg cIcon name="cilLockLocked"></svg>
+                    </span>
+                    <input
+                      cFormControl
+                      placeholder="••••••••"
+                      type="password"
+                      formControlName="password"
+                      class="border-start-0 ps-0 shadow-none"
+                    />
+                  </c-input-group>
+                  <c-form-feedback *ngIf="password?.invalid && (password?.dirty || password?.touched)" [valid]="false">
+                    <span class="small" *ngIf="password?.errors?.['required']">La contraseña es requerida</span>
+                  </c-form-feedback>
+                </div>
+
+                <div class="d-grid gap-2">
+                  <button
+                    cButton
+                    color="primary"
+                    type="submit"
+                    class="py-2 fw-bold shadow-sm btn-login"
+                    [disabled]="loading">
+                    <span *ngIf="!loading">INGRESAR AL SISTEMA</span>
+                    <span *ngIf="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                  </button>
+                  
+                  <button cButton class="mt-2" color="link" type="button" style="font-size: 0.85rem;">
+                    ¿Olvidaste tu contraseña?
+                  </button>
+                </div>
+              </form>
+            </c-card-body>
+          </c-card>
+        </c-card-group>
+        <p class="text-center mt-4 text-muted small">
+          &copy; 2026 Sistema de Cobros Diarios. Todos los derechos reservados.
+        </p>
       </c-col>
     </c-row>
   </c-container>

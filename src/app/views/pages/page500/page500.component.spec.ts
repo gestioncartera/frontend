@@ -11,8 +11,8 @@ describe('Page500Component', () => {
   let fixture: ComponentFixture<Page500Component>;
   let iconSetService: IconSetService;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
+  beforeEach(() => {
+    return TestBed.configureTestingModule({
     imports: [GridModule, ButtonModule, FormModule, IconModule, Page500Component],
     providers: [IconSetService]
 })
