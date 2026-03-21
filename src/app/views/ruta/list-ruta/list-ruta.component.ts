@@ -204,7 +204,7 @@ export class ListRutaComponent implements OnInit, AfterViewInit {
         if (ruta.ruta_id) {
           const rutaActualizada = { ...ruta, estado: nuevoEstado };
 
-          this.rutaService.editRutas(ruta.ruta_id, rutaActualizada).subscribe({
+          this.rutaService.desactivarRuta(ruta.ruta_id).subscribe({
             next: () => {
               // Mantenemos Swal para el mensaje de éxito por ahora
               this.snackBar.open(
@@ -221,8 +221,9 @@ export class ListRutaComponent implements OnInit, AfterViewInit {
             },
             error: (err) => {
               console.error(`Error al ${accion} la ruta:`, err);
-             this.snackBar.open(`❌ No se pudo ${accion} la ruta`, 'Cerrar', { duration: 5000 });
-               },
+              const errorMessage = err.error?.message || err.error?.error || 'Error desconocido del servidor';
+              this.snackBar.open(`❌ No se pudo ${accion} la ruta: ${errorMessage}`, 'Cerrar', { duration: 5000 });
+            },
           });
         }
       }

@@ -39,7 +39,7 @@
         </td>
       </ng-container>
 
-            <ng-container matColumnDef="valor_cuota">
+      <ng-container matColumnDef="valor_cuota">
         <th mat-header-cell *matHeaderCellDef> Cuota </th>
         <td mat-cell *matCellDef="let row" class="amount"> 
           {{ row.valor_cuota | currency:'COP':'symbol-narrow':'1.0-0' }} 
@@ -47,24 +47,35 @@
       </ng-container>
 
       <ng-container matColumnDef="fecha_fin_prestamo">
-  <th mat-header-cell *matHeaderCellDef> Finalización </th>
-  <td mat-cell *matCellDef="let row"> 
-    <div class="date-wrapper"> 
-      <mat-icon>calendar_today</mat-icon>
-      <span>{{ (row.fecha_fin_prestamo | date:'mediumDate') || 'No definida' }}</span>
-    </div>
-  </td>
-</ng-container>
+          <th mat-header-cell *matHeaderCellDef> Finalización </th>
+          <td mat-cell *matCellDef="let row"> 
+            <div class="date-wrapper d-flex align-items-center gap-2"> 
+                 
+              <div class="text-container">
+                <span class="fecha-principal  ">
+                  {{ row?.fecha_fin_prestamo | date:'MM/dd/yy' }}
+                </span>
 
-     <ng-container matColumnDef="actions">
-  <th mat-header-cell *matHeaderCellDef> Acciones </th>
-  <td mat-cell *matCellDef="let row" class="text-right">
-    <button mat-button class="detail-btn" (click)="verDetalles(row)">
-      <mat-icon>visibility</mat-icon>
-      <span class="btn-text">Ver detalles</span>
-    </button>
-  </td>
-</ng-container>
+                <small class="dias-detalle" [ngClass]="getColorVencimiento(obtenerDiasRestantes(row?.fecha_fin_prestamo))">
+                  <ng-container *ngIf="obtenerDiasRestantes(row?.fecha_fin_prestamo) as dias">
+                    {{ dias > 0 ? 'Faltan ' + dias + ' d' : (dias === 0 ? 'Hoy' : 'Vencido') }}
+                  </ng-container>
+                </small>
+              </div>
+              
+            </div>
+          </td>
+        </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef> Acciones </th>
+        <td mat-cell *matCellDef="let row" class="text-right">
+          <button mat-button class="detail-btn" (click)="verDetalles(row)">
+            <mat-icon>visibility</mat-icon>
+            <span class="btn-text">Ver detalles</span>
+          </button>
+        </td>
+      </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover-row"></tr>
@@ -73,7 +84,7 @@
   </div>
 
   <div class="mobile-grid" *ngIf="isMobile">
-    <mat-card class="modern-mobile-card" *ngFor="let row of dataSource.connect() | async" (click)="verDetalles(row)">
+    <mat-card class="modern-mobile-card" *ngFor="let row of dataSource.data" (click)="verDetalles(row)">
       <div class="card-accent" [ngClass]="row.estado?.toLowerCase() || 'activo'"></div>
       <div class="card-content">
         <div class="card-header-mobile">
@@ -93,7 +104,14 @@
         </div>
 
         <div class="card-footer-mobile">
-          <span>Vence: {{ row.fecha_fin_prestamo || 'Pendiente' }}</span>
+          <div class="vencimiento-pill" [ngClass]="getColorVencimiento(obtenerDiasRestantes(row.fecha_fin_prestamo))">
+            <mat-icon>event</mat-icon>
+            <span>
+              <ng-container *ngIf="obtenerDiasRestantes(row.fecha_fin_prestamo) as dias">
+                {{ dias > 0 ? 'Faltan ' + dias + ' días' : (dias === 0 ? 'Hoy' : 'Vencido') }}
+              </ng-container>
+            </span>
+          </div>
           <mat-icon>chevron_right</mat-icon>
         </div>
       </div>

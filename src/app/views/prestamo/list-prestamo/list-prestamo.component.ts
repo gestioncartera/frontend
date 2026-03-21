@@ -142,6 +142,28 @@ displayedColumns: string[]  = ['prestamo_id', 'saldo_pendiente', 'valor_cuota', 
   newPrestamo() {
     this.router.navigate(['/prestamo/crear-prestamo']);
   }
+  // Función para calcular días restantes
+obtenerDiasRestantes(fechaCorte: any): number | null {
+  if (!fechaCorte) return null;
+  
+  const hoy = new Date();
+  const fin = new Date(fechaCorte);
+  
+  // Normalizar fechas a medianoche
+  hoy.setHours(0, 0, 0, 0);
+  fin.setHours(0, 0, 0, 0);
+
+  const diffTime = fin.getTime() - hoy.getTime();
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+}
+
+// Función auxiliar para el estilo visual
+getColorVencimiento(dias: number | null): string {
+  if (dias === null) return 'text-muted';
+  if (dias < 0) return 'text-danger fw-bold'; // Vencido
+  if (dias <= 3) return 'text-warning fw-bold'; // Por vencer (3 días o menos)
+  return 'text-success'; // Al día
+}
 
   verDetalles(row: any) {
     if (this.cliente_id) {

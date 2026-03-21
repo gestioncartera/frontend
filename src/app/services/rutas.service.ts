@@ -52,6 +52,9 @@ export class RutasService {
     editRutas(id: number, ruta: Partial<Rutas>): Observable<Rutas> {
     return this.http.put<Rutas>(`${this.apiUrl}/updateRuta/${id}`, ruta);
   }
+   desactivarRuta(id: number): Observable<Rutas> {
+    return this.http.patch<Rutas>(`${this.apiUrl}/desactivarRuta/${id}`,{});
+  }
     deleteRutas(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/deleteRuta/${id}`);
   }
