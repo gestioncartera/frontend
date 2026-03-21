@@ -100,6 +100,11 @@ export class ListGastoComponent implements OnInit, AfterViewInit {
       next: (data) => {
         this.movimientosData = data;
         this.dataSource.data = data;
+        setTimeout(() => {
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
+      });
+      
         console.log('Movimientos cargados:', data);
       },
       error: (err) => {

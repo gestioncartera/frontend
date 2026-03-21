@@ -102,14 +102,21 @@
       <div *ngIf="isMobile" class="mobile-list">
         <div class="mobile-card" *ngFor="let item of dataSource.filteredData">
           <div class="card-header">
-            <div class="header-left">
-              <span class="m-date">{{ item.fecha_movimiento | date:'dd MMM' }}</span>
-              <span class="status-badge small" [ngClass]="item.estado_movto.toLowerCase()">{{ item.estado_movto }}</span>
+            <div class="header-left d-flex flex-column"> <div class="date-time-group">
+                <span class="m-date fw-bold text-dark">{{ item.fecha_movimiento | date:'dd MMM, yyyy' }}</span>
+                <small class="m-time text-muted ms-2">{{ item.fecha_movimiento | date:'hh:mm a' }}</small>
+              </div>
+              <div>
+                <span class="status-badge small mt-1" [ngClass]="item.estado_movto.toLowerCase()">
+                  {{ item.estado_movto }}
+                </span>
+              </div>
             </div>
             <span class="m-amount" [class.negative]="item.tipo_movimiento === 'egreso'">
               {{ item.tipo_movimiento === 'egreso' ? '-' : '+' }} {{ item.monto | currency }}
             </span>
           </div>
+          
           <div class="card-body">
             <p class="m-type"><strong>Tipo:</strong> {{ item.tipo_movimiento | uppercase }}</p>
             <p class="m-desc">{{ item.descripcion }}</p>
@@ -119,7 +126,7 @@
                     (click)="delete(item)" 
                     color="warn"
                     [disabled]="item.estado_movto.toLowerCase() === 'anulado'">
-              Eliminar
+              Anular Movimiento
             </button>  
           </div>
         </div>
