@@ -18,7 +18,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'; /
  import { TipoPrestamo, TipoPrestamoService } from '../../../services/tipoPrestamo.service';
 import { CobroService } from '../../../services/cobro.service';
 import { SucursalContextService } from '../../../services/sucursal-context.service';
-
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 @Component({
   selector: 'app-detalle-prestamo',
   standalone: true,
@@ -161,4 +162,79 @@ export class DetallePrestamoComponent implements OnInit {
       this.prestamo.monto_prestamo = 0;
     }
   }
+  generarPDF() {
+  if (!this.prestamo) return;
+
+  const doc = new jsPDF();
+  const p = this.prestamo;
+  //doc.text(`Nombre: ${p.nombre_cliente}`, 14, 55);
+
+  // --- 1. ENCABEZADO Y TÍTULO ---
+  doc.setFillColor(33, 150, 243); // Azul Primario (Material)
+  doc.rect(0, 0, 210, 40, 'F');
+  
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(22);
+  doc.text('ESTADO DE CUENTA', 14, 20);
+  doc.setFontSize(12);
+  doc.text(`Crédito ID: #${p.prestamo_id}`, 14, 30);
+
+  // --- 2. INFORMACIÓN DEL CLIENTE Y RESUMEN ---
+  doc.setTextColor(40, 40, 40);
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.text('INFORMACIÓN DEL CLIENTE', 14, 50);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Nombre: ${p.nombre_cliente}`, 14, 55);
+  doc.text(`Fecha Desembolso: ${p.fecha_desembolso ? new Date(p.fecha_desembolso).toLocaleDateString() : 'N/A'}`, 14, 60);
+
+  // Cuadro de Resumen Financiero (Derecha)
+  doc.setDrawColor(200, 200, 200);
+  doc.rect(120, 45, 75, 25);
+  doc.text('SALDO PENDIENTE:', 125, 52);
+  doc.setFontSize(14);
+  doc.setFont('helvetica', 'bold');
+  doc.text(`$${Number(p.saldo_pendiente).toLocaleString()}`, 125, 62);
+
+  // --- 3. TABLA DE HISTORIAL DE COBROS ---
+  doc.setFontSize(12);
+  doc.text('DETALLE DE MOVIMIENTOS', 14, 80);
+
+  const columns = ['Fecha de Pago', 'Monto Cobrado', 'Estado'];
+  const data = this.historialCobros.map(c => [
+    new Date(c.fecha).toLocaleDateString(),
+    `$${Number(c.monto).toLocaleString()}`,
+    c.estado.toUpperCase()
+  ]);
+
+  autoTable(doc, {
+    startY: 85,
+    head: [columns],
+    body: data,
+    theme: 'striped',
+    headStyles: { fillColor: [52, 58, 64], textColor: [255, 255, 255], halign: 'center' },
+    columnStyles: {
+      1: { halign: 'right' }, // Monto a la derecha
+      2: { halign: 'center' } // Estado centrado
+    },
+    didParseCell: (data) => {
+      // Opcional: Pintar el texto de estado
+      if (data.column.index === 2 && data.cell.section === 'body') {
+        const estado = data.cell.raw as string;
+        if (estado.includes('MORA')) data.cell.styles.textColor = [220, 53, 69];
+      }
+    }
+  });
+
+  // --- 4. PIE DE PÁGINA ---
+  const finalY = (doc as any).lastAutoTable.finalY || 100;
+  doc.setFontSize(9);
+  doc.setTextColor(100);
+  doc.text('Este documento es un soporte informativo de los pagos realizados.', 14, finalY + 10);
+  doc.text(`Generado el: ${new Date().toLocaleString()}`, 14, finalY + 15);
+
+  // --- 5. DESCARGAR ---
+  doc.save(`Reporte_Credito_${p.prestamo_id}.pdf`);
+}
+
 }

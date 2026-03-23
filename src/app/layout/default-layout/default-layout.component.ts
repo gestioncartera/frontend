@@ -69,12 +69,13 @@ export class DefaultLayoutComponent implements OnInit {
       console.log('Sucursal actual en DefaultLayoutComponent:', this.sucursalNombre);
     });
 
-    // 2. Lógica para contraer menús al navegar
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
-    ).subscribe(() => {
-      this.collapseAllMenus(this.navItems);
+   this.router.events.pipe(
+     filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: any) => {
+      this.collapseAllMenus(this.navItems, event.urlAfterRedirects);
     });
+    
+
     const isCobrador = this.authService.isCobrador();
     // Si el usuario es Cobrador (rol 2) y es redirigido al dashboard,
     // lo enviamos directamente a la página de creación de cobros.
@@ -83,15 +84,36 @@ export class DefaultLayoutComponent implements OnInit {
       this.router.navigate(['/cobro/crear-cobro']);
     }
   }
-
-  private collapseAllMenus(items: any[]) {
-    items.forEach(item => {
-      if (item.children) {
-        item.attributes = { ...item.attributes, expanded: false }; // Forzamos el cierre
-        this.collapseAllMenus(item.children); // Aplicamos a sub-niveles si existen
+  private closeInactiveMenus(currentUrl: string) {
+  this.navItems.forEach(item => {
+    if (item.children) {
+      // Si la URL actual no está contenida en los hijos de este grupo, lo cerramos
+      const isChildActive = item.children.some((child: any) => currentUrl.includes(child.url));
+      if (!isChildActive) {
+        item.attributes = { ...item.attributes, expanded: false };
       }
-    });
-  }
+    }
+  });
+}
+
+private collapseAllMenus(items: any[], currentUrl: string = '') {
+  items.forEach(item => {
+    if (item.children) {
+      const hasActiveChild = item.children.some((child: any) => 
+        currentUrl.includes(child.url)
+      );
+
+      // Usamos el spread operator para asegurar que Angular vea un cambio de objeto
+      item.attributes = { ...item.attributes, expanded: hasActiveChild };
+
+      // Recursividad
+      this.collapseAllMenus(item.children, currentUrl);
+    }
+  });
+
+  // ESTA LÍNEA ES CLAVE: Forzamos a Angular a detectar un cambio de referencia
+  this.navItems = [...items];
+}
 
   private getFilteredNavItems() {
     if (this.authService.isCobrador()) {

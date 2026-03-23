@@ -108,9 +108,18 @@
 
     <div class="history-column">
       <mat-card class="modern-card">
-        <mat-card-header>
-          <mat-card-title>Últimos Movimientos</mat-card-title>
-        </mat-card-header>
+       <mat-card-header>
+            <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+              <mat-card-title>Últimos Movimientos</mat-card-title>
+              
+              <button mat-icon-button 
+                      color="accent" 
+                      (click)="generarPDF()" 
+                      [disabled]="!historialCobros.length"
+                      matTooltip="Descargar reporte PDF"> <mat-icon>download</mat-icon>
+              </button>
+            </div>
+          </mat-card-header>
         <mat-divider></mat-divider>
         <div class="scroll-container">
           <table mat-table [dataSource]="historialCobros" class="compact-table">

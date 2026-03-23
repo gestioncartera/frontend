@@ -120,7 +120,7 @@ export class CrearPrestamoComponent implements OnInit, OnDestroy {
       clientesObservable = this.clienteService.getClientesRutaUser(userId);
       console.log('Cargando clientes para el usuario ID:', idSucursal, user);
     } else {
-      clientesObservable = this.clienteService.getClientesRutaUser(8);
+      clientesObservable = this.clienteService.getClientes(idSucursal);
       //clientesObservable = this.clienteService.getClientes(idSucursal);
       console.log('Cargando clientes para sucursal ID:', idSucursal,user);
     }

@@ -18,6 +18,28 @@
   //}
 }
 
+/* Forzar que solo el grupo con la clase 'show' despliegue su contenido */
+::v-deep {
+  .nav-group:not(.show) {
+    .nav-group-items {
+      max-height: 0 !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+      overflow: hidden !important;
+      display: none !important;
+    }
+  }
+
+  .nav-group.show {
+    .nav-group-items {
+      max-height: 1000px !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      display: block !important;
+    }
+  }
+}
+
 // ng-scrollbar css variables
 //.cui-scrollbar {
 //  --scrollbar-border-radius: 7px;
