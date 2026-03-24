@@ -48,6 +48,7 @@ export class DetallePrestamoComponent implements OnInit {
   displayedColumns: string[] = ['fecha_cobro', 'monto_cobrado', 'estado'];
   tiposPrestamo: TipoPrestamo[] = [];
   historialCobros: any[] = [];
+  nombreCliente?: string = '';
   constructor(
     private route: ActivatedRoute,
     private prestamoService: PrestamoService,
@@ -61,6 +62,7 @@ export class DetallePrestamoComponent implements OnInit {
     this.cargarTiposPrestamo();
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
+    const nombreCliente = params.get('nombre_cliente') || '';
       if (id) {
         this.prestamoId = +id;
         this.loadPrestamo(this.prestamoId);
@@ -113,7 +115,8 @@ export class DetallePrestamoComponent implements OnInit {
           this.prestamo.saldo_pendiente = Number(this.prestamo.saldo_pendiente);
           this.prestamo.valor_intereses = Number(this.prestamo.valor_intereses);
           this.prestamo.valor_cuota = Number(this.prestamo.valor_cuota);
-
+          this.prestamo.nombre_cliente = this.prestamo.cliente; 
+          console.log('Préstamo cargado:', this.prestamo); 
           // Convertir fechas
           if (this.prestamo.fecha_desembolso) {
             this.prestamo.fecha_desembolso = new Date(this.prestamo.fecha_desembolso);
@@ -167,7 +170,7 @@ export class DetallePrestamoComponent implements OnInit {
 
   const doc = new jsPDF();
   const p = this.prestamo;
-  //doc.text(`Nombre: ${p.nombre_cliente}`, 14, 55);
+  const nombreFinal = p.nombre_cliente || this.nombreCliente  || 'Cliente';
 
   // --- 1. ENCABEZADO Y TÍTULO ---
   doc.setFillColor(33, 150, 243); // Azul Primario (Material)
@@ -185,7 +188,7 @@ export class DetallePrestamoComponent implements OnInit {
   doc.setFont('helvetica', 'bold');
   doc.text('INFORMACIÓN DEL CLIENTE', 14, 50);
   doc.setFont('helvetica', 'normal');
-  doc.text(`Nombre: ${p.nombre_cliente}`, 14, 55);
+  doc.text(`Nombre: ${nombreFinal}`, 14, 55);
   doc.text(`Fecha Desembolso: ${p.fecha_desembolso ? new Date(p.fecha_desembolso).toLocaleDateString() : 'N/A'}`, 14, 60);
 
   // Cuadro de Resumen Financiero (Derecha)

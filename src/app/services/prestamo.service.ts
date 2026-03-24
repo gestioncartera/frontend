@@ -16,6 +16,7 @@ export interface Prestamos {
   fecha_fin_prestamo: string | Date | null;
   created_at?: string;       
   estado_prestamo: string; 
+  cliente: string;
   nombre_cliente?: string; 
   sucursal_id?: number;
   id_usuario_creacion: number;

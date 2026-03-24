@@ -38,7 +38,7 @@ export const routes: Routes = [
         data: { title: 'Crear Préstamo' },
       },
       {
-        path: 'detalle-prestamo/:id',
+        path: 'detalle-prestamo/:id/:nombre',
         loadComponent: () =>
           import('./detalle-prestamo/detalle-prestamo.component').then(
             (m) => m.DetallePrestamoComponent

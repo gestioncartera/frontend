@@ -114,8 +114,8 @@ export class CrearCobroComponent implements OnInit, AfterViewInit {
 
   verDetalles(cliente: Cliente): void {
     // Navegar a la vista de préstamos del cliente
-    console.log('Navegando a préstamos del cliente:', cliente.cliente_id);
-    this.router.navigateByUrl(`/prestamo/prestamos-cliente/${cliente.cliente_id}`).catch(err => {
+    console.log('Navegando a préstamos del cliente:', cliente.cliente_id); 
+    this.router.navigate(['/prestamo/prestamos-cliente', cliente.cliente_id]).catch(err => {
       console.error('Error en navegación:', err);
     });
   }

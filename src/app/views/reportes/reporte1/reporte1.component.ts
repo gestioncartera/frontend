@@ -9,6 +9,8 @@ import {
   FormModule,
   BadgeModule 
 } from '@coreui/angular'; // Usando los módulos de CoreUI que ya tienes
+import { SucursalContextService } from '../../../services/sucursal-context.service';
+import { CobroService } from '../../../services/cobro.service';
 
 @Component({
   selector: 'app-reporte1',
@@ -27,7 +29,8 @@ import {
 })
  
 export class Reporte1Component implements OnInit {
-  
+  public resumenRutas: any[] = [];
+  public cargando: boolean = false;
   // Datos simulados basados en la imagen
   kpis = {
     totalCobradoHoy: 1450.00,
@@ -42,14 +45,63 @@ export class Reporte1Component implements OnInit {
     { cobrador: 'Luis Rodríguez', ruta: 'Ruta 03 - Sur', clientes: 64, cobrados: 60, porcentaje: 94, total: 295.00 }
   ];
 
-  constructor() {}
+  constructor(
+    private cobroService: CobroService,
+    private sucursalContextService: SucursalContextService) {}
 
   ngOnInit(): void {
-    // Aquí llamarías a tus servicios de Node.js para cargar datos reales
+    this.cargarResumenCobros();
+    this.cargarDatosKpis();
   }
 
   verDetalles(item: any) {
     console.log('Navegando a detalles de:', item.cobrador);
   }
+
+
+cargarResumenCobros() {
+  const sucursalId = this.sucursalContextService.getSucursalId();
+  if (!sucursalId) return;
+
+  this.cargando = true;
+
+  this.cobroService.getResumenCobrosCobradorRuta(sucursalId).subscribe({
+    next: (data) => {
+      this.resumenRutas = data;
+      this.cargando = false;
+      
+      // Calculamos el total recaudado sumando todos los items
+      this.actualizarKpisGlobales();
+    },
+    error: (err) => {
+      this.cargando = false;
+      console.error('Error:', err);
+    }
+  });
+}
+
+actualizarKpisGlobales() {
+  // Suma el total recaudado de todas las rutas que llegaron
+  const total = this.resumenRutas.reduce((acc, curr) => acc + Number(curr.total_recaudado), 0);
+  this.kpis.totalCobradoHoy = total;
+  
+  // Opcional: Contar total de recibos del día
+  this.kpis.cobrosPendientes = this.resumenRutas.reduce((acc, curr) => acc + Number(curr.total_recibos), 0);
+}
+
+cargarDatosKpis() {
+  const sucursalId = this.sucursalContextService.getSucursalId();
+  if (!sucursalId) return;
+
+  this.cobroService.getTotalCobradoHoy(sucursalId).subscribe({
+    next: (res) => {
+      // Actualizamos los KPIs que definiste en tu objeto
+      this.kpis.totalCobradoHoy = res.total_hoy;
+      this.kpis.cobrosPendientes = res.conteo_recibos; 
+      console.log('KPIs actualizados:', this.kpis);
+    },
+    error: (err) => console.error('Error cargando KPIs:', err)
+  });
+}
 
 }

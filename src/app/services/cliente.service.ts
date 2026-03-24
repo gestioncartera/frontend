@@ -63,7 +63,7 @@ getClientesByRutaPrestamo(id_usuario: number): Observable<Cliente[]> {
  
 
 getClientes(id_sucursal: number | string): Observable<Cliente[]> {
-  return this.http.get<Cliente[]>(`${this.apiUrl}/getClientesBySucursal/${id_sucursal}`);
+  return this.http.get<Cliente[]>(`${this.apiUrl}/getClientes/${id_sucursal}`);
 }
 
 getClientesPrestamo(id_sucursal: number | string): Observable<Cliente[]> {

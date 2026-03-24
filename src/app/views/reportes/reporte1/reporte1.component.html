@@ -5,7 +5,7 @@
       <c-card class="shadow-sm border-0 border-top-info border-top-3 h-100">
         <c-card-body class="p-3">
           <div class="text-muted x-small text-uppercase font-bold">Total Cobrado Hoy</div>
-          <div class="h3 mb-1 mt-2">{{ kpis.totalCobradoHoy | currency }}</div>
+          <div class="h3 mb-1 mt-2">{{ kpis.totalCobradoHoy | currency:'COP':'$':'1.0-0' }}</div>
           <c-badge color="success" class="ms-1">+8.5%</c-badge>
         </c-card-body>
       </c-card>
@@ -15,7 +15,7 @@
       <c-card class="shadow-sm border-0 border-top-primary border-top-3 h-100">
         <c-card-body class="p-3">
           <div class="text-muted x-small text-uppercase font-bold">Cartera Total</div>
-          <div class="h3 mb-1 mt-2">{{ kpis.carteraTotal | currency }}</div>
+          <div class="h3 mb-1 mt-2">{{ kpis.carteraTotal | currency:'COP':'$':'1.0-0' }}</div>
         </c-card-body>
       </c-card>
     </c-col>
@@ -46,8 +46,8 @@
       <div class="d-flex justify-content-between align-items-center">
         <strong class="text-uppercase small text-muted">Resumen de Cobros por Cobrador & Ruta</strong>
         <div class="d-flex gap-2">
-          <button cButton color="light" size="sm" class="border shadow-sm">
-            📅 Últimos 15 días
+          <button cButton color="primary" size="sm" (click)="cargarResumenCobros()" [disabled]="cargando">
+            {{ cargando ? 'Cargando...' : '🔄 Actualizar' }}
           </button>
         </div>
       </div>
@@ -58,28 +58,34 @@
           <tr class="x-small text-uppercase">
             <th class="ps-3">Cobrador</th>
             <th>Ruta</th>
-            <th class="text-center">Total Clientes</th>
-            <th class="text-center">Clientes Cobrados</th>
-            <th class="text-center">% Cobro</th>
+            <th class="text-center">Recibos</th>
             <th class="text-end pe-3">Total Recaudado Hoy</th>
             <th class="text-center">Acción</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let item of listaResumen">
-            <td class="ps-3 font-bold">{{ item.cobrador }}</td>
-            <td class="text-muted">{{ item.ruta }}</td>
-            <td class="text-center">{{ item.clientes }}</td>
-            <td class="text-center text-success font-bold">{{ item.cobrados }}</td>
+          <tr *ngIf="cargando">
+            <td colspan="5" class="text-center py-4">Actualizando datos...</td>
+          </tr>
+
+          <tr *ngFor="let item of resumenRutas">
+            <td class="ps-3 font-bold">{{ item.nombre_cobrador }}</td>
+            <td class="text-muted">{{ item.nombre_ruta }}</td>
             <td class="text-center">
-              <span class="badge bg-light text-primary border">{{ item.porcentaje }}%</span>
+              <span class="badge bg-light text-primary border">{{ item.total_recibos }}</span>
             </td>
-            <td class="text-end pe-3 font-bold">{{ item.total | currency }}</td>
+            <td class="text-end pe-3 font-bold text-success">
+              {{ item.total_recaudado | currency:'COP':'$':'1.0-0' }}
+            </td>
             <td class="text-center">
               <button cButton color="primary" variant="outline" size="sm" (click)="verDetalles(item)">
                 Ver Detalles
               </button>
             </td>
+          </tr>
+
+          <tr *ngIf="!cargando && resumenRutas.length === 0">
+            <td colspan="5" class="text-center py-4 text-muted">No hay movimientos registrados hoy.</td>
           </tr>
         </tbody>
       </table>

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { catchError, Observable, throwError } from 'rxjs';
+import { catchError, Observable, tap, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 // Interface para crear cobro
@@ -90,4 +90,24 @@ export class CobroService {
   gethistorialcobros(prestamoId: number | string): Observable<Cobrohistorial[]> {
     return this.http.get<Cobrohistorial[]>(`${this.apiUrl}/getCobrosByPrestamoId/${prestamoId}`);
   }
+
+  getResumenCobrosCobradorRuta(sucursalId: number): Observable<any[]> {
+  const url = `${this.apiUrl}/resumenCobrosCoradorRuta/${sucursalId}`;
+  
+  return this.http.get<any[]>(url).pipe(
+    tap(resumen => console.log('Resumen de ruta cargado:', resumen)),
+    catchError(err => {
+      console.error('Error al obtener resumen de cobros por ruta:', err);
+      throw err;
+    })
+  );
+}
+
+getTotalCobradoHoy(sucursalId: number): Observable<{total_hoy: number, conteo_recibos: number}> {
+  return this.http.get<{total_hoy: number, conteo_recibos: number}>(
+    `${this.apiUrl}/getTotalCobradoHoy/${sucursalId}`
+  );
+}
+
+
 }

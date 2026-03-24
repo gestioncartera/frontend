@@ -165,16 +165,26 @@ getColorVencimiento(dias: number | null): string {
   return 'text-success'; // Al día
 }
 
-  verDetalles(row: any) {
-    if (this.cliente_id) {
-       // Estamos viendo préstamos, ir a detalle de préstamo
-       this.router.navigate(['/prestamo/detalle-prestamo', row.prestamo_id]);
+verDetalles(row: any) {
+  // Según tu consola, el objeto tiene: prestamo_id y cliente
+  console.log('Datos de la fila:', row);
+
+  // 1. Extraemos los valores usando los nombres exactos de tu consola
+  const prestamoId = row.prestamo_id; // Es 26 en tu imagen
+  const nombreCliente = row.cliente;   // Es "Alejandro Martínez" en tu imagen
+console.log('prestamo_id:', prestamoId, 'nombre_cliente:', nombreCliente);
+  // 2. Validamos que existan antes de navegar
+  if (prestamoId && nombreCliente) {
+    this.router.navigate(['/prestamo/detalle-prestamo', prestamoId, nombreCliente]);
+  } else {
+    // Si por alguna razón el nombre no viene en el row, usamos el del componente
+    const nombreRespaldo = nombreCliente || this.clienteNombre || 'Detalle';
+    
+    if (prestamoId) {
+       this.router.navigate(['/prestamo/detalle-prestamo', prestamoId, nombreRespaldo]);
     } else {
-       // Estamos viendo clientes, ir a ver los préstamos de este cliente
-       // Esto recargará este mismo componente pero con el cliente_id set
-       // Sin embargo, este componente se usa generalmente embebido o routeado.
-       // Si es routeado, deberíamos navegar a la ruta prestamos-cliente/:id
-       this.router.navigate(['/prestamo/prestamos-cliente', row.cliente_id]);
+       console.error('No se pudo navegar: falta prestamo_id', row);
     }
   }
+}
 }

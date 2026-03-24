@@ -30,6 +30,7 @@ import { PrestamoService } from '../../../services/prestamo.service';
 })
 export class PrestamosClienteComponent implements OnInit {
   cliente_id!: number;
+  nombre_cliente: string = '';
   displayedColumns: string[] = ['prestamo_id', 'saldo_pendiente', 'valor_cuota', 'fecha_fin_prestamo', 'actions'];
   dataSource = new MatTableDataSource<any>([]);
   isMobile = false;
@@ -48,6 +49,11 @@ export class PrestamosClienteComponent implements OnInit {
     this.route.params.subscribe(params => {
       if (params['cliente_id']) {
         this.cliente_id = +params['cliente_id'];
+      }
+      if (params['nombre_cliente']) {
+        this.nombre_cliente = params['nombre_cliente'];
+      }
+      if (this.cliente_id) {
         this.loadPrestamos();
       }
     });
