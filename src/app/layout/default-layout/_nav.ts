@@ -151,7 +151,7 @@ export const navItems: INavData[] = [
     iconComponent: { name: 'cil-chart-pie' },
     children: [
       {
-        name: 'General',
+        name: 'Diario',
         url: '/reportes/reporte1',
         icon: 'nav-icon-bullet',
       },

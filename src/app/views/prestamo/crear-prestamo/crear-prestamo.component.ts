@@ -200,9 +200,9 @@ crear() {
 
   // Extraemos el ID explícitamente para evitar el undefined
   // Estrategia robusta para encontrar el ID
-  const tipoObj = this.selectedTipoPrestamo as any;
-  let tipoId = tipoObj.id_tipo_prestamo || tipoObj.id || tipoObj.Id || tipoObj.tipo_prestamo_id;
-
+  const tipoObj = this.selectedTipoPrestamo as TipoPrestamo;
+  let tipoId = tipoObj.id_tipo_prestamo ;
+/*
   // Si aún no encontramos ID, buscamos cualquier propiedad que parezca un ID
   if (!tipoId) {
       console.warn('ID estándar no encontrado. Buscando alternativas en:', Object.keys(tipoObj));
@@ -214,12 +214,13 @@ crear() {
           console.log(`ID encontrado usando heurística: ${possibleIdKey} -> ${tipoId}`);
       }
   }
+      
 
   if (!tipoId) {
     console.error('CRITICAL: No se encontró ID en el tipo de préstamo. Objeto completo:', JSON.stringify(this.selectedTipoPrestamo));
     window.alert('Error: El tipo de préstamo seleccionado no tiene un ID válido. Revisa la consola para más detalles.');
     return;
-  }
+  }   */
   
   // Calculamos el interés y total aquí para que el log sea real
   const interesCalculado = this.valor * (this.selectedTipoPrestamo.porcentaje / 100);
