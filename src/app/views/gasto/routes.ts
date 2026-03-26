@@ -11,6 +11,11 @@ export const routes: Routes = [
         loadComponent: () => import('./list-gasto/list-gasto.component').then(m => m.ListGastoComponent),
         data: { title: 'Lista de Gastos' }
     },
+     {
+        path: 'listar-gasto-cobro',
+        loadComponent: () => import('./listar-gasto-cobro/listar-gasto-cobro.component').then(m => m.ListarGastoCobroComponent),
+        data: { title: 'Lista de Gasto' }
+    },
     {
         path: 'crear-gasto',
         loadComponent: () => import('./crear-gasto/crear-gasto.component').then(m => m.CrearGastoComponent),

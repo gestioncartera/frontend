@@ -1,0 +1,151 @@
+@use 'sass:color';
+
+/* Variables de Color (puedes ajustarlas según tu tema de Angular Material) */
+$success: #2ecc71;
+$danger: #e74c3c;
+$warning: #f1c40f;
+$info: #3498db;
+$dark-blue: #2c3e50;
+
+.table-wrapper {
+  margin-top: 1rem;
+
+  .search-field {
+    width: 100%;
+    margin-bottom: 1.5rem;
+  }
+}
+
+/* Estilos de la Tabla Moderna */
+.modern-table {
+  background: white;
+  
+  th.mat-header-cell {
+    color: $dark-blue;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    padding: 16px;
+  }
+
+  td.mat-cell {
+    padding: 16px;
+    font-size: 0.9rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  .row-hover:hover {
+    background-color: rgba($info, 0.03);
+    transition: background-color 0.2s ease;
+  }
+}
+
+/* Columna de Montos */
+.amount-cell {
+  font-weight: 600;
+  color: $success;
+  font-size: 1rem;
+
+  &.negative {
+    color: $danger;
+  }
+}
+
+/* Badges de Tipo de Movimiento */
+.type-badge {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+
+  &.ingreso {
+    background-color: rgba($success, 0.15);
+    color: color.adjust($success, $lightness: -10%);
+  }
+
+  &.egreso {
+    background-color: rgba($danger, 0.15);
+    color: color.adjust($danger, $lightness: -10%);
+  }
+}
+
+/* Badges de Estado (Completado, Pendiente, Anulado) */
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+
+  &.completado, &.activo {
+    background-color: #d4edda;
+    color: #155724;
+  }
+
+  &.pendiente {
+    background-color: #fff3cd;
+    color: #856404;
+  }
+
+  &.anulado {
+    background-color: #f8d7da;
+    color: #721c24;
+    opacity: 0.7;
+    text-decoration: line-through;
+  }
+}
+
+/* Estilos para la Vista Móvil */
+.mobile-list {
+  .mobile-card {
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+    border: none;
+    margin-bottom: 1rem;
+    transition: transform 0.2s;
+
+    &:active {
+      transform: scale(0.98);
+    }
+
+    .card-content {
+      hr {
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        margin: 10px 0;
+      }
+    }
+  }
+
+  .m-amount {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: $success;
+
+    &.negative {
+      color: $danger;
+    }
+  }
+}
+
+/* Otros Elementos */
+.no-records {
+  mat-icon {
+    font-size: 48px;
+    height: 48px;
+    width: 48px;
+    margin-bottom: 10px;
+    color: #cbd5e0;
+  }
+  p {
+    font-size: 1rem;
+    color: #718096;
+  }
+}
+
+.btn-delete {
+  transition: color 0.2s;
+  &:hover:not([disabled]) {
+    color: $danger;
+  }
+}

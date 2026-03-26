@@ -34,6 +34,7 @@ export interface CobroDetalle {
   fecha_cobro: string;
   monto_cobrado: string;
   estado: string;
+  cobro_id?: number;
 }
 
 export interface PrestamoCobros {

@@ -20,6 +20,7 @@ interface Pago {
   fecha: string;
   abono: number;
   estado: 'PAGADO' | 'PARCIAL' | 'Pendiente';
+  cobro_id?: number;
 }
 
 @Component({
@@ -129,8 +130,10 @@ export class TarjetaComponent implements OnInit {
         this.pagos = data.data.map((cobro: CobroDetalle) => ({
           fecha: new Date(cobro.fecha_cobro).toLocaleDateString(),
           abono: parseFloat(cobro.monto_cobrado),
-          estado: cobro.estado as 'PAGADO' | 'PARCIAL' | 'Pendiente'
+          estado: cobro.estado as 'PAGADO' | 'Pendiente',
+          cobro_id: cobro.cobro_id
         }));
+        console.log('Pagos transformados para la tabla:', this.pagos);
 
         this.isLoading = false;
       },
@@ -238,9 +241,19 @@ confirmarEdicionRapida(pago: any) {
 
 validarAbonoTemporal(pago: any) {
   if (pago.abono < 0) pago.abono = 0;
-  // Opcional: validar que no exceda el saldo total
-}
-
+ console.log('Monto de cobro actualizado con caja:', pago);
+  this.cobroService.updateMontoCobroConCaja(pago.cobro_id, pago.abono).subscribe({
+    next: (response) => {
+      this.snackBar.open('Monto de cobro actualizado con éxito', 'Cerrar', { duration: 3000 });
+      this.cargarDatosPrestamo();
+     
+    },
+    error: (err) => {
+      console.error('Error al actualizar monto de cobro:', err);
+      this.snackBar.open('Error al actualizar el monto del cobro', 'Cerrar', { duration: 3000 });
+    }
+  });
+}  
 
   // ============================
   // Volver al menú anterior

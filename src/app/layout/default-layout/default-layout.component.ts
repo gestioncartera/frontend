@@ -138,6 +138,11 @@ private collapseAllMenus(items: any[], currentUrl: string = '') {
       url: '/gasto/crear-gasto',
       iconComponent: { name: 'cil-calculator' },    
      },
+     {
+      name: 'Lista Gasto',
+      url: '/gasto/listar-gasto-cobro',
+      iconComponent: { name: 'cil-calculator' },    
+     },
       
       
       ];
