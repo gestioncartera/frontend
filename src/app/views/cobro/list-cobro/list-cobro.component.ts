@@ -248,11 +248,15 @@ loadCobros() {
     return ['/cobro/edit-cobro'];
   }
 
-  getEditQueryParams(item: any): any {
-    const params: any = { id: item.cobro_id };
-    if (this.isCobrosPorRuta && this.rutaId) params.rutaId = this.rutaId;
-    return params;
-  }
+    getEditQueryParams(item: any): any {
+      const params: any = { 
+        id: item.cobro_id,
+        nombre: item.nombrecliente,
+        prestamoId: item.prestamo_id
+      };
+      if (this.isCobrosPorRuta && this.rutaId) params.rutaId = this.rutaId;
+      return params;
+    }
 
   // ELIMINACIÓN (MANTENIDO SEGÚN TU LÓGICA)
   delete = async (item: any) => {

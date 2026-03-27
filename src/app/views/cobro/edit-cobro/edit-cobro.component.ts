@@ -36,7 +36,9 @@ import { MatIconModule } from '@angular/material/icon';
 export class EditCobroComponent implements OnInit {
   cobroForm: FormGroup;
   cobroId: string | number | null = null;
-  rutaId: string | null = null;
+    rutaId: string | null = null;
+  nombreCliente: string = '';
+  prestamoId: string = '';
 
   constructor(
     private fb: FormBuilder, 
@@ -59,7 +61,8 @@ export class EditCobroComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       this.cobroId = params['id'] || null;
       this.rutaId = params['rutaId'] || null;
-      
+            this.nombreCliente = params['nombre'];
+      this.prestamoId = params['prestamoId']; 
       if (this.cobroId) {
         this.loadCobroData();
       }
