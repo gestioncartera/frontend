@@ -104,10 +104,12 @@ export class CrearGastoComponent implements OnInit {
 
     // Llamada al servicio HTTP
     this.cajaDiarioService.createEgresoOperacion(nuevoGasto).subscribe({
-      next: (res) => {
+            next: (res) => {
         this.loading = false;
         this.mostrarMensaje(res.message || '✅ Gasto registrado correctamente', 'success-snackbar');
-        this.router.navigate(['/gasto/list-gasto']);
+        // Limpiar formulario para "refrescar" la vista sin navegar
+        this.concepto = '';
+        this.valor = 0;
       },
       error: (err) => {
         this.loading = false;

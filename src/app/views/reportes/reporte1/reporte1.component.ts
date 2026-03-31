@@ -33,10 +33,10 @@ export class Reporte1Component implements OnInit {
   public cargando: boolean = false;
   // Datos simulados basados en la imagen
   kpis = {
-    totalCobradoHoy: 1450.00,
-    carteraTotal: 285400.00,
-    cobrosPendientes: 45,
-    eficienciaRuta: 94
+    totalCobradoHoy: 0,
+    carteraTotal: 0,
+    cobrosPendientes: 0,
+    eficienciaRuta: 0
   };
 
   listaResumen = [
@@ -64,6 +64,7 @@ cargarResumenCobros() {
   if (!sucursalId) return;
 
   this.cargando = true;
+  console.log(sucursalId)
 
   this.cobroService.getResumenCobrosCobradorRuta(sucursalId).subscribe({
     next: (data) => {

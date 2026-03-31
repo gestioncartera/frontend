@@ -109,6 +109,16 @@ getTotalCobradoHoy(sucursalId: number): Observable<{total_hoy: number, conteo_re
   );
 }
 
+
+
+
+
+
+
+
+
+
+
 updateMontoCobroConCaja(cobro_id: number, monto: number): Observable<any> {
   return this.http.patch(`${this.apiUrl}/updateMontoCobroConCaja/${cobro_id}`, { monto }).pipe(
     tap(response => console.log('Monto de cobros actualizado con caja:', response)),
@@ -119,4 +129,12 @@ updateMontoCobroConCaja(cobro_id: number, monto: number): Observable<any> {
   ); 
 }
 
+getEgresosOperacionCobrador(sucursalId: number): Observable<any> {
+  return this.http.get<any>(`${this.apiUrl}/getEgresosOperacionCobrador/${sucursalId}`).pipe(
+    catchError(err => {
+      console.error('Error al obtener egresos:', err);
+      throw err;
+    })
+  );
+}
 }

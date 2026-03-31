@@ -69,6 +69,13 @@ export class CajaDiarioService {
   }
 
  
+getEgresosOperacionCobrador(usuario_id: number): Observable<EgresoOperacion[]> {
+  const url = `${this.URL_EGRESO_OP}/getEgresosOperacionCobrador/${usuario_id}`;
+  
+  // Retornamos la petición al backend
+  return this.http.get<EgresoOperacion[]>(url);
+}
+
  getEgresosOperacionPendientes(usuario_id: number): Observable<EgresoOperacion[]> {
     const url = `${this.URL_EGRESO_OP}/getAllEgresosOperacionPendientes/${usuario_id}`;
     

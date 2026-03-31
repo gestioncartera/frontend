@@ -236,7 +236,7 @@ private guardarCobroConfirmado(): void {
   });
 }
 confirmarEdicionRapida(pago: any) {
-  console.log('Nuevo abono a guardar:', pago.abono);  
+  console.log('Nuevo abono a guardar:', pago);  
 }
 
 validarAbonoTemporal(pago: any) {
@@ -246,7 +246,7 @@ validarAbonoTemporal(pago: any) {
     next: (response) => {
       this.snackBar.open('Monto de cobro actualizado con éxito', 'Cerrar', { duration: 3000 });
       this.cargarDatosPrestamo();
-     
+     console.log("prueba",pago)
     },
     error: (err) => {
       console.error('Error al actualizar monto de cobro:', err);

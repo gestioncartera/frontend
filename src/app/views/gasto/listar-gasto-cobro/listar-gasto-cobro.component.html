@@ -1,20 +1,39 @@
 <div class="table-wrapper">
   <mat-form-field appearance="outline" class="search-field w-100 mb-3">
     <mat-label>Buscar movimiento</mat-label>
-    <input matInput (keyup)="applyFilter($event)" placeholder="Ej: Pago de luz, abono cliente..." />
+    <input matInput (keyup)="applyFilter($event)" placeholder="Ej: Pago de luz, abono cliente..." [disabled]="isLoading" />
     <mat-icon matSuffix>search</mat-icon>
   </mat-form-field>
 
-  <div *ngIf="dataSource.data.length === 0" class="no-records text-center p-4">
-    <mat-icon color="primary" class="fs-1">info_outline</mat-icon>
-    <p class="text-muted">No hay movimientos para mostrar.</p>
+  <div *ngIf="isLoading" class="loading-container text-center p-5">
+    <mat-spinner diameter="50" class="mx-auto"></mat-spinner>
+    <p class="mt-3 text-muted">Consultando movimientos de caja...</p>
   </div>
 
-  <div *ngIf="dataSource.data.length > 0">
+  <div *ngIf="error && !isLoading" class="error-container text-center p-4 border rounded bg-light">
+    <mat-icon color="warn" class="fs-1">error_outline</mat-icon>
+    <p class="text-danger fw-bold">{{ error }}</p>
+    <button mat-flat-button color="primary" (click)="retryLoad()">
+      <mat-icon>refresh</mat-icon> Reintentar
+    </button>
+  </div>
+
+  <div *ngIf="dataSource.data.length === 0 && !isLoading && !error" class="no-records text-center p-4">
+    <mat-icon color="primary" class="fs-1">info_outline</mat-icon>
+    <p class="text-muted">No hay movimientos registrados para este cobrador.</p>
+  </div>
+
+  <div *ngIf="dataSource.data.length > 0 && !isLoading && !error">
+    
     <div *ngIf="!isMobile" class="table-container shadow-sm border rounded">
       <table mat-table [dataSource]="dataSource" matSort class="modern-table w-100">
 
-        <ng-container matColumnDef="fecha">
+        <ng-container matColumnDef="concepto">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Concepto</th>
+          <td mat-cell *matCellDef="let item">{{ item.descripcion }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="fecha_movimiento">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha</th>
           <td mat-cell *matCellDef="let item">
             <div class="d-flex flex-column">
@@ -24,44 +43,13 @@
           </td>
         </ng-container>
 
-        <ng-container matColumnDef="tipo">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Tipo</th>
-          <td mat-cell *matCellDef="let item">
-            <span class="type-badge" [ngClass]="item.tipo_movimiento">{{ item.tipo_movimiento | uppercase }}</span>
+        <ng-container matColumnDef="monto">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Monto</th>
+          <td mat-cell *matCellDef="let item" [class.negative]="item.tipo_movimiento?.toLowerCase() === 'egreso'" class="fw-bold">
+            {{ item.monto | currency:'USD':'symbol':'1.0-0' }}
           </td>
-        </ng-container>
-
-        <ng-container matColumnDef="concepto">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Concepto</th>
-          <td mat-cell *matCellDef="let item">{{ item.descripcion }}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="valor">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Valor</th>
-          <td mat-cell *matCellDef="let item" [class.negative]="item.tipo_movimiento === 'egreso'" class="fw-bold">
-            {{ item.tipo_movimiento === 'egreso' ? '-' : '+' }} {{ item.monto | currency }}
-          </td>
-        </ng-container>
-
-        <ng-container matColumnDef="estado">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Estado</th>
-          <td mat-cell *matCellDef="let item">
-            <span class="status-badge" [ngClass]="item.estado_movto.toLowerCase()">
-              {{ item.estado_movto | titlecase }}
-            </span>
-          </td>
-        </ng-container>
-
-        <ng-container matColumnDef="acciones">
-          <th mat-header-cell *matHeaderCellDef class="text-center">Acciones</th>
-          <td mat-cell *matCellDef="let item" class="text-center"> 
-            <button mat-icon-button color="warn" (click)="emitDelete(item)"
-                    [disabled]="item.estado_movto?.toLowerCase() === 'anulado'">
-              <mat-icon>delete_outline</mat-icon>
-            </button>
-          </td>
-        </ng-container>
-
+        </ng-container> 
+        
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns" class="row-hover"></tr>
       </table>
@@ -69,27 +57,22 @@
     </div>
 
     <div *ngIf="isMobile" class="mobile-list">
-      <mat-card class="mobile-card mb-2" *ngFor="let item of dataSource.filteredData">
+      <mat-card class="mobile-card mb-2 shadow-sm" *ngFor="let item of dataSource.filteredData">
         <div class="card-content p-3">
-          <div class="d-flex justify-content-between align-items-start">
+          <div class="d-flex justify-content-between align-items-center">
             <div>
-              <p class="m-0 fw-bold">{{ item.fecha_movimiento | date:'dd MMM, yyyy' }}</p>
-              <small class="text-muted">{{ item.fecha_movimiento | date:'hh:mm a' }}</small>
+              <p class="m-0 fw-bold">{{ item.descripcion }}</p>
+              <small class="text-muted">
+                {{ item.fecha_movimiento | date:'dd MMM, yyyy' }} • {{ item.fecha_movimiento | date:'hh:mm a' }}
+              </small>
             </div>
-            <span class="fs-5 fw-bold" [class.negative]="item.tipo_movimiento === 'egreso'">
-              {{ item.tipo_movimiento === 'egreso' ? '-' : '+' }} {{ item.monto | currency }}
+            <span class="fs-6 fw-bold" [class.negative]="item.tipo_movimiento?.toLowerCase() === 'egreso'">
+              {{ item.tipo_movimiento?.toLowerCase() === 'egreso' ? '-' : '+' }} {{ item.monto | currency:'USD':'symbol':'1.0-0' }}
             </span>
-          </div>
-          <hr>
-          <p class="mb-1 text-uppercase small text-muted">Concepto:</p>
-          <p>{{ item.descripcion }}</p>
-          <div class="d-flex justify-content-between align-items-center mt-2">
-            <span class="status-badge" [ngClass]="item.estado_movto.toLowerCase()">{{ item.estado_movto }}</span>
-            <button mat-stroked-button color="warn" size="small" (click)="emitDelete(item)"
-                    [disabled]="item.estado_movto.toLowerCase() === 'anulado'">Anular</button>
           </div>
         </div>
       </mat-card>
+      <mat-paginator [pageSizeOptions]="[10, 20]" showFirstLastButtons class="mt-2"></mat-paginator>
     </div>
   </div>
 </div>
