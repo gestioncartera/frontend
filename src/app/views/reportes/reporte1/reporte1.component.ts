@@ -33,7 +33,7 @@ export class Reporte1Component implements OnInit {
   public cargando: boolean = false;
   // Datos simulados basados en la imagen
   kpis = {
-    totalCobradoHoy: 0,
+    total_cobro_hoy: 0,
     carteraTotal: 0,
     cobrosPendientes: 0,
     eficienciaRuta: 0
@@ -73,6 +73,7 @@ cargarResumenCobros() {
       
       // Calculamos el total recaudado sumando todos los items
       this.actualizarKpisGlobales();
+      console.log('prueba',data);
     },
     error: (err) => {
       this.cargando = false;
@@ -84,21 +85,24 @@ cargarResumenCobros() {
 actualizarKpisGlobales() {
   // Suma el total recaudado de todas las rutas que llegaron
   const total = this.resumenRutas.reduce((acc, curr) => acc + Number(curr.total_recaudado), 0);
-  this.kpis.totalCobradoHoy = total;
+  this.kpis.total_cobro_hoy = total;
   
   // Opcional: Contar total de recibos del día
   this.kpis.cobrosPendientes = this.resumenRutas.reduce((acc, curr) => acc + Number(curr.total_recibos), 0);
 }
 
 cargarDatosKpis() {
-  const sucursalId = this.sucursalContextService.getSucursalId();
+  const sucursalId = 4;  
   if (!sucursalId) return;
 
   this.cobroService.getTotalCobradoHoy(sucursalId).subscribe({
     next: (res) => {
-      // Actualizamos los KPIs que definiste en tu objeto
-      this.kpis.totalCobradoHoy = res.total_hoy;
-      this.kpis.cobrosPendientes = res.conteo_recibos; 
+      const totalRecuperado = Number(res.total_cobro_hoy);
+ this.kpis = {
+        ...this.kpis,
+        total_cobro_hoy: totalRecuperado
+      };
+
       console.log('KPIs actualizados:', this.kpis);
     },
     error: (err) => console.error('Error cargando KPIs:', err)

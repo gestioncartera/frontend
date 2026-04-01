@@ -1,0 +1,131 @@
+<div class="caja-mayor-wrapper p-3">
+  <mat-card class="shadow-sm">
+    <mat-card-header class="bg-primary text-white p-3 rounded-top d-flex justify-content-between align-items-center">
+      <mat-card-title class="fs-5 m-0 text-uppercase">Consulta de Saldos de Caja Mayor</mat-card-title>
+      <button mat-icon-button (click)="cargarDatosCaja()" matTooltip="Refrescar datos" class="text-white">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </mat-card-header>
+
+    <mat-card-content class="p-4">
+      
+      <div class="row align-items-center mb-4">
+        <div class="col-md-6 d-flex align-items-center gap-3">
+          <span class="fw-bold text-uppercase text-secondary">Sucursal:</span>
+          <mat-form-field appearance="outline" class="flex-grow-1 dense-form-field">
+            <mat-select [(ngModel)]="sucursalSeleccionada" (selectionChange)="cargarDatosCaja()">
+              <mat-option *ngFor="let suc of sucursales" [value]="suc.id">
+                {{ suc.id }} - {{ suc.nombre }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-md-6 text-end">
+          <div class="d-inline-block border rounded p-2 bg-light">
+            <span class="text-muted text-uppercase small d-block">Caja Inicial</span>
+            <span class="fs-4 fw-bold text-dark">{{ datosCaja.caja_inicial | currency:'USD':'symbol':'1.0-0' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <mat-divider class="mb-4"></mat-divider>
+
+      <div class="row g-4">
+        
+        <div class="col-md-6 border-end">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="m-0 text-success text-uppercase fw-bold">Entradas</h3>
+            <mat-icon color="success">trending_up</mat-icon>
+          </div>
+          
+          <div class="data-list">
+            <div class="data-item">
+              <span>Cobros</span>
+              <span class="fw-bold">{{ datosCaja.entradas.cobros | currency:'USD':'symbol':'1.0-0' }} <span class="text-success">*</span></span>
+            </div>
+            <div class="data-item">
+              <span>Cheques Cobrados</span>
+              <span class="fw-bold">{{ datosCaja.entradas.cheques_cobrados | currency:'USD':'symbol':'1.0-0' }}</span>
+            </div>
+            <div class="data-item">
+              <span>Aportes</span>
+              <span class="fw-bold">{{ datosCaja.entradas.aportes | currency:'USD':'symbol':'1.0-0' }}</span>
+            </div>
+            <div class="data-item bg-light border-top mt-2 fw-bold">
+              <span>Líquido a Depositar</span>
+              <span class="text-primary fs-5">{{ datosCaja.entradas.liquido_a_depositar | currency:'USD':'symbol':'1.0-0' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="m-0 text-danger text-uppercase fw-bold">Salidas</h3>
+            <mat-icon color="warn">trending_down</mat-icon>
+          </div>
+          
+          <div class="data-list">
+            <div class="data-item">
+              <span>Gastos</span>
+              <span class="fw-bold">{{ datosCaja.salidas.gastos | currency:'USD':'symbol':'1.0-0' }} <span class="text-danger">*</span></span>
+            </div>
+            <div class="data-item">
+              <span>Depósito a Banco</span>
+              <span class="fw-bold">{{ datosCaja.salidas.deposito_a_banco | currency:'USD':'symbol':'1.0-0' }}</span>
+            </div>
+            <div class="data-item">
+              <span>Préstamos</span>
+              <span class="fw-bold">{{ datosCaja.salidas.prestamos | currency:'USD':'symbol':'1.0-0' }} <span class="text-danger">*</span></span>
+            </div>
+            <div class="data-item">
+              <span>Reembolso a Socios</span>
+              <span class="fw-bold">{{ datosCaja.salidas.reembolso_a_socios | currency:'USD':'symbol':'1.0-0' }} <span class="text-danger">*</span></span>
+            </div>
+            <div class="data-item bg-light border-top mt-2 fw-bold">
+              <span>Base Diaria</span>
+              <span class="text-dark fs-5">{{ datosCaja.salidas.base_diaria | currency:'USD':'symbol':'1.0-0' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <mat-divider class="my-4"></mat-divider>
+
+      <div class="row align-items-center">
+        
+        <div class="col-md-4">
+          <mat-card class="bg-light shadow-none border">
+            <mat-card-content class="p-3">
+              <span class="d-block text-center text-secondary fw-bold mb-2">{{ datosCaja.metricas_adicionales.fecha }}</span>
+              <div class="d-flex justify-content-between small mb-1">
+                <span>Cuentas X Cobrar:</span>
+                <span class="fw-bold">{{ datosCaja.metricas_adicionales.cuentas_por_cobrar | currency:'USD':'symbol':'1.0-0' }}</span>
+              </div>
+              <div class="d-flex justify-content-between small">
+                <span>Rendimiento:</span>
+                <span class="fw-bold">{{ datosCaja.metricas_adicionales.rendimiento | currency:'USD':'symbol':'1.0-0' }}</span>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <div class="d-inline-block border border-primary rounded p-3 bg-white shadow-sm" style="min-width: 200px;">
+            <span class="text-primary text-uppercase small fw-bold d-block">Caja Actual</span>
+            <span class="fs-3 fw-bold text-primary">{{ datosCaja.caja_actual | currency:'USD':'symbol':'1.0-0' }}</span>
+          </div>
+        </div>
+
+        <div class="col-md-4 text-end">
+          <div class="mb-3">
+            <button mat-flat-button color="accent" (click)="verHistorial()">
+              <mat-icon>history</mat-icon> Ver Historial
+            </button>
+          </div>
+          <span class="text-muted small"><span class="fw-bold text-success">*</span> = No Afecta Saldos</span>
+        </div>
+      </div>
+
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -70,7 +70,7 @@ export class CobroService {
   
   getClientesByuser(userId: number | string): Observable<Cobro[]> {
     // Nota: Aquí tenías Hardcoded el '1', podrías usar `${userId}` en el futuro
-    return this.http.get<Cobro[]>(`${this.apiUrl}/getClientesByRuta/1`);
+    return this.http.get<Cobro[]>(`${this.apiUrl}/getClientesByRuta/${userId}`);
   }
 
   createCobro(cobro: CreateCobroDto): Observable<any> {
@@ -91,33 +91,7 @@ export class CobroService {
     return this.http.get<Cobrohistorial[]>(`${this.apiUrl}/getCobrosByPrestamoId/${prestamoId}`);
   }
 
-  getResumenCobrosCobradorRuta(sucursalId: number): Observable<any[]> {
-  const url = `${this.apiUrl}/resumenCobrosCoradorRuta/${sucursalId}`;
-  
-  return this.http.get<any[]>(url).pipe(
-    tap(resumen => console.log('Resumen de ruta cargado:', resumen)),
-    catchError(err => {
-      console.error('Error al obtener resumen de cobros por ruta:', err);
-      throw err;
-    })
-  );
-}
-
-getTotalCobradoHoy(sucursalId: number): Observable<{total_hoy: number, conteo_recibos: number}> {
-  return this.http.get<{total_hoy: number, conteo_recibos: number}>(
-    `${this.apiUrl}/getTotalCobradoHoy/${sucursalId}`
-  );
-}
-
-
-
-
-
-
-
-
-
-
+ 
 
 updateMontoCobroConCaja(cobro_id: number, monto: number): Observable<any> {
   return this.http.patch(`${this.apiUrl}/updateMontoCobroConCaja/${cobro_id}`, { monto }).pipe(
@@ -137,4 +111,29 @@ getEgresosOperacionCobrador(sucursalId: number): Observable<any> {
     })
   );
 }
+
+getResumenCobrosCobradorRuta(sucursalId: number): Observable<any[]> {
+    const url = `${this.apiUrl}/resumenCobrosCoradorRuta/${sucursalId}`;
+    console.log('prueba bac', url);
+    return this.http.get<any[]>(url).pipe(
+      tap(resumen => console.log('Resumen de ruta cargado:', resumen)),
+      catchError(err => {
+        console.error('Error al obtener resumen de cobros por ruta:', err);
+        throw err;
+      })
+    );
+  }
+
+  getTotalCobradoHoy(sucursalId: number | string): Observable<{ total_cobro_hoy: string | number }> {
+    return this.http.get<{ total_cobro_hoy: string | number }>(
+      `${this.apiUrl}/getTotalCobradoHoy/${sucursalId}`
+    ).pipe(
+      tap(response => console.log('Respuesta del servidor:', response)),
+      catchError(err => {
+        console.error('Error al obtener el total cobrado hoy:', err);
+        return throwError(() => err);
+      })
+    );
+  }
+
 }

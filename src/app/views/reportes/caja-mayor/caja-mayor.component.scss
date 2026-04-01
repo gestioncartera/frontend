@@ -1,0 +1,29 @@
+.caja-mayor-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+
+  .dense-form-field {
+    .mat-mdc-form-field-wrapper {
+      padding-bottom: 0;
+    }
+  }
+
+  .data-list {
+    .data-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 4px;
+      margin-bottom: 4px;
+
+      &:nth-child(odd):not(.bg-light) {
+        background-color: #f8f9fa;
+      }
+    }
+  }
+
+  .bg-primary {
+    background-color: #1976d2 !important;
+  }
+}
