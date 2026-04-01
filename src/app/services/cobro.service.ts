@@ -93,8 +93,8 @@ export class CobroService {
 
  
 
-updateMontoCobroConCaja(cobro_id: number, monto: number): Observable<any> {
-  return this.http.patch(`${this.apiUrl}/updateMontoCobroConCaja/${cobro_id}`, { monto }).pipe(
+updateMontoCobroConCaja(cobro_id: number, monto_cobrado: number): Observable<any> {
+  return this.http.patch(`${this.apiUrl}/updateMontoCobroConCaja/${cobro_id}`, { monto_cobrado }).pipe(
     tap(response => console.log('Monto de cobros actualizado con caja:', response)),
     catchError(err => {
       console.error('Error al actualizar monto de cobros con caja:', err);
