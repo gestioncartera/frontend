@@ -44,11 +44,6 @@ export const navItems: INavData[] = [
         url: '/gasto/registro-egreso-diario',
         icon: 'nav-icon-bullet',
       },
-      {
-        name: 'Lista Gasto Cobro',
-        url: '/gasto/listar-gasto-cobro',
-        icon: 'nav-icon-bullet',
-      },
        {
         name: 'Cierre de Caja',
         url: '/caja/cerrar-caja',
