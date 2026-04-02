@@ -1,5 +1,5 @@
 import { NgIf, CommonModule } from '@angular/common';
-import { Component, computed, inject, Input, input, OnInit } from '@angular/core';
+import { Component, computed, inject, Input, input, OnInit, ChangeDetectorRef } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 
@@ -18,9 +18,9 @@ import {
 } from '@coreui/angular';
 
 import { IconDirective } from '@coreui/icons-angular';
-import { Validators } from '@angular/forms';
 import { SucursalContextService } from '../../../services/sucursal-context.service';
 import { CajaDiarioService } from '../../../services/caja-diario..service';
+import { delay } from 'rxjs/operators';
 
 // --- INTERFAZ PARA CORREGIR EL ERROR TS2339 ---
 interface NotificationItem {
@@ -30,8 +30,8 @@ interface NotificationItem {
   icon: string;
   color: string;
   time: string;
-  sucursalId: number | null ;// Agregado para evitar error de propiedad no encontrada
-  totalEgresos?: number; // Agregado para evitar error de propiedad no encontrada
+  sucursalId: number | null;
+  totalEgresos?: number;
 }
 
 @Component({
@@ -45,24 +45,22 @@ interface NotificationItem {
     SidebarToggleDirective, 
     IconDirective, 
     HeaderNavComponent,
-    //NavItemComponent,
-    //NavLinkDirective, 
     RouterLink,
-    //RouterLinkActive,
     DropdownComponent, 
     DropdownToggleDirective, 
     AvatarComponent, 
     DropdownMenuDirective,
     DropdownItemDirective, 
-     
   ]
 })
 export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
   @Input() sucursalNombre: string = 'Sin Sucursal';
+  
   readonly #colorModeService = inject(ColorModeService);
   readonly colorMode = this.#colorModeService.colorMode;
   private authService = inject(AuthService);
-  
+  private cd = inject(ChangeDetectorRef); // Inyectado para corregir NG0100
+
   // Propiedades de usuario
   public userName: string = 'Usuario';
   public userRole: string = 'Cobrador';
@@ -74,7 +72,6 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
   public notificationCount = 0;
   sidebarId = input('sidebar1');
 
-  // Configuración de temas
   readonly colorModes = [
     { name: 'light', text: 'Light', icon: 'cilSun' },
     { name: 'dark', text: 'Dark', icon: 'cilMoon' },
@@ -86,7 +83,6 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
     return this.colorModes.filter(mode => mode.name === currentMode)[0]?.icon ?? 'cilSun';
   });
 
-  // --- ARREGLO DE NOTIFICACIONES CORREGIDO ---
   public dataSource: NotificationItem[] = [];
  
   constructor(
@@ -99,7 +95,7 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
   ngOnInit(): void {
     this.sucursalId = this.sucursalContextService.getSucursalId();
     this.loadUserData();
-    this.notificationCount =0;// this.newNotifications.length;
+    this.notificationCount = 0;
     this.loadBalance();
   }
 
@@ -108,58 +104,49 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
     if (userStr) {
       try {
         const user = JSON.parse(userStr);
-        this.userName = user.nombre + ' ' + user.apellidos || user.nombre || user.email || 'Usuario';
+        this.userName = `${user.nombre || ''} ${user.apellidos || ''}`.trim() || user.email || 'Usuario';
         this.userId = user.usuario_id;
         
         const roleId = user.tipo_usuario || user.rol;
-        if (roleId === 1) {
-          this.userRole = 'Administrador';
-        } else if (roleId === 2) {
-          this.userRole = 'Cobrador';
-        } else {
-          this.userRole = user.tipoUsuario || 'Personal';
-        }
+        this.userRole = roleId === 1 ? 'Administrador' : roleId === 2 ? 'Cobrador' : (user.tipoUsuario || 'Personal');
       } catch (error) {
         console.error('Error al leer usuario', error);
       }
     }
   }
 
-  viewNotifications(): void {
-    console.log('Ver todas las notificaciones');
+  loadBalance(): void {
+    if (!this.userId) return;
+    
+    // Usamos delay(0) para que la actualización ocurra en el siguiente tick de JS
+    // y detectChanges() para asegurar que la vista se entere del cambio de 0 -> valor real
+    this.cajaDiarioService.getCaja(this.userId)
+      .pipe(delay(0)) 
+      .subscribe({
+        next: (res: any) => { 
+          this.totalEgresos = res?.monto_final_esperado || 0;
+          this.cd.detectChanges(); // Forzamos la actualización segura
+          console.log('Resumen de caja en header:', res);
+        },
+        error: (err) => {
+          if (err.status === 404) {
+            this.totalEgresos = 0;
+          } else {
+            console.error('Error crítico al cargar datos de caja:', err);
+          }
+          this.cd.detectChanges();
+        }
+      });
   }
 
   onLogout(): void {
     this.authService.logout();
   }
 
-  loadBalance(): void {
-  if (!this.userId) {
-    console.warn('No hay userId disponible para cargar el balance.');
-    return;
+  viewNotifications(): void {
+    console.log('Ver todas las notificaciones');
   }
-  
-  this.cajaDiarioService.getCaja(this.userId).subscribe({
-    next: (res: any) => { 
-      this.totalEgresos = res?.monto_final_esperado || 0;
-     // this.monto_final_esperado = res?.monto_actual || res?.saldo_disponible || 0;
-      
-      console.log('Resumen de caja en header:', res);
-    },
-    error: (err) => {
-      if (err.status === 404) {
-        // El usuario no tiene caja abierta hoy: valores en cero
-        this.totalEgresos = 0;
-        //this.monto_final_esperado = 0;
-      } else {
-        console.error('Error crítico al cargar datos de caja:', err);
-      }
-    }
-  });
-}
-  
 
-  // Se mantienen para compatibilidad si los usas en otras partes
   public newMessages = [
     { id: 0, from: 'Sistema', title: 'Mantenimiento', time: 'Just now', message: 'Revisión nocturna...' }
   ];

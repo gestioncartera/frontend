@@ -93,76 +93,47 @@ export class EditCobroComponent implements OnInit {
     this.cobroForm.markAllAsTouched();
     return;
   }
-
-  const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-    width: '420px',
-    disableClose: true,
-    data: {
-      title: 'Confirmar actualización',
-      message: '¿Está seguro de que desea actualizar este cobro?',
-      confirmText: 'Actualizar',
-      cancelText: 'Cancelar',
-      color: 'primary',
-      icon: 'edit',
-      type: 'warning'
-    }
-  });
-
-  dialogRef.afterClosed().subscribe(confirmado => {
-    if (confirmado) {
-      this.actualizarCobro();
-    }
-  });
+    this.aprobarCobro();
 }
-private actualizarCobro() {
-  if (!this.cobroId) return;
 
-  // Enviar todos los campos que requiere el backend
-  const cobroData = {
-    prestamo_id: this.cobroForm.get('prestamo_id')?.value,
-    usuario_id: this.cobroForm.get('usuario_id')?.value,
-    fecha_cobro: this.cobroForm.get('fecha_cobro')?.value,
-    monto_cobrado: this.cobroForm.get('monto_cobrado')?.value,
-    estado: this.cobroForm.get('estado')?.value
-  };
+  aprobarCobro() {
+    if (!this.cobroId) return;
 
-  this.cobroService.editCobro(this.cobroId, cobroData).subscribe({
-    next: () => {
-      this.dialog.open(ConfirmDialogComponent, {
-        width: '380px',
-        data: {
-          title: 'Actualización exitosa',
-          message: 'El cobro fue actualizado correctamente.',
-          confirmText: 'Aceptar',
-          color: 'primary',
-          icon: 'check_circle',
-          type: 'success'
-        }
-      }).afterClosed().subscribe(() => {
-        // Navegar directamente después de guardar exitosamente
-        if (this.rutaId) {
-          this.router.navigate(['/cobro/ruta', this.rutaId, 'cobros']);
-        } else {
-          this.router.navigate(['/cobro/list-cobro']);
-        }
-      });
-    },
-    error: (err) => {
-      console.error('Error al actualizar el cobro:', err);
-      this.dialog.open(ConfirmDialogComponent, {
-        width: '380px',
-        data: {
-          title: 'Error',
-          message: 'No se pudo actualizar el cobro.',
-          confirmText: 'Aceptar',
-          color: 'warn',
-          icon: 'error',
-          type: 'error'
-        }
-      });
-    }
-  });
-}
+    Swal.fire({
+      title: '¿Aprobar este cobro?',
+      text: 'El estado cambiará a "Pagado" y se validará el registro.',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#1e293b',
+      cancelButtonColor: '#64748b',
+      confirmButtonText: 'Sí, aprobar',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Convertimos explícitamente a número para evitar el error TS2345
+        const ids: number[] = [Number(this.cobroId)];
+
+        this.cobroService.validarMultiplesCobros(ids).subscribe({
+          next: (res) => {
+            Swal.fire({
+              icon: 'success',
+              title: '¡Validación Exitosa!',
+              text: res.message || 'El cobro ha sido aprobado correctamente.',
+              showConfirmButton: false,
+              timer: 1500,
+            }).then(() => {
+              this.regresarALista();
+            });
+          },
+          error: (err) => {
+            console.error('Error al aprobar cobro:', err);
+            Swal.fire('Error', 'No se pudo completar la aprobación.', 'error');
+          }
+        });
+      }
+    });
+  }
 
   cancelar() {
   const dialogRef = this.dialog.open(ConfirmDialogComponent, {
@@ -180,13 +151,17 @@ private actualizarCobro() {
 
   dialogRef.afterClosed().subscribe(confirmado => {
     if (confirmado) {
-      if (this.rutaId) {
-        this.router.navigate(['/cobro/ruta', this.rutaId, 'cobros']);
-      } else {
-        this.router.navigate(['/cobro/list-cobro']);
-      }
+      this.regresarALista();
     }
   });
+}
+
+private regresarALista() {
+  if (this.rutaId) {
+    this.router.navigate(['/cobro/ruta', this.rutaId, 'cobros']);
+  } else {
+    this.router.navigate(['/cobro/list-cobro']);
+  }
 }
 limpiarCeroRecaudo() {
   const monto = this.cobroForm.get('monto_cobrado')?.value;
@@ -204,4 +179,3 @@ validarVacioRecaudo() {
 }
 
 }
-

@@ -237,6 +237,7 @@ private guardarCobroConfirmado(): void {
 }
 confirmarEdicionRapida(pago: any) {
   console.log('Nuevo abono a guardar:', pago);  
+  this.validarAbonoTemporal(pago);
 }
 
 validarAbonoTemporal(pago: any) {

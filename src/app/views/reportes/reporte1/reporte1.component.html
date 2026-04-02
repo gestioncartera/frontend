@@ -40,9 +40,8 @@
           <tr class="x-small text-uppercase">
             <th class="ps-3">Cobrador</th>
             <th>Ruta</th>
-            <th class="text-center">Recibos</th>
-            <th class="text-end pe-3">Total Recaudado Hoy</th>
-            <th class="text-center">Acción</th>
+            <th class="text-center">Cobros</th>
+            <th class="text-end pe-3">Total Recaudado Hoy</th>             
           </tr>
         </thead>
         <tbody>
@@ -54,16 +53,12 @@
             <td class="ps-3 font-bold">{{ item.nombre_cobrador }}</td>
             <td class="text-muted">{{ item.nombre_ruta }}</td>
             <td class="text-center">
-              <span class="badge bg-light text-primary border">{{ item.total_recibos }}</span>
+              <span class="badge bg-light text-primary border">{{ item.total_clientes }}</span>
             </td>
             <td class="text-end pe-3 font-bold text-success">
-              {{ item.total_recaudado | currency:'COP':'$':'1.0-0' }}
+              {{ item.total_cobros | currency:'COP':'$':'1.0-0' }}
             </td>
-            <td class="text-center">
-              <button cButton color="primary" variant="outline" size="sm" (click)="verDetalles(item)">
-                Ver Detalles
-              </button>
-            </td>
+            
           </tr>
 
           <tr *ngIf="!cargando && resumenRutas.length === 0">

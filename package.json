@@ -9,6 +9,10 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
+  "config": {
+    "coreui_library_short_version": "5.5.17",
+    "coreui_library_docs_url": "https://coreui.io/docs/"
+  },
   "dependencies": {
     "@angular/animations": "^21.2.0",
     "@angular/cdk": "^21.2.0",
@@ -29,8 +33,6 @@
     "@coreui/icons": "^3.0.1",
     "@coreui/icons-angular": "^5.6.21",
     "@coreui/utils": "^2.0.2",
-    "@coreui_library_short_version": "5.5.17",
-    "@coreui_library_docs_url": "https://coreui.io/docs/",
     "chart.js": "^4.5.0",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.7",
@@ -55,7 +57,7 @@
     "karma-coverage": "^2.2.1",
     "karma-jasmine": "^5.1.0",
     "karma-jasmine-html-reporter": "^2.1.0",
-     "typescript": "~5.9.3"
+    "typescript": "~5.9.3"
   },
   "engines": {
     "node": "^20.19.0 || ^22.12.0 || ^24.0.0",
