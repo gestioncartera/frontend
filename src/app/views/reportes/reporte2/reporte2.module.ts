@@ -7,8 +7,18 @@ import { CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 @NgModule({
-  declarations: [Reporte2Component],
-  imports: [CommonModule, FormsModule, RouterModule, CardModule, GridModule, TableModule, BadgeModule, ButtonModule],
+  declarations: [],
+  imports: [
+    CommonModule, 
+    FormsModule, 
+    RouterModule, 
+    CardModule, 
+    GridModule, 
+    TableModule, 
+    BadgeModule, 
+    ButtonModule,
+    Reporte2Component // Al ser standalone, debe ir en imports, no en declarations
+  ],
   providers: [CurrencyPipe],
   exports: [Reporte2Component]
 })

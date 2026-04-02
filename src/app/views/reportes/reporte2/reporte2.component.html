@@ -18,14 +18,7 @@
         </c-card-body>
       </c-card>
     </c-col>
-    <c-col sm="6" lg="3">
-      <c-card class="border-start-danger border-start-4 shadow-sm mb-3">
-        <c-card-body>
-          <div class="text-muted x-small text-uppercase">Total en Mora</div>
-          <div class="h4 font-bold text-danger">{{ resumenCartera.moraTotal | currency }}</div>
-        </c-card-body>
-      </c-card>
-    </c-col>
+     
   </c-row>
 
   <c-card class="shadow-sm border-0">
@@ -40,8 +33,7 @@
             <th>Cliente</th>
             <th class="text-end">Capital Inicial</th>
             <th class="text-end">Saldo Actual</th>
-            <th class="text-center">Estado</th>
-            <th class="text-center">Acciones</th>
+            <th class="text-center">Estado</th> 
           </tr>
         </thead>
         <tbody>
@@ -53,9 +45,7 @@
             <td class="text-center">
               <c-badge [color]="getBadgeColor(p.estado)">{{ p.estado }}</c-badge>
             </td>
-            <td class="text-center">
-              <button cButton color="secondary" variant="ghost" size="sm">Historial</button>
-            </td>
+            
           </tr>
         </tbody>
       </table>

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { catchError, Observable, throwError } from 'rxjs';
+import { catchError, Observable, tap, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface Prestamos {
@@ -21,6 +21,8 @@ export interface Prestamos {
   sucursal_id?: number;
   id_usuario_creacion: number;
   total_cartera:number;
+  capital_en_calle:number;
+  intereses_proyectados:number;
 }
 
 export interface PrestamoCliente {
@@ -120,5 +122,24 @@ rechazarPrestamo(id: number) {
 getTotalCarteraSucursal(sucursal_id: number): Observable<Prestamos> {
     return this.http.get<Prestamos>(`${this.apiUrl}/TotalCarteraSucursal/${sucursal_id}`);
   }
+getCapitalEnCalle(sucursal_id: number): Observable<Prestamos> {
+    return this.http.get<Prestamos>(`${this.apiUrl}/getCapitalEnCalle/${sucursal_id}`);
+  }
+
+  getInteresesProyectados(sucursal_id: number): Observable<Prestamos> {
+    return this.http.get<Prestamos>(`${this.apiUrl}/getInteresesProyectados/${sucursal_id}`);
+  }
+
+  getDesglosePrestamos(sucursalId: number | string): Observable<any[]> {
+  return this.http.get<any[]>(`${this.apiUrl}/getDesglosePrestamos/${sucursalId}`).pipe(
+    tap(data => console.log('Desglose de préstamos recibido:', data)),
+    catchError(err => {
+      console.error('Error al obtener el desglose:', err);
+      return throwError(() => err);
+    })
+  );
+}
+
+
 
 }
