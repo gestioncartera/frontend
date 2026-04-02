@@ -160,6 +160,11 @@ export const navItems: INavData[] = [
         url: '/reportes/reporte2',
         icon: 'nav-icon-bullet',
       },
+      {
+        name: 'Caja Mayor',
+        url: '/reportes/caja-mayor',
+        icon: 'nav-icon-bullet',
+      },
     ],
   },
 /*

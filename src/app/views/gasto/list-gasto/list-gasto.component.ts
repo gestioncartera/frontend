@@ -17,7 +17,7 @@ import { CajaService, MovimientoCajaSucursal } from '../../../services/caja-sucu
 import { SucursalContextService } from '../../../services/sucursal-context.service';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
-
+import { ChangeDetectorRef, inject } from '@angular/core';
 @Component({
   selector: 'app-list-gasto',
   templateUrl: './list-gasto.component.html',
@@ -41,7 +41,7 @@ import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dial
 })
 export class ListGastoComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = ['fecha', 'tipo', 'concepto', 'valor', 'estado', 'acciones'];
-  dataSource: MatTableDataSource<MovimientoCajaSucursal>;
+  //dataSource: MatTableDataSource<MovimientoCajaSucursal>;
   
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -49,9 +49,9 @@ export class ListGastoComponent implements OnInit, AfterViewInit {
   movimientosData: MovimientoCajaSucursal[] = [];
   totalCaja: number = 0;
   isMobile = false;
-
+  private cd = inject(ChangeDetectorRef);
   sucursalId: number | null = null;
-
+  dataSource = new MatTableDataSource<MovimientoCajaSucursal>([]);
   constructor(
     private router: Router, 
     private responsive: BreakpointObserver,
@@ -59,7 +59,7 @@ export class ListGastoComponent implements OnInit, AfterViewInit {
     private sucursalContextService: SucursalContextService,
     private dialog: MatDialog
   ) {
-    this.dataSource = new MatTableDataSource(this.movimientosData);
+     
   }
 
   ngOnInit(): void {
@@ -94,34 +94,33 @@ export class ListGastoComponent implements OnInit, AfterViewInit {
     this.dataSource.sort = this.sort;
   }
 
-  loadMovimientos(): void {
-    if (!this.sucursalId) return;
-    this.cajaService.getMovimientos(this.sucursalId).subscribe({
-      next: (data) => {
-        this.movimientosData = data;
-        this.dataSource.data = data;
-        setTimeout(() => {
+ loadMovimientos(): void {
+  if (!this.sucursalId) return;
+  
+  this.cajaService.getMovimientos(this.sucursalId).subscribe({
+    next: (data) => {
+      this.movimientosData = data;
+      
+      // 1. Asignamos la data
+      this.dataSource.data = data;
+
+      // 2. Usamos un pequeño delay para asegurar que el DOM de la tabla esté listo
+      setTimeout(() => {
         this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;
+        
+        // FORZAR EL FILTRO VACÍO: Esto obliga a la tabla a renderizar la data actual
+        this.dataSource.filter = ''; 
+        this.cd.detectChanges();
       });
-      
-        console.log('Movimientos cargados:', data);
-      },
-      error: (err) => {
-        console.error('Error al cargar movimientos', err);
-        this.dialog.open(ConfirmDialogComponent, {
-          data: {
-            title: 'Error de Carga',
-            message: 'No se pudieron recuperar los movimientos de caja.',
-            confirmText: 'Reintentar',
-            type: 'error',
-            icon: 'cloud_off',
-            color: 'warn'
-          }
-        });
-      }
-    });
-  }
+
+      console.log('Movimientos cargados:', data);
+    },
+    error: (err) => {
+      // ... tu manejo de error
+    }
+  });
+}
  
   loadBalance(): void {
     if (!this.sucursalId) return;
@@ -137,13 +136,16 @@ export class ListGastoComponent implements OnInit, AfterViewInit {
   }
     
 
-  setupFilter(): void {
-    // Personalización del filtrado para buscar en descripción
-    this.dataSource.filterPredicate = (data: MovimientoCajaSucursal, filter: string) => {
-      const searchStr = data.descripcion.toLowerCase();
-      return searchStr.includes(filter);
-    };
-  }
+setupFilter(): void {
+  this.dataSource.filterPredicate = (data: MovimientoCajaSucursal, filter: string) => {
+    // Si no hay filtro, mostrar todo
+    if (!filter) return true;
+    const searchStr = (data.descripcion || '').toLowerCase();
+    const conceptoStr = (data.descripcion || '').toLowerCase(); // Opcional: buscar también por concepto
+    
+    return searchStr.includes(filter) || conceptoStr.includes(filter);
+  };
+}
 
   detectMobile(): void {
     this.responsive.observe([Breakpoints.Handset]).subscribe((result) => {
