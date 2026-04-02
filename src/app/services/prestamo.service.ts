@@ -20,6 +20,7 @@ export interface Prestamos {
   nombre_cliente?: string; 
   sucursal_id?: number;
   id_usuario_creacion: number;
+  total_cartera:number;
 }
 
 export interface PrestamoCliente {
@@ -115,4 +116,9 @@ rechazarPrestamo(id: number) {
   return this.http.patch(`${this.apiUrl}/rechazarPrestamo/${id}`, {  });
 }
   
+ 
+getTotalCarteraSucursal(sucursal_id: number): Observable<Prestamos> {
+    return this.http.get<Prestamos>(`${this.apiUrl}/TotalCarteraSucursal/${sucursal_id}`);
+  }
+
 }

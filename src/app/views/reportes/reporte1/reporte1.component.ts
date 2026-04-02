@@ -11,6 +11,7 @@ import {
 } from '@coreui/angular';
 import { SucursalContextService } from '../../../services/sucursal-context.service';
 import { CobroService } from '../../../services/cobro.service';
+import { PrestamoService } from '../../../services/prestamo.service';
 import { delay } from 'rxjs/operators'; // Importante para la solución
 
 @Component({
@@ -35,22 +36,26 @@ export class Reporte1Component implements OnInit {
   
   // Inyectamos el ChangeDetectorRef para solucionar el error NG0100
   private cd = inject(ChangeDetectorRef);
-
+  sucursalId: number = 0;
   kpis = {
     total_cobro_hoy: 0,
     carteraTotal: 0  
   };
 
   constructor(
-    private cobroService: CobroService,
+    private cobroService: CobroService ,
+    private  prestamos:PrestamoService,
     private sucursalContextService: SucursalContextService
   ) {}
 
-  ngOnInit(): void {
-    this.cargarResumenCobros();
-    this.cargarDatosKpis();
+  ngOnInit(): void { 
+  this.sucursalId = this.sucursalContextService.getSucursalId() || 0;  
+    if (this.sucursalId) {
+      this.cargarResumenCobros();
+      this.cargarDatosKpis();  
+      this.cargarTotal();
+    }
   }
-
   verDetalles(item: any) {
     console.log('Navegando a detalles de:', item.cobrador);
   }
@@ -87,11 +92,7 @@ export class Reporte1Component implements OnInit {
   }
 
   cargarDatosKpis() {
-    // Nota: Aquí usas un ID estático 4, asegúrate de que sea intencional
-    const sucursalId = 4;  
-    if (!sucursalId) return;
-
-    this.cobroService.getTotalCobradoHoy(sucursalId)
+     this.cobroService.getTotalCobradoHoy(this.sucursalId)
       .pipe(delay(0)) // Evitamos colisión de cambios en el objeto kpis
       .subscribe({
         next: (res) => {
@@ -105,4 +106,22 @@ export class Reporte1Component implements OnInit {
         error: (err) => console.error('Error cargando KPIs:', err)
       });
   }
+
+  cargarTotal() {
+       this.prestamos.getTotalCarteraSucursal(this.sucursalId)
+      .pipe(delay(0)) // Evitamos colisión de cambios en el objeto kpis
+      .subscribe({
+        next: (res) => {
+          const totalRecuperado = Number(res. total_cartera);
+          this.kpis = {
+            ...this.kpis,
+            carteraTotal: totalRecuperado
+          };
+          this.cd.detectChanges();
+          console.log('prueba cartera',totalRecuperado)
+        },
+        error: (err) => console.error('Error cargando KPIs:', err)
+      });
+  }
+
 }

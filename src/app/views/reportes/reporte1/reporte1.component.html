@@ -53,10 +53,10 @@
             <td class="ps-3 font-bold">{{ item.nombre_cobrador }}</td>
             <td class="text-muted">{{ item.nombre_ruta }}</td>
             <td class="text-center">
-              <span class="badge bg-light text-primary border">{{ item.total_clientes }}</span>
+              <span class="badge bg-light text-primary border">{{ item.total_cobros }}</span>
             </td>
             <td class="text-end pe-3 font-bold text-success">
-              {{ item.total_cobros | currency:'COP':'$':'1.0-0' }}
+              {{ item.total_cobrado | currency:'COP':'$':'1.0-0' }}
             </td>
             
           </tr>
