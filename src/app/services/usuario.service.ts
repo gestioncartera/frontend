@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { map, Observable } from 'rxjs';
+import { catchError, map, Observable, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface Usuario {
@@ -64,11 +64,16 @@ getCobradoresActivos(idSucursal: number | string): Observable<Usuario[]> {
   const url = `${this.apiUrl}/getCobradoresActivos/${idSucursal}`;
   
   return this.http.get<Usuario[]>(url).pipe(
-    // Opcional: Procesar los nombres para que sea más fácil mostrarlos en el HTML
     map(usuarios => usuarios.map(u => ({
       ...u,
-      nombre_completo: `${u.nombres} ${u.apellidos}`
-    })))
+      // Usamos trim() para evitar espacios dobles si un apellido falta
+      nombre_completo: `${u.nombres} ${u.apellidos}`.trim() 
+    }))),
+    // Agregamos un catchError para que la app no se bloquee si el API falla
+    catchError(err => {
+      console.error('Error en el servicio de cobradores:', err);
+      return throwError(() => err);
+    })
   );
 }
 }

@@ -14,8 +14,8 @@
           <span class="fw-bold text-uppercase text-secondary">Sucursal:</span>
           <mat-form-field appearance="outline" class="flex-grow-1 dense-form-field">
             <mat-select [(ngModel)]="sucursalSeleccionada" (selectionChange)="cargarDatosCaja()">
-              <mat-option *ngFor="let suc of sucursales" [value]="suc.id">
-                {{ suc.id }} - {{ suc.nombre }}
+              <mat-option *ngFor="let suc of sucursales" [value]="suc.sucursal_id">
+                {{ suc.sucursal_id }} - {{ suc.nombre }}
               </mat-option>
             </mat-select>
           </mat-form-field>

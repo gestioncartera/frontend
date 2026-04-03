@@ -1,6 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { forkJoin } from 'rxjs';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { CajaService } from '../../../services/caja-sucursal.service';
+import { CobroService } from '../../../services/cobro.service';
+import { SucursalService, Sucursal } from '../../../services/sucursal.service';
 
 // Angular Material
 import { MatCardModule } from '@angular/material/card';
@@ -46,21 +51,18 @@ export interface CajaMayorData {
     MatIconModule,
     MatButtonModule,
     MatTooltipModule,
-    MatDividerModule
+    MatDividerModule,
+    MatSnackBarModule
   ],
   templateUrl: './caja-mayor.component.html',
   styleUrls: ['./caja-mayor.component.scss']
 })
 export class CajaMayorComponent implements OnInit {
 
-  sucursales = [
-    { id: 1, nombre: 'SUCURSAL MEX' },
-    { id: 2, nombre: 'SUCURSAL COL' }
-  ];
+   sucursales: Sucursal[] = [];
   
   sucursalSeleccionada: number = 1;
-  isLoading: boolean = false;
-
+  isLoading: boolean = false; 
   // Datos basados en tu captura de pantalla
   datosCaja: CajaMayorData = {
     caja_inicial: 2373,
@@ -85,18 +87,77 @@ export class CajaMayorComponent implements OnInit {
     }
   };
 
-  constructor() { }
+  constructor(
+    private cd: ChangeDetectorRef,
+    private snackBar: MatSnackBar,
+    private cajaService: CajaService,
+    private cobroService: CobroService,
+    private sucursalService: SucursalService,
+  ) { }
 
   ngOnInit(): void {
+    this.obtenerListaSucursales();
     this.cargarDatosCaja();
   }
-
-  cargarDatosCaja(): void {
-    // Aquí harías la petición a tu backend pasándole this.sucursalSeleccionada
-    console.log('Cargando datos para sucursal:', this.sucursalSeleccionada);
+  obtenerListaSucursales(): void { 
+    this.sucursalService.getSucursales().subscribe({
+      next: (data: Sucursal[]) => {
+        this.sucursales = data; 
+        if (this.sucursales.length > 0) {
+          this.sucursalSeleccionada = this.sucursales[0].sucursal_id;
+          this.cargarDatosCaja(); // Cargar datos iniciales
+        }
+        this.cd.detectChanges();        
+      },
+      error: (err:any) => console.error('Error al cargar sucursales:', err)
+    });
+    
   }
 
   verHistorial(): void {
     console.log('Abriendo historial...');
+  }
+
+   cargarDatosCaja(): void {
+    if (!this.sucursalSeleccionada) return;
+
+    this.isLoading = true;
+
+    // Ejecutamos las peticiones en paralelo
+    forkJoin({
+      cajaInicial: this.cajaService.getCajaInicialSucursal(this.sucursalSeleccionada),
+      sumatoriaCobros: this.cobroService.getSumatoriaCobrosSucursal(this.sucursalSeleccionada),
+      cajaInfo: this.cajaService.getCajaSucursal(this.sucursalSeleccionada)
+      // Agrega aquí más peticiones si tienes otros servicios para gastos o préstamos
+    }).subscribe({
+      next: (res) => {
+        // Actualizamos el objeto datosCaja con la información real
+        this.datosCaja = {
+          ...this.datosCaja, // Mantenemos valores por defecto para lo que no venga de la API
+          caja_inicial: res.cajaInicial,
+          caja_actual: Number(res.cajaInfo?.saldo_actual || 0),
+          entradas: {
+            ...this.datosCaja.entradas,
+            cobros: res.sumatoriaCobros
+          },
+          metricas_adicionales: {
+            ...this.datosCaja.metricas_adicionales,
+            fecha: res.cajaInfo?.fecha_ultima_actualizacion || new Date().toLocaleDateString()
+          }
+        };
+  
+        this.isLoading = false;
+        this.cd.detectChanges();
+         console.log('dddd',this.datosCaja)
+      },
+      error: (err) => {
+        console.error('Error al sincronizar datos de caja mayor:', err);
+        this.isLoading = false;
+        this.snackBar.open('❌ Error al cargar los datos financieros', 'Cerrar', {
+          duration: 3000
+        });
+        this.cd.detectChanges();
+      }
+    });
   }
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { catchError, Observable, tap, throwError } from 'rxjs';
+import { catchError, map, Observable, tap, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 // Interface para crear cobro
@@ -39,6 +39,11 @@ export interface RespuestaRuta {
   recaudado: number;
   egresos: number;
   total: string;
+}
+
+export interface SumatoriaCobrosRespuesta {
+  sucursal_id: number; 
+  sumatoria_cobro_sucursal: number; 
 }
 
 @Injectable({
@@ -135,5 +140,20 @@ getResumenCobrosCobradorRuta(sucursalId: number): Observable<any[]> {
       })
     );
   }
+  getSumatoriaCobrosSucursal(sucursalId: number | string): Observable<number> {
+  const url = `${this.apiUrl}/getSumatoriaCobrosSucursal/${sucursalId}`;
+  
+  return this.http.get<any>(url).pipe(
+    map(res => {
+      // Extraemos el valor según el nombre que venga en tu JSON (visto en tu Postman anterior)
+      const total = res.sumatoria_cobros_sucursal || res.total_recaudado || 0;
+      return Number(total); // Convertimos string "569.00" a número 569
+    }),
+    catchError(err => {
+      console.error('Error al obtener sumatoria:', err);
+      return throwError(() => err);
+    })
+  );
+}
 
 }

@@ -105,6 +105,22 @@ createMovimiento(movimiento: any): Observable<any> {
     return this.http.patch<any>(`${this.URL}/anularmovimiento/${id}`, {});
   }
 
+  getCajaInicialSucursal(sucursal_id: number | string): Observable<number> {
+    const url = `${this.URLcaja}/cajaInicialSucursal/${sucursal_id}`;
+    return this.http.get<any>(url).pipe(
+      map(res => {
+        const monto = res?.saldo_inicial || 0;
+        console.log('caja',res);
+        return parseFloat(monto.toString());
+      }),
+      catchError(err => {
+        console.error('Error al obtener la caja inicial de la sucursal:', err);
+        return of(0);
+      })
+    );
+  }
+
+
   /**
    * Obtiene el balance actual de una sucursal
    * @param sucursal_id ID de la sucursal
