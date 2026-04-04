@@ -20,10 +20,13 @@
             </mat-select>
           </mat-form-field>
         </div>
-        <div class="col-md-6 text-end">
-          <div class="d-inline-block border rounded p-2 bg-light">
-            <span class="text-muted text-uppercase small d-block">Caja Inicial</span>
-            <span class="fs-4 fw-bold text-dark">{{ datosCaja.caja_inicial | currency:'USD':'symbol':'1.0-0' }}</span>
+ 
+        <div class="col-md-6 text-md-end text-center mt-3 mt-md-0">
+          <div class="d-inline-block border border-primary rounded p-2 bg-light shadow-sm" style="min-width: 220px;">
+            <span class="text-primary text-uppercase x-small fw-bold d-block">Disponible en Caja Actual</span>
+            <span class="fs-2 fw-bold text-primary">
+            {{ datosCaja.caja_actual | currency:'USD':'symbol':'1.0-0' }}
+            </span>
           </div>
         </div>
       </div>
@@ -31,7 +34,6 @@
       <mat-divider class="mb-4"></mat-divider>
 
       <div class="row g-4">
-        
         <div class="col-md-6 border-end">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h3 class="m-0 text-success text-uppercase fw-bold">Entradas</h3>
@@ -42,18 +44,18 @@
             <div class="data-item">
               <span>Cobros</span>
               <span class="fw-bold">{{ datosCaja.entradas.cobros | currency:'USD':'symbol':'1.0-0' }} <span class="text-success">*</span></span>
-            </div>
-            <div class="data-item">
-              <span>Cheques Cobrados</span>
-              <span class="fw-bold">{{ datosCaja.entradas.cheques_cobrados | currency:'USD':'symbol':'1.0-0' }}</span>
-            </div>
+            </div> 
+
             <div class="data-item">
               <span>Aportes</span>
-              <span class="fw-bold">{{ datosCaja.entradas.aportes | currency:'USD':'symbol':'1.0-0' }}</span>
+              <span class="fw-bold">{{ datosCaja.caja_inicial | currency:'USD':'symbol':'1.0-0' }}</span>
             </div>
+
             <div class="data-item bg-light border-top mt-2 fw-bold">
               <span>Líquido a Depositar</span>
-              <span class="text-primary fs-5">{{ datosCaja.entradas.liquido_a_depositar | currency:'USD':'symbol':'1.0-0' }}</span>
+              <span class="text-primary fs-5">
+                {{ (datosCaja.entradas.cobros * 1) + (datosCaja.caja_inicial * 1) | currency:'USD':'symbol':'1.0-0' }}
+              </span>
             </div>
           </div>
         </div>
@@ -69,10 +71,7 @@
               <span>Gastos</span>
               <span class="fw-bold">{{ datosCaja.salidas.gastos | currency:'USD':'symbol':'1.0-0' }} <span class="text-danger">*</span></span>
             </div>
-            <div class="data-item">
-              <span>Depósito a Banco</span>
-              <span class="fw-bold">{{ datosCaja.salidas.deposito_a_banco | currency:'USD':'symbol':'1.0-0' }}</span>
-            </div>
+              
             <div class="data-item">
               <span>Préstamos</span>
               <span class="fw-bold">{{ datosCaja.salidas.prestamos | currency:'USD':'symbol':'1.0-0' }} <span class="text-danger">*</span></span>
@@ -87,44 +86,7 @@
             </div>
           </div>
         </div>
-      </div>
-
-      <mat-divider class="my-4"></mat-divider>
-
-      <div class="row align-items-center">
-        
-        <div class="col-md-4">
-          <mat-card class="bg-light shadow-none border">
-            <mat-card-content class="p-3">
-              <span class="d-block text-center text-secondary fw-bold mb-2">{{ datosCaja.metricas_adicionales.fecha }}</span>
-              <div class="d-flex justify-content-between small mb-1">
-                <span>Cuentas X Cobrar:</span>
-                <span class="fw-bold">{{ datosCaja.metricas_adicionales.cuentas_por_cobrar | currency:'USD':'symbol':'1.0-0' }}</span>
-              </div>
-              <div class="d-flex justify-content-between small">
-                <span>Rendimiento:</span>
-                <span class="fw-bold">{{ datosCaja.metricas_adicionales.rendimiento | currency:'USD':'symbol':'1.0-0' }}</span>
-              </div>
-            </mat-card-content>
-          </mat-card>
-        </div>
-
-        <div class="col-md-4 text-center">
-          <div class="d-inline-block border border-primary rounded p-3 bg-white shadow-sm" style="min-width: 200px;">
-            <span class="text-primary text-uppercase small fw-bold d-block">Caja Actual</span>
-            <span class="fs-3 fw-bold text-primary">{{ datosCaja.caja_actual | currency:'USD':'symbol':'1.0-0' }}</span>
-          </div>
-        </div>
-
-        <div class="col-md-4 text-end">
-          <div class="mb-3">
-            <button mat-flat-button color="accent" (click)="verHistorial()">
-              <mat-icon>history</mat-icon> Ver Historial
-            </button>
-          </div>
-          <span class="text-muted small"><span class="fw-bold text-success">*</span> = No Afecta Saldos</span>
-        </div>
-      </div>
+      </div> 
 
     </mat-card-content>
   </mat-card>

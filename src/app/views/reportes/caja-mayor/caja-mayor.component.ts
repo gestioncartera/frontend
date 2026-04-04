@@ -20,14 +20,12 @@ export interface CajaMayorData {
   caja_inicial: number;
   caja_actual: number;
   entradas: {
-    cobros: number;
-    cheques_cobrados: number;
+    cobros: number; 
     aportes: number;
     liquido_a_depositar: number;
   };
   salidas: {
-    gastos: number;
-    deposito_a_banco: number;
+    gastos: number; 
     prestamos: number;
     reembolso_a_socios: number;
     base_diaria: number;
@@ -65,24 +63,22 @@ export class CajaMayorComponent implements OnInit {
   isLoading: boolean = false; 
   // Datos basados en tu captura de pantalla
   datosCaja: CajaMayorData = {
-    caja_inicial: 2373,
-    caja_actual: 259393,
+    caja_inicial: 0,
+    caja_actual: 0,
     entradas: {
-      cobros: 10866086,
-      cheques_cobrados: 0,
-      aportes: 44000,
-      liquido_a_depositar: 26411025
+      cobros: 0, 
+      aportes: 0,
+      liquido_a_depositar: 0
     },
     salidas: {
-      gastos: 609975,
-      deposito_a_banco: 0,
-      prestamos: 9654160,
+      gastos: 0, 
+      prestamos: 0,
       reembolso_a_socios: 0,
-      base_diaria: 26198005
+      base_diaria: 0
     },
     metricas_adicionales: {
-      cuentas_por_cobrar: 948115,
-      rendimiento: 1448124,
+      cuentas_por_cobrar: 0,
+      rendimiento: 0,
       fecha: 'Viernes [ 5.Sep.2025 ]'
     }
   };
@@ -96,8 +92,7 @@ export class CajaMayorComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.obtenerListaSucursales();
-    this.cargarDatosCaja();
+    this.obtenerListaSucursales(); 
   }
   obtenerListaSucursales(): void { 
     this.sucursalService.getSucursales().subscribe({
@@ -127,7 +122,8 @@ export class CajaMayorComponent implements OnInit {
     forkJoin({
       cajaInicial: this.cajaService.getCajaInicialSucursal(this.sucursalSeleccionada),
       sumatoriaCobros: this.cobroService.getSumatoriaCobrosSucursal(this.sucursalSeleccionada),
-      cajaInfo: this.cajaService.getCajaSucursal(this.sucursalSeleccionada)
+      cajaInfo: this.cajaService.getCajaSucursal(this.sucursalSeleccionada),
+      reporteGastos: this.cajaService.getReporteGastosSucursal(this.sucursalSeleccionada)  
       // Agrega aquí más peticiones si tienes otros servicios para gastos o préstamos
     }).subscribe({
       next: (res) => {
@@ -143,12 +139,19 @@ export class CajaMayorComponent implements OnInit {
           metricas_adicionales: {
             ...this.datosCaja.metricas_adicionales,
             fecha: res.cajaInfo?.fecha_ultima_actualizacion || new Date().toLocaleDateString()
-          }
+          },
+          salidas: {
+          gastos: res.reporteGastos.gastos,
+          prestamos: res.reporteGastos.total_prestamos,
+          reembolso_a_socios: res.reporteGastos.total_reembolsos, 
+          base_diaria: res.reporteGastos.gastos +  res.reporteGastos.total_prestamos +  res.reporteGastos.total_reembolsos
+        }
+        
         };
   
         this.isLoading = false;
         this.cd.detectChanges();
-         console.log('dddd',this.datosCaja)
+        
       },
       error: (err) => {
         console.error('Error al sincronizar datos de caja mayor:', err);
@@ -160,4 +163,13 @@ export class CajaMayorComponent implements OnInit {
       }
     });
   }
+
+  // Dentro de la clase CajaMayorComponent
+
+gettotalLiquidoADepositar(): number {
+  const cobros = Number(this.datosCaja.entradas.cobros) || 0;
+  const aportes = Number(this.datosCaja.caja_inicial) || 0; // Según tu HTML usas caja_inicial como aporte
+  
+  return cobros + aportes;
+}
 }

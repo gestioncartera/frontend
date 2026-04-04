@@ -85,21 +85,37 @@ $bg-light-slate: #f8fafc;
 /* =========================================
    FILTROS Y TARJETA
    ========================================= */
-.list-card {
-  border-radius: 20px !important;
-  border: 1px solid $border-light !important;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
-  overflow: hidden;
-  background: white;
-}
-
+/* Actualizar en la sección FILTROS Y TARJETA */
 .filters-row {
   padding: 1.5rem;
   background: white;
+
+  .filter-controls {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap; // Para que en móvil se apilen
+  }
   
+  .date-field {
+    width: 200px;
+  }
+
   .search-field {
-    width: 100%;
-    max-width: 400px;
+    flex: 1; // El buscador toma el espacio restante
+    min-width: 250px;
+  }
+}
+
+/* Ajuste responsivo */
+@media (max-width: 650px) {
+  .filters-row .filter-controls {
+    flex-direction: column;
+    align-items: stretch;
+    
+    .date-field, .search-field {
+      width: 100%;
+    }
   }
 }
 

@@ -18,6 +18,9 @@ import { SucursalContextService } from '../../../services/sucursal-context.servi
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
 import { ChangeDetectorRef, inject } from '@angular/core';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-list-gasto',
   templateUrl: './list-gasto.component.html',
@@ -36,7 +39,10 @@ import { ChangeDetectorRef, inject } from '@angular/core';
     MatSelectModule,
     MatCardModule,
     MatTooltipModule,
-    MatDialogModule
+    MatDialogModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    FormsModule
   ],
 })
 export class ListGastoComponent implements OnInit, AfterViewInit {
@@ -51,6 +57,7 @@ export class ListGastoComponent implements OnInit, AfterViewInit {
   isMobile = false;
   private cd = inject(ChangeDetectorRef);
   sucursalId: number | null = null;
+  fechaFiltro: Date = new Date();
   dataSource = new MatTableDataSource<MovimientoCajaSucursal>([]);
   constructor(
     private router: Router, 
@@ -67,8 +74,7 @@ export class ListGastoComponent implements OnInit, AfterViewInit {
     this.detectMobile();
 
     if (this.sucursalId) {
-      this.loadMovimientos();
-      this.loadBalance();
+      this.cargarDatosPorFecha(); 
       this.setupFilter();
     } else {
      this.dialog.open(ConfirmDialogComponent, {
@@ -88,6 +94,14 @@ export class ListGastoComponent implements OnInit, AfterViewInit {
     
     }
   }
+  onFechaChange(): void {
+    this.cargarDatosPorFecha();
+  }
+
+  cargarDatosPorFecha(): void {
+    this.loadMovimientos();
+    this.loadBalance();
+  }
 
   ngAfterViewInit(): void {
     this.dataSource.paginator = this.paginator;
@@ -96,7 +110,7 @@ export class ListGastoComponent implements OnInit, AfterViewInit {
 
  loadMovimientos(): void {
   if (!this.sucursalId) return;
-  
+  const fechaStr = this.fechaFiltro.toISOString().split('T')[0];
   this.cajaService.getMovimientos(this.sucursalId).subscribe({
     next: (data) => {
       this.movimientosData = data;
@@ -124,6 +138,7 @@ export class ListGastoComponent implements OnInit, AfterViewInit {
  
   loadBalance(): void {
     if (!this.sucursalId) return;
+    const fechaStr = this.fechaFiltro.toISOString().split('T')[0];
     this.cajaService.getCajaSucursal(this.sucursalId).subscribe({
       next: (balance) => {
         this.totalCaja = Number(balance?.saldo_actual) || 0;

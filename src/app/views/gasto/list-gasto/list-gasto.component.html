@@ -22,13 +22,22 @@
   </header>
 
   <mat-card class="list-card">
-    <div class="filters-row">
-      <mat-form-field appearance="outline" class="search-field">
-        <mat-label>Buscar movimiento</mat-label>
-        <input matInput (keyup)="applyFilter($event)" placeholder="Ej: Pago de luz, abono cliente..." />
-        <mat-icon matSuffix>search</mat-icon>
-      </mat-form-field>
-    </div>
+   <div class="filters-row">
+        <div class="filter-controls">
+          <mat-form-field appearance="outline" class="date-field">
+            <mat-label>Filtrar por fecha</mat-label>
+            <input matInput [matDatepicker]="picker" [(ngModel)]="fechaFiltro" (dateChange)="onFechaChange()">
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Buscar movimiento</mat-label>
+            <input matInput (keyup)="applyFilter($event)" placeholder="Ej: Pago de luz..." />
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+        </div>
+      </div>
 
     <div *ngIf="dataSource.data.length === 0" class="no-records">
       <mat-icon>info_outline</mat-icon>

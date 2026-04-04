@@ -21,6 +21,11 @@ export interface CajaSucursal {
   saldo_actual: string | number; // Viene como string del backend
   fecha_ultima_actualizacion: string;
 }
+export interface ReporteGastosSucursal {
+  gastos: number;
+  total_prestamos: number;
+  total_reembolsos: number;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -120,6 +125,28 @@ createMovimiento(movimiento: any): Observable<any> {
     );
   }
 
+  /**
+   * Obtiene el reporte de gastos, préstamos y reembolsos de una sucursal.
+   * Basado en el endpoint: /cajasucursal/getReporteGastosSucursal/:id
+   * @param sucursal_id ID de la sucursal
+   */
+  getReporteGastosSucursal(sucursal_id: number | string): Observable<ReporteGastosSucursal> {
+    const url = `${this.URLcaja}/getReporteGastosSucursal/${sucursal_id}`;
+    
+    return this.http.get<ReporteGastosSucursal>(url).pipe(
+      map(res => ({
+        // Aseguramos que los valores sean numéricos por si el backend los envía como string
+        gastos: Number(res.gastos || 0),
+        total_prestamos: Number(res.total_prestamos || 0),
+        total_reembolsos: Number(res.total_reembolsos || 0)
+      })),
+      catchError(err => {
+        console.error('Error al obtener reporte de gastos:', err);
+        // Retornamos valores en 0 para no romper la vista
+        return of({ gastos: 0, total_prestamos: 0, total_reembolsos: 0 });
+      })
+    );
+  }
 
   /**
    * Obtiene el balance actual de una sucursal

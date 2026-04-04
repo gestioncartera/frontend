@@ -1,27 +1,56 @@
-.x-small {
-  font-size: 0.7rem;
-  letter-spacing: 0.5px;
-}
+.x-small { font-size: 0.75rem; letter-spacing: 0.5px; }
+.font-bold { font-weight: 700; }
 
-.font-bold {
-  font-weight: 700;
-}
+// Estilos para KPIs
+.kpi-card {
+  border: none;
+  border-radius: 12px;
+  border-left: 5px solid transparent;
+  transition: all 0.3s ease;
 
-// Clases personalizadas de bordes para los KPIs
-.border-top-3 {
-  border-top-width: 3px !important;
-}
+  &.info { border-left-color: #39f; background: linear-gradient(135deg, #fff 0%, #f0f7ff 100%); }
+  &.primary { border-left-color: #321fdb; background: linear-gradient(135deg, #fff 0%, #f5f3ff 100%); }
 
-.c-card {
-  transition: transform 0.2s ease-in-out;
-  &:hover {
-    transform: translateY(-3px);
+  .kpi-label { color: #6c757d; text-transform: uppercase; font-size: 0.7rem; font-weight: 800; }
+  .kpi-value { font-size: 1.6rem; font-weight: 800; color: #2c3e50; margin: 8px 0; }
+  .kpi-icon { color: rgba(0,0,0,0.1); font-size: 2.5rem; width: 40px; height: 40px; }
+  
+  .kpi-footer {
+    display: flex;
+    align-items: center;
+    font-size: 0.75rem;
+    gap: 4px;
+    mat-icon { font-size: 14px; width: 14px; height: 14px; }
   }
+
+  &:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); }
 }
 
-// Estilo para los headers de las tablas
-thead th {
-  color: #8a93a2;
-  border-bottom: 1px solid #d8dbe0;
-  padding: 12px 8px;
+// Estilos de Tabla
+.table-header {
+  background-color: #f8f9fa;
+  th { font-size: 0.75rem; color: #495057; font-weight: 800; padding: 15px 10px; border-bottom: 2px solid #ebedef; }
+}
+
+.avatar-circle {
+  width: 32px; height: 32px; background: #eef2ff; color: #321fdb;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; font-size: 0.8rem; font-weight: bold;
+}
+
+.count-badge {
+  background: #f0f3f5; color: #3c4b64; padding: 4px 12px;
+  border-radius: 20px; font-weight: bold; font-size: 0.85rem;
+}
+
+// Filtros
+.dense-form-field {
+  width: 220px;
+  ::ng-deep .mat-mdc-form-field-wrapper { padding-bottom: 0; }
+  ::ng-deep .mat-mdc-form-field-subscript-wrapper { display: none; } // Quita el espacio del hint
+}
+
+.btn-refresh {
+  height: 48px; width: 48px; display: flex; align-items: center; justify-content: center;
+  border-radius: 8px;
 }

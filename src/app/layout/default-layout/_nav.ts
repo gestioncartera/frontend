@@ -24,6 +24,28 @@ export const navItems: INavData[] = [
       },
     ],
   }, 
+    {
+    name: 'Reportes',
+    url: '/reportes',
+    iconComponent: { name: 'cil-chart-pie' },
+    children: [
+      {
+        name: 'Diario',
+        url: '/reportes/reporte1',
+        icon: 'nav-icon-bullet',
+      },
+      {
+        name: 'Prestamos',
+        url: '/reportes/reporte2',
+        icon: 'nav-icon-bullet',
+      },
+      {
+        name: 'Caja Mayor',
+        url: '/reportes/caja-mayor',
+        icon: 'nav-icon-bullet',
+      },
+    ],
+  },
    {
     name: 'Caja',
     url: '/gasto',
@@ -134,39 +156,10 @@ export const navItems: INavData[] = [
         name: 'Gestión de Cobros',
         url: '/cobro/seleccionar-ruta',
         icon: 'nav-icon-bullet',
-      },
-      {
-        name: 'Registro Cobro',
-        url: '/cobro/crear-cobro',
-        icon: 'nav-icon-bullet',
-      },
+      }  
+    ],
+  },
 
-        
-      
-    ],
-  },
-  {
-    name: 'Reportes',
-    url: '/reportes',
-    iconComponent: { name: 'cil-chart-pie' },
-    children: [
-      {
-        name: 'Diario',
-        url: '/reportes/reporte1',
-        icon: 'nav-icon-bullet',
-      },
-      {
-        name: 'Prestamos',
-        url: '/reportes/reporte2',
-        icon: 'nav-icon-bullet',
-      },
-      {
-        name: 'Caja Mayor',
-        url: '/reportes/caja-mayor',
-        icon: 'nav-icon-bullet',
-      },
-    ],
-  },
 /*
   {
     name: 'Periodo',

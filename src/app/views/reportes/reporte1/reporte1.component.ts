@@ -13,7 +13,10 @@ import { SucursalContextService } from '../../../services/sucursal-context.servi
 import { CobroService } from '../../../services/cobro.service';
 import { PrestamoService } from '../../../services/prestamo.service';
 import { delay } from 'rxjs/operators'; // Importante para la solución
-
+import { MatIconModule } from '@angular/material/icon';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatInputModule } from '@angular/material/input';
 @Component({
   selector: 'app-reporte1',
   templateUrl: './reporte1.component.html',
@@ -27,14 +30,17 @@ import { delay } from 'rxjs/operators'; // Importante para la solución
     TableModule, 
     ButtonModule, 
     FormModule,
-    BadgeModule
+    BadgeModule,
+    MatIconModule, 
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatInputModule,
   ], 
 })
 export class Reporte1Component implements OnInit {
   public resumenRutas: any[] = [];
   public cargando: boolean = false;
-  
-  // Inyectamos el ChangeDetectorRef para solucionar el error NG0100
+  fechaSeleccionada: Date = new Date(); 
   private cd = inject(ChangeDetectorRef);
   sucursalId: number = 0;
   kpis = {
@@ -63,12 +69,12 @@ export class Reporte1Component implements OnInit {
   cargarResumenCobros() {
     const sucursalId = this.sucursalContextService.getSucursalId();
     if (!sucursalId) return;
-
+   const fechaFmt = this.fechaSeleccionada.toISOString().split('T')[0];
     this.cargando = true;  
     // Forzamos que Angular registre el estado 'true' antes de la petición
     this.cd.detectChanges();
 
-    this.cobroService.getResumenCobrosCobradorRuta(sucursalId)
+    this.cobroService.getResumenCobrosCobradorRuta(sucursalId )
       .pipe(delay(0)) // El truco para evitar el error NG0100
       .subscribe({
         next: (data) => {
