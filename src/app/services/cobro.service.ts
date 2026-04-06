@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError, map, Observable, tap, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { HttpParams } from '@angular/common/http';
 
 // Interface para crear cobro
 export interface CreateCobroDto {
@@ -117,17 +118,23 @@ getEgresosOperacionCobrador(sucursalId: number): Observable<any> {
   );
 }
 
-getResumenCobrosCobradorRuta(sucursalId: number): Observable<any[]> {
-    const url = `${this.apiUrl}/resumenCobrosCoradorRuta/${sucursalId}`;
-    console.log('prueba bac', url);
-    return this.http.get<any[]>(url).pipe(
-      tap(resumen => console.log('Resumen de ruta cargado:', resumen)),
-      catchError(err => {
-        console.error('Error al obtener resumen de cobros por ruta:', err);
-        throw err;
-      })
-    );
-  }
+getResumenCobrosCobradorRuta(sucursalId: number, fecha: string): Observable<any[]> {
+  const url = `${this.apiUrl}/resumenCobrosCoradorRuta/${sucursalId}`;
+  
+  // Convertimos la fecha a formato string YYYY-MM-DD para evitar problemas de zona horaria
+  const fechaFormateada = fecha.split('T')[0];
+
+  // Configuramos los parámetros de la URL
+  const params = new HttpParams().set('fecha', fechaFormateada);
+
+  return this.http.get<any[]>(url, { params }).pipe(
+    tap(resumen => console.log('Resumen de ruta cargado:', resumen)),
+    catchError(err => {
+      console.error('Error al obtener resumen de cobros por ruta:', err);
+      throw err;
+    })
+  );
+}
 
   getTotalCobradoHoy(sucursalId: number | string): Observable<{ total_cobro_hoy: string | number }> {
     return this.http.get<{ total_cobro_hoy: string | number }>(

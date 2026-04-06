@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError, map, Observable, of } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { HttpParams } from '@angular/common/http';
 
 // Interfaz para definir la estructura de un movimiento
 export interface MovimientoCajaSucursal {
@@ -46,19 +47,26 @@ export class CajaService {
     console.log(`Cargando movimientos para caja_sucursal_id: ${caja_sucursal_id}`);
     return this.http.get<MovimientoCajaSucursal[]>(`${this.URL}/getmovimientos/${caja_sucursal_id}`);
   }
+ 
 
-  /**
- * Obtiene la información de la caja de una sucursal específica
- * @param sucursal_id ID de la sucursal
- */
-getCajaSucursal(sucursal_id: number): Observable<CajaSucursal | null> {
-  return this.http.get<any>(`${this.URLcaja}/getCajaSucursal/${sucursal_id}`).pipe(
+getCajaSucursal(sucursal_id: number, fecha?: string | Date): Observable<CajaSucursal | null> {
+  // 1. Preparamos los parámetros
+  let params = new HttpParams();
+  
+  if (fecha) {
+    // Si es un objeto Date, lo convertimos a YYYY-MM-DD
+    const fechaFmt = fecha instanceof Date 
+      ? fecha.toISOString().split('T')[0] 
+      : fecha;
+    params = params.set('fecha', fechaFmt);
+  }
+
+  return this.http.get<any>(`${this.URLcaja}/getCajaSucursal/${sucursal_id}`, { params }).pipe(
     map(res => {
-      // El backend retorna el objeto directamente
       if (res && res.caja_sucursal_id) {
         return {
           ...res,
-          // Convertimos "10000.00" (string) a 10000 (number)
+          // Convertimos el string de la base de datos a número para cálculos en el front
           saldo_actual: parseFloat(res.saldo_actual)
         };
       }
@@ -66,7 +74,7 @@ getCajaSucursal(sucursal_id: number): Observable<CajaSucursal | null> {
     }),
     catchError(err => {
       console.error('Error al obtener saldo de caja:', err);
-      return of (null);
+      return of(null);
     })
   );
 }

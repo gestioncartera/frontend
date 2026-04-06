@@ -74,7 +74,7 @@ export class Reporte1Component implements OnInit {
     // Forzamos que Angular registre el estado 'true' antes de la petición
     this.cd.detectChanges();
 
-    this.cobroService.getResumenCobrosCobradorRuta(sucursalId )
+    this.cobroService.getResumenCobrosCobradorRuta(sucursalId,fechaFmt )
       .pipe(delay(0)) // El truco para evitar el error NG0100
       .subscribe({
         next: (data) => {
