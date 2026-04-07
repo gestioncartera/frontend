@@ -119,15 +119,10 @@ getEgresosOperacionCobrador(sucursalId: number): Observable<any> {
 }
 
 getResumenCobrosCobradorRuta(sucursalId: number, fecha: string): Observable<any[]> {
-  const url = `${this.apiUrl}/resumenCobrosCoradorRuta/${sucursalId}`;
-  
-  // Convertimos la fecha a formato string YYYY-MM-DD para evitar problemas de zona horaria
-  const fechaFormateada = fecha.split('T')[0];
-
-  // Configuramos los parámetros de la URL
-  const params = new HttpParams().set('fecha', fechaFormateada);
-
-  return this.http.get<any[]>(url, { params }).pipe(
+    const url = `${this.apiUrl}/resumenCobrosCoradorRuta/${sucursalId}/${fecha}`;
+ 
+  // 3. Realizamos la petición (el interceptor añadirá el Bearer Token automáticamente)
+  return this.http.get<any[]>(url).pipe(
     tap(resumen => console.log('Resumen de ruta cargado:', resumen)),
     catchError(err => {
       console.error('Error al obtener resumen de cobros por ruta:', err);
@@ -136,17 +131,23 @@ getResumenCobrosCobradorRuta(sucursalId: number, fecha: string): Observable<any[
   );
 }
 
-  getTotalCobradoHoy(sucursalId: number | string): Observable<{ total_cobro_hoy: string | number }> {
-    return this.http.get<{ total_cobro_hoy: string | number }>(
-      `${this.apiUrl}/getTotalCobradoHoy/${sucursalId}`
-    ).pipe(
-      tap(response => console.log('Respuesta del servidor:', response)),
-      catchError(err => {
-        console.error('Error al obtener el total cobrado hoy:', err);
-        return throwError(() => err);
-      })
-    );
-  }
+  getTotalCobradoHoy(sucursalId: number | string, fecha: string): Observable<{ total_cobro_hoy: string | number }> {
+  // Nos aseguramos de que solo pase YYYY-MM-DD, eliminando la parte del tiempo si existe
+  const fechaLimpia = fecha.includes('T') ? fecha.split('T')[0] : fecha;
+
+  const url = `${this.apiUrl}/getTotalCobradoHoy/${sucursalId}/${fechaLimpia}`;
+  
+  console.log('Consultando Total Cobrado en:', url);
+
+  return this.http.get<{ total_cobro_hoy: string | number }>(url).pipe(
+    tap(response => console.log('Respuesta del servidor (Total):', response)),
+    catchError(err => {
+      console.error('Error al obtener el total cobrado hoy:', err);
+      return throwError(() => err);
+    })
+  );
+}
+
   getSumatoriaCobrosSucursal(sucursalId: number | string): Observable<number> {
   const url = `${this.apiUrl}/getSumatoriaCobrosSucursal/${sucursalId}`;
   

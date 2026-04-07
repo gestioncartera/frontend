@@ -12,11 +12,12 @@ import {
 import { SucursalContextService } from '../../../services/sucursal-context.service';
 import { CobroService } from '../../../services/cobro.service';
 import { PrestamoService } from '../../../services/prestamo.service';
-import { delay } from 'rxjs/operators'; // Importante para la solución
 import { MatIconModule } from '@angular/material/icon';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
+import { forkJoin, delay, finalize } from 'rxjs';
+
 @Component({
   selector: 'app-reporte1',
   templateUrl: './reporte1.component.html',
@@ -38,96 +39,90 @@ import { MatInputModule } from '@angular/material/input';
   ], 
 })
 export class Reporte1Component implements OnInit {
+  // Variables de Estado
   public resumenRutas: any[] = [];
   public cargando: boolean = false;
-  fechaSeleccionada: Date = new Date(); 
-  private cd = inject(ChangeDetectorRef);
-  sucursalId: number = 0;
-  kpis = {
+  public fechaSeleccionada: Date = new Date(); 
+  public sucursalId: number = 0;
+  
+  // KPIs del reporte
+  public kpis = {
     total_cobro_hoy: 0,
     carteraTotal: 0  
   };
 
+  private cd = inject(ChangeDetectorRef);
+
   constructor(
-    private cobroService: CobroService ,
-    private  prestamos:PrestamoService,
+    private cobroService: CobroService,
+    private prestamoService: PrestamoService,
     private sucursalContextService: SucursalContextService
   ) {}
 
   ngOnInit(): void { 
-  this.sucursalId = this.sucursalContextService.getSucursalId() || 0;  
+    this.sucursalId = this.sucursalContextService.getSucursalId() || 0;  
     if (this.sucursalId) {
-      this.cargarResumenCobros();
-      this.cargarDatosKpis();  
-      this.cargarTotal();
+      this.cargarTodo();
     }
   }
-  verDetalles(item: any) {
-    console.log('Navegando a detalles de:', item.cobrador);
+
+  /**
+   * Se ejecuta al cambiar la fecha en el MatDatepicker
+   */
+  onFechaChange(): void {
+    this.cargarTodo();
   }
 
-  cargarResumenCobros() {
-    const sucursalId = this.sucursalContextService.getSucursalId();
-    if (!sucursalId) return;
-   const fechaFmt = this.fechaSeleccionada.toISOString().split('T')[0];
-    this.cargando = true;  
-    // Forzamos que Angular registre el estado 'true' antes de la petición
+  /**
+   * Orquestador centralizado para evitar bloqueos en el indicador de carga
+   */
+  cargarTodo(): void {
+    if (!this.sucursalId) return;
+
+    // Formato YYYY-MM-DD para el backend
+    const fechaFmt = this.fechaSeleccionada.toLocaleDateString('en-CA');
+    
+    this.cargando = true;
     this.cd.detectChanges();
 
-    this.cobroService.getResumenCobrosCobradorRuta(sucursalId,fechaFmt )
-      .pipe(delay(0)) // El truco para evitar el error NG0100
-      .subscribe({
-        next: (data) => {
-          this.resumenRutas = data;
-          this.cargando = false;
-          this.actualizarKpisGlobales(); 
-          this.cd.detectChanges(); // Notificamos el cambio a la vista
-        },
-        error: (err) => {
-          this.cargando = false;
-          this.cd.detectChanges();
-          console.error('Error:', err);
-        }
-      });
+    // forkJoin ejecuta las peticiones en paralelo
+    forkJoin({
+      resumen: this.cobroService.getResumenCobrosCobradorRuta(this.sucursalId, fechaFmt),
+      kpiHoy: this.cobroService.getTotalCobradoHoy(this.sucursalId, fechaFmt),
+      cartera: this.prestamoService.getTotalCarteraSucursal(this.sucursalId)
+    })
+    .pipe(
+      delay(0),
+      // finalize asegura que cargando sea false tanto en éxito como en error
+      finalize(() => {
+        this.cargando = false;
+        this.cd.detectChanges();
+      })
+    )
+    .subscribe({
+      next: (res) => {
+        // 1. Datos de la tabla (ajustado a 'total_cobrado' según tu Postman)
+        this.resumenRutas = res.resumen || [];
+
+        // 2. KPI Recaudación
+        this.kpis.total_cobro_hoy = res.kpiHoy?.total_cobro_hoy 
+          ? Number(res.kpiHoy.total_cobro_hoy) 
+          : 0;
+
+        // 3. KPI Cartera Total
+        this.kpis.carteraTotal = res.cartera?.total_cartera 
+          ? Number(res.cartera.total_cartera) 
+          : 0;
+      },
+      error: (err) => {
+        console.error('Error en la carga masiva del reporte:', err);
+        // Opcional: resetear datos para no mostrar información vieja
+        this.resumenRutas = [];
+      }
+    });
   }
 
-  actualizarKpisGlobales() {
-    const total = this.resumenRutas.reduce((acc, curr) => acc + Number(curr.total_recaudado), 0);
-    this.kpis.total_cobro_hoy = total;
-    // No es estrictamente necesario otro detectChanges aquí si se llama dentro de un subscribe con cd
+  verDetalles(item: any): void {
+    console.log('Ruta:', item.nombre_ruta, 'Cobrador:', item.nombre_cobrador);
   }
-
-  cargarDatosKpis() {
-     this.cobroService.getTotalCobradoHoy(this.sucursalId)
-      .pipe(delay(0)) // Evitamos colisión de cambios en el objeto kpis
-      .subscribe({
-        next: (res) => {
-          const totalRecuperado = Number(res.total_cobro_hoy);
-          this.kpis = {
-            ...this.kpis,
-            total_cobro_hoy: totalRecuperado
-          };
-          this.cd.detectChanges();
-        },
-        error: (err) => console.error('Error cargando KPIs:', err)
-      });
-  }
-
-  cargarTotal() {
-       this.prestamos.getTotalCarteraSucursal(this.sucursalId)
-      .pipe(delay(0)) // Evitamos colisión de cambios en el objeto kpis
-      .subscribe({
-        next: (res) => {
-          const totalRecuperado = Number(res. total_cartera);
-          this.kpis = {
-            ...this.kpis,
-            carteraTotal: totalRecuperado
-          };
-          this.cd.detectChanges();
-          console.log('prueba cartera',totalRecuperado)
-        },
-        error: (err) => console.error('Error cargando KPIs:', err)
-      });
-  }
-
 }

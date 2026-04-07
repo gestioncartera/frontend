@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -33,6 +33,7 @@ import { MatDialog } from '@angular/material/dialog';
   styleUrls: ['./registro-egreso-suc.component.scss']
 })
 export class RegistroEgresoSucComponent implements OnInit {
+  private cd = inject(ChangeDetectorRef);
   egresoForm: FormGroup;
   sucursalId: number | null = null;
     totalCaja: number = 0;
@@ -127,8 +128,11 @@ onSubmit(): void {
     if (!this.sucursalId) return;
     this.cajaService.getCajaSucursal(this.sucursalId).subscribe({
       next: (balance) => {
-        this.totalCaja = Number(balance?.saldo_actual) || 0;
-        console.log('Balance de caja cargado:', this.totalCaja);
+        setTimeout(() => {
+          this.totalCaja = Number(balance?.saldo_actual) || 0;
+          console.log('Balance de caja cargado:', this.totalCaja);
+          this.cd.detectChanges();
+        });
       },
       error: (err) => {
         console.error('Error al cargar el balance', err);

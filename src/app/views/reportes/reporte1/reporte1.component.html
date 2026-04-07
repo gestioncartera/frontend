@@ -9,13 +9,13 @@
     <div class="d-flex align-items-center gap-2">
       <mat-form-field appearance="outline" class="dense-form-field">
         <mat-label>Fecha de Consulta</mat-label>
-        <input matInput [matDatepicker]="picker" [(ngModel)]="fechaSeleccionada" (dateChange)="cargarResumenCobros()">
+        <input matInput [matDatepicker]="picker" [(ngModel)]="fechaSeleccionada" (dateChange)="onFechaChange()">
         <mat-hint>DD/MM/YYYY</mat-hint>
         <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
       </mat-form-field>
 
-      <button cButton color="primary" variant="outline" class="btn-refresh" (click)="cargarResumenCobros()" [disabled]="cargando">
+      <button cButton color="primary" variant="outline" class="btn-refresh" (click)="onFechaChange()" [disabled]="cargando">
         <mat-icon *ngIf="!cargando">sync</mat-icon>
         <span *ngIf="cargando" class="spinner-border spinner-border-sm"></span>
       </button>
@@ -24,31 +24,31 @@
 
   <c-row class="mb-4 g-3">
     <c-col xs="12" sm="6" lg="3">
-      <c-card class="kpi-card info">
+      <c-card class="kpi-card info shadow-sm border-0">
         <c-card-body>
           <div class="d-flex justify-content-between align-items-start">
             <div>
-              <div class="kpi-label">Total Cobrado</div>
-              <div class="kpi-value">{{ kpis.total_cobro_hoy | currency:'COP':'$':'1.0-0' }}</div>
+              <div class="kpi-label text-uppercase small text-muted fw-bold">Total Cobrado</div>
+              <div class="kpi-value fs-3 fw-bold text-primary">{{ kpis.total_cobro_hoy | currency:'COP':'$':'1.0-0' }}</div>
             </div>
-            <mat-icon class="kpi-icon">payments</mat-icon>
+            <mat-icon class="kpi-icon text-info">payments</mat-icon>
           </div>
-          <div class="kpi-footer text-success">
-            <mat-icon>trending_up</mat-icon> <span>En línea</span>
+          <div class="kpi-footer text-success d-flex align-items-center mt-2 small">
+            <mat-icon class="fs-6 me-1">trending_up</mat-icon> <span>Sincronizado</span>
           </div>
         </c-card-body>
       </c-card>
     </c-col>
 
     <c-col xs="12" sm="6" lg="3">
-      <c-card class="kpi-card primary">
+      <c-card class="kpi-card primary shadow-sm border-0">
         <c-card-body>
           <div class="d-flex justify-content-between align-items-start">
             <div>
-              <div class="kpi-label">Cartera Total</div>
-              <div class="kpi-value">{{ kpis.carteraTotal | currency:'COP':'$':'1.0-0' }}</div>
+              <div class="kpi-label text-uppercase small text-muted fw-bold">Cartera Total</div>
+              <div class="kpi-value fs-3 fw-bold text-dark">{{ kpis.carteraTotal | currency:'COP':'$':'1.0-0' }}</div>
             </div>
-            <mat-icon class="kpi-icon">account_balance_wallet</mat-icon>
+            <mat-icon class="kpi-icon text-primary">account_balance_wallet</mat-icon>
           </div>
         </c-card-body>
       </c-card>
@@ -62,7 +62,7 @@
     <c-card-body class="p-0">
       <table cTable [striped]="true" [responsive]="true" [hover]="true" class="mb-0 align-middle">
         <thead>
-          <tr class="table-header">
+          <tr class="table-header bg-light">
             <th class="ps-4">Cobrador</th>
             <th>Ruta</th>
             <th class="text-center">Cant. Cobros</th>
@@ -73,32 +73,35 @@
           <tr *ngIf="cargando">
             <td colspan="4" class="text-center py-5">
               <div class="spinner-grow text-primary" role="status"></div>
-              <p class="mt-2 text-muted">Sincronizando rutas...</p>
+              <p class="mt-2 text-muted">Consultando datos del servidor...</p>
             </td>
           </tr>
 
           <tr *ngFor="let item of resumenRutas" class="row-hover">
-            <td class="ps-4 font-bold text-dark">
-              <div class="d-flex align-items-center gap-2">
-                <div class="avatar-circle">{{ item.nombre_cobrador.charAt(0) }}</div>
-                {{ item.nombre_cobrador }}
+            <td class="ps-4">
+              <div class="d-flex align-items-center gap-3">
+                <div class="avatar-circle bg-primary text-white d-flex align-items-center justify-content-center rounded-circle" style="width: 35px; height: 35px;">
+                  {{ item.nombre_cobrador.charAt(0) }}
+                </div>
+                <span class="fw-semibold text-dark">{{ item.nombre_cobrador }}</span>
               </div>
             </td>
             <td>
-              <c-badge color="light" class="text-dark border-0">{{ item.nombre_ruta }}</c-badge>
+              <c-badge color="light" class="text-dark border p-2 fw-normal">{{ item.nombre_ruta }}</c-badge>
             </td>
             <td class="text-center">
-              <span class="count-badge">{{ item.total_cobros }}</span>
+              <span class="badge bg-secondary rounded-pill">{{ item.total_cobros }}</span>
             </td>
-            <td class="text-end pe-4 font-bold text-success fs-6">
+            <td class="text-end pe-4 fw-bold text-success">
               {{ item.total_cobrado | currency:'COP':'$':'1.0-0' }}
             </td>
           </tr>
 
           <tr *ngIf="!cargando && resumenRutas.length === 0">
             <td colspan="4" class="text-center py-5">
-              <mat-icon class="text-muted fs-1">event_busy</mat-icon>
-              <p class="text-muted">No se encontraron movimientos para esta fecha.</p>
+              <mat-icon class="text-muted fs-1" style="height: 48px; width: 48px;">event_busy</mat-icon>
+              <p class="text-muted fw-bold">No hay registros para la fecha seleccionada</p>
+              <button cButton color="light" size="sm" (click)="onFechaChange()">Reintentar</button>
             </td>
           </tr>
         </tbody>

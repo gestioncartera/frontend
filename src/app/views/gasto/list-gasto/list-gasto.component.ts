@@ -163,12 +163,13 @@ loadMovimientos(): void {
  
   loadBalance(): void {
     if (!this.sucursalId) return;
-    const fechaStr = this.fechaFiltro.toISOString().split('T')[0];
     this.cajaService.getCajaSucursal(this.sucursalId ).subscribe({
       next: (balance) => {
-        this.totalCaja = Number(balance?.saldo_actual) || 0;
-        console.log('Balance de caja cargado:', this.totalCaja);
-        this.cd.detectChanges();
+        setTimeout(() => {
+          this.totalCaja = Number(balance?.saldo_actual) || 0;
+          console.log('Balance de caja cargado:', this.totalCaja);
+          this.cd.detectChanges();
+        });
       },
       error: (err) => {
         console.error('Error al cargar el balance', err);
