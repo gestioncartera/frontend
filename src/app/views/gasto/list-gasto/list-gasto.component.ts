@@ -59,6 +59,9 @@ export class ListGastoComponent implements OnInit, AfterViewInit {
   sucursalId: number | null = null;
   fechaFiltro: Date = new Date();
   dataSource = new MatTableDataSource<MovimientoCajaSucursal>([]);
+  fechaInicio: Date = new Date();
+  fechaFin: Date = new Date();
+
   constructor(
     private router: Router, 
     private responsive: BreakpointObserver,
@@ -69,36 +72,57 @@ export class ListGastoComponent implements OnInit, AfterViewInit {
      
   }
 
-  ngOnInit(): void {
-    this.sucursalId = this.sucursalContextService.getSucursalId();
-    this.detectMobile();
+ ngOnInit(): void {
+  this.sucursalId = this.sucursalContextService.getSucursalId();
+  this.detectMobile();
 
-    if (this.sucursalId) {
-      this.cargarDatosPorFecha(); 
-      this.setupFilter();
-    } else {
-     this.dialog.open(ConfirmDialogComponent, {
-        width: '400px',
-        data: {
-          title: 'Advertencia',
-          message: 'No ha seleccionado una sucursal activa.',
-          confirmText: 'Ir a Selección',
-          cancelText: '', // Solo un botón para forzar la navegación
-          type: 'warning',
-          icon: 'storefront',
-          color: 'primary'
-        }
-      }).afterClosed().subscribe(() => {
-        this.router.navigate(['/cambio-sucursal']);
-      });
-    
+  // 1. Si NO hay sucursal, bloqueamos y redirigimos
+  if (!this.sucursalId) {
+    this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Advertencia',
+        message: 'No ha seleccionado una sucursal activa.',
+        confirmText: 'Ir a Selección',
+        type: 'warning',
+        icon: 'storefront',
+        color: 'primary'
+      }
+    }).afterClosed().subscribe(() => {
+      this.router.navigate(['/cambio-sucursal']);
+    });
+    return; // Salimos de la función
+  }
+
+  // 2. Si llegamos aquí, la sucursal existe. Cargamos todo.
+  this.setupFilter();
+  this.cargarDatosPorRango();
+}
+
+// Extraer el diálogo a un método privado hace que el ngOnInit sea más fácil de leer
+private mostrarAdvertenciaSucursal(): void {
+  this.dialog.open(ConfirmDialogComponent, {
+    width: '400px',
+    data: {
+      title: 'Advertencia',
+      message: 'No ha seleccionado una sucursal activa.',
+      confirmText: 'Ir a Selección',
+      cancelText: '', 
+      type: 'warning',
+      icon: 'storefront',
+      color: 'primary'
     }
-  }
+  }).afterClosed().subscribe(() => {
+    this.router.navigate(['/cambio-sucursal']);
+  });
+}
   onFechaChange(): void {
-    this.cargarDatosPorFecha();
+  if (this.fechaInicio && this.fechaFin) {
+    this.cargarDatosPorRango();
   }
+}
 
-  cargarDatosPorFecha(): void {
+ cargarDatosPorRango(): void {
     this.loadMovimientos();
     this.loadBalance();
   }
@@ -108,30 +132,31 @@ export class ListGastoComponent implements OnInit, AfterViewInit {
     this.dataSource.sort = this.sort;
   }
 
- loadMovimientos(): void {
-  if (!this.sucursalId) return;
-  const fechaStr = this.fechaFiltro.toISOString().split('T')[0];
-  this.cajaService.getMovimientos(this.sucursalId).subscribe({
+loadMovimientos(): void {
+  // Verificamos que tengamos la sucursal y ambas fechas
+  if (!this.sucursalId || !this.fechaInicio || !this.fechaFin) return;
+
+ const fInicio = this.fechaInicio.toLocaleDateString('en-CA');  
+ const fFin = this.fechaFin.toLocaleDateString('en-CA');
+
+  // Enviamos los tres parámetros al servicio
+  this.cajaService.getMovimientos(this.sucursalId, fInicio, fFin).subscribe({
     next: (data) => {
       this.movimientosData = data;
-      
-      // 1. Asignamos la data
       this.dataSource.data = data;
 
-      // 2. Usamos un pequeño delay para asegurar que el DOM de la tabla esté listo
+      // Sincronizamos los complementos de la tabla
       setTimeout(() => {
         this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;
-        
-        // FORZAR EL FILTRO VACÍO: Esto obliga a la tabla a renderizar la data actual
         this.dataSource.filter = ''; 
         this.cd.detectChanges();
       });
 
-      console.log('Movimientos cargados:', data);
+      console.log(`Movimientos cargados  `,data);
     },
     error: (err) => {
-      // ... tu manejo de error
+      console.error('Error al cargar movimientos por rango:', err);
     }
   });
 }
@@ -139,10 +164,11 @@ export class ListGastoComponent implements OnInit, AfterViewInit {
   loadBalance(): void {
     if (!this.sucursalId) return;
     const fechaStr = this.fechaFiltro.toISOString().split('T')[0];
-    this.cajaService.getCajaSucursal(this.sucursalId,fechaStr).subscribe({
+    this.cajaService.getCajaSucursal(this.sucursalId ).subscribe({
       next: (balance) => {
         this.totalCaja = Number(balance?.saldo_actual) || 0;
         console.log('Balance de caja cargado:', this.totalCaja);
+        this.cd.detectChanges();
       },
       error: (err) => {
         console.error('Error al cargar el balance', err);

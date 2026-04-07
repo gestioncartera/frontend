@@ -1,290 +1,183 @@
-/* =========================================
-   VARIABLES Y PALETA
-   ========================================= */
-$primary-blue: #2563eb;
-$bg-dark: #0f172a;
+/* VARIABLES DE DISEÑO PROFESIONAL */
+$primary: #2563eb;
+$surface: #ffffff;
+$bg-app: #f1f5f9;
+$dark-slate: #1e293b;
+$slate-soft: #64748b;
+$success: #10b981;
 $danger: #ef4444;
-$success: #166534;
-$warning: #854d0e;
-$text-main: #1e293b;
-$text-soft: #64748b;
-$border-light: #e2e8f0;
-$bg-light-slate: #f8fafc;
+$border: #e2e8f0;
 
-/* =========================================
-   CONTENEDOR Y CABECERA
-   ========================================= */
-.container { 
-  padding: 2rem 1.5rem; 
-  max-width: 1200px; 
-  margin: 0 auto; 
+.container {
+  padding: 2.5rem 1.5rem;
+  max-width: 1300px;
+  margin: 0 auto;
 }
 
-.fade-in {
-  animation: fadeIn 0.5s ease-in;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
+/* HEADER Y BALANCE */
 .page-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 2rem;
-  gap: 20px;
+  align-items: flex-end;
+  margin-bottom: 2.5rem;
+  gap: 24px;
 
   .title-group {
-    h2 { margin: 0; font-size: 26px; font-weight: 800; color: $bg-dark; }
-    .subtitle { color: $text-soft; font-size: 14px; margin-top: 4px; }
+    h2 { font-size: 28px; font-weight: 800; color: $dark-slate; margin: 0; }
+    .subtitle { color: $slate-soft; margin: 5px 0 0; .highlight { color: $primary; font-weight: 600; } }
   }
 }
 
 .header-actions {
   display: flex;
-  align-items: center;
-  gap: 20px;
+  align-items: stretch;
+  gap: 16px;
 }
 
-/* =========================================
-   WIDGET: TOTAL EN CAJA
-   ========================================= */
-.cash-summary-card {
-  background: linear-gradient(135deg, $bg-dark, #1e293b);
+.balance-card {
+  background: $dark-slate;
   color: white;
-  padding: 12px 24px;
-  border-radius: 16px;
+  padding: 12px 20px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   gap: 20px;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 
-  .cash-info {
-    .cash-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7; display: block; }
-    .cash-amount { margin: 0; font-size: 22px; font-weight: 700; }
-  }
-
-  .cash-icon {
-    background: rgba(255, 255, 255, 0.1);
-    width: 44px; height: 44px; border-radius: 12px;
-    display: grid; place-items: center;
-    mat-icon { font-size: 24px; width: 24px; height: 24px; }
-  }
+  .label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.8; }
+  .amount { margin: 0; font-size: 22px; font-weight: 700; color: #f8fafc; }
+  .balance-visual { background: rgba(255,255,255,0.1); padding: 8px; border-radius: 10px; display: flex; }
 }
 
-.btn-add {
-  height: 54px; 
+.btn-primary-action {
+  background: $primary !important;
+  color: white !important;
   border-radius: 14px !important;
-  font-weight: 600; 
-  padding: 0 25px !important;
-  background-color: $primary-blue !important;
+  padding: 0 24px !important;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 6px -1px rgba($primary, 0.3);
 }
 
-/* =========================================
-   FILTROS Y TARJETA
-   ========================================= */
-/* Actualizar en la sección FILTROS Y TARJETA */
-.filters-row {
+/* FILTROS MEJORADOS */
+.filters-wrapper {
   padding: 1.5rem;
-  background: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  border-bottom: 1px solid $border;
 
-  .filter-controls {
+  .date-controls {
     display: flex;
-    gap: 15px;
-    align-items: center;
-    flex-wrap: wrap; // Para que en móvil se apilen
-  }
-  
-  .date-field {
-    width: 200px;
+    gap: 12px;
+    flex: 1;
   }
 
-  .search-field {
-    flex: 1; // El buscador toma el espacio restante
-    min-width: 250px;
+  .search-control {
+    flex: 1;
+    max-width: 350px;
   }
-}
 
-/* Ajuste responsivo */
-@media (max-width: 650px) {
-  .filters-row .filter-controls {
-    flex-direction: column;
-    align-items: stretch;
-    
-    .date-field, .search-field {
-      width: 100%;
-    }
+  .custom-field {
+    width: 100%;
+    ::v-deep .mat-mdc-text-field-wrapper { background: white !important; }
   }
 }
 
-/* =========================================
-   TABLA PROFESIONAL
-   ========================================= */
-.table-container {
-  overflow-x: auto;
-}
-
-.modern-table {
+/* TABLA REFINADA */
+.refined-table {
   width: 100%;
-
+  
   th.mat-header-cell {
-    background: $bg-light-slate;
-    color: $text-soft;
+    background: #f8fafc;
+    color: $slate-soft;
     font-weight: 700;
-    text-transform: uppercase;
     font-size: 11px;
     letter-spacing: 0.5px;
+    text-transform: uppercase;
     padding: 18px !important;
   }
 
-  td.mat-cell {
-    padding: 16px 18px !important;
-    color: $text-main;
-    border-bottom: 1px solid $bg-light-slate;
+  td.mat-cell { padding: 16px 18px !important; }
+
+  .hover-row:hover { background: #f1f5f9; cursor: pointer; transition: 0.2s; }
+
+  .date-cell {
+    display: flex;
+    flex-direction: column;
+    .main-date { font-weight: 600; color: $dark-slate; }
+    .sub-date { font-size: 11px; color: $slate-soft; }
   }
 
-  tr.row-hover:hover { 
-    background-color: rgba($primary-blue, 0.02); 
-    cursor: pointer; 
-  }
-
-  .date-text { display: block; font-weight: 600; color: $bg-dark; }
-  .time-text { font-size: 11px; color: $text-soft; }
-
-  .amount-cell {
+  .value-cell {
     font-weight: 700;
     font-size: 15px;
-    color: $success; // Color por defecto (ingreso)
-    
+    color: $success;
     &.negative { color: $danger; }
   }
 }
 
-/* =========================================
-   BADGES: TIPO Y ESTADO
-   ========================================= */
-.type-badge {
-  background-color: #f1f5f9;
-  color: #475569;
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 700;
-  border: 1px solid $border-light;
-  text-transform: uppercase;
+/* ESTADOS Y CHIPS */
+.chip-type {
+  padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800;
+  background: #e2e8f0; color: #475569;
+  &.ingreso { background: #dcfce7; color: #166534; }
+  &.egreso { background: #fee2e2; color: #991b1b; }
 }
 
-.status-badge {
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  display: inline-block;
-  text-align: center;
-  min-width: 90px;
-
-  /* Colores semánticos según el estado */
-  &.pagado, &.confirmado {
-    background-color: #dcfce7;
-    color: $success;
-  }
-
-  &.pendiente {
-    background-color: #fef9c3;
-    color: $warning;
-  }
-
-  &.anulado {
-    background-color: #fee2e2;
-    color: #991b1b;
-  }
-
-  &.small {
-    padding: 2px 8px;
-    font-size: 10px;
-    min-width: auto;
-  }
+.dot-status {
+  position: relative; padding-left: 15px; font-size: 12px; font-weight: 600;
+  &::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 8px; height: 8px; border-radius: 50%; }
+  &.confirmado, &.pagado { &::before { background: $success; } color: #065f46; }
+  &.anulado { &::before { background: $danger; } color: #991b1b; }
+  &.pendiente { &::before { background: #f59e0b; } color: #92400e; }
 }
 
-/* =========================================
-   ACCIONES
-   ========================================= */
-.btn-edit { color: $primary-blue; &:hover { background: rgba($primary-blue, 0.1); } }
-.btn-delete { color: $danger; &:hover { background: rgba($danger, 0.1); } }
+/* ACCIONES */
+.action-btn {
+  &.delete { color: $slate-soft; &:hover { color: $danger; background: #fee2e2; } }
+}
 
-/* =========================================
-   VISTA MÓVIL
-   ========================================= */
-.mobile-card {
-  border-radius: 16px; 
-  margin: 0 1rem 1rem 1rem;
-  border: 1px solid $bg-light-slate;
-  background: white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+/* VISTA MÓVIL REFINADA */
+.refined-mobile-card {
+  background: white; border: 1px solid $border; border-radius: 16px; margin: 15px; overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 
-  .card-header {
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center;
+  .card-top {
+    padding: 15px; background: #f8fafc; display: flex; justify-content: space-between; align-items: center;
+    .m-date { font-weight: 700; color: $dark-slate; }
+    .m-value { font-weight: 800; font-size: 16px; color: $success; &.negative { color: $danger; } }
+  }
+
+  .card-mid {
     padding: 15px;
-    background: $bg-light-slate; 
-    border-bottom: 1px solid $border-light;
-
-    .header-left {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      .m-date { font-weight: 700; color: $bg-dark; }
-    }
-
-    .m-amount { 
-      font-weight: 800; 
-      font-size: 16px;
-      color: $success;
-      &.negative { color: $danger; }
-    }
+    .m-desc { font-size: 14px; font-weight: 500; margin-bottom: 12px; color: $dark-slate; }
+    .m-badges { display: flex; gap: 8px; }
   }
 
-  .card-body {
-    padding: 15px;
-    p { margin: 4px 0; font-size: 14px; color: $text-main; }
-    .m-type { color: $text-soft; font-size: 12px; font-weight: 600; }
-    .m-desc { font-weight: 500; margin-top: 8px; color: $bg-dark; }
-  }
-
-  .card-actions {
-    display: flex;
-    justify-content: flex-end;
-    padding: 8px 15px;
-    border-top: 1px dashed $border-light;
+  .card-bottom {
+    padding: 8px 15px; border-top: 1px solid $border; display: flex; justify-content: flex-end;
   }
 }
 
-/* =========================================
-   RESPONSIVO
-   ========================================= */
-@media (max-width: 850px) {
-  .page-header { 
-    flex-direction: column; 
-    align-items: stretch;
-    text-align: left;
-  }
+.empty-state {
+  padding: 60px 0; text-align: center;
+  .empty-icon-box { background: #f1f5f9; width: 60px; height: 60px; border-radius: 50%; display: grid; place-items: center; margin: 0 auto 15px; color: $slate-soft; }
+  p { color: $slate-soft; font-weight: 500; }
+}
 
-  .header-actions { 
-    flex-direction: column; 
-    width: 100%; 
-    align-items: stretch; 
-  }
+/* RESPONSIVO */
+@media (max-width: 900px) {
+  .page-header { flex-direction: column; align-items: flex-start; }
+  .header-actions { width: 100%; flex-direction: column; }
+  .filters-wrapper { flex-direction: column; align-items: stretch; gap: 0; }
+  .date-controls { flex-direction: row; }
+  .search-control { max-width: 100%; }
+}
 
-  .cash-summary-card { 
-    justify-content: space-between; 
-  }
-
-  .btn-add { width: 100%; }
-
-  .filters-row .search-field {
-    max-width: 100%;
-  }
+@media (max-width: 500px) {
+  .date-controls { flex-direction: column; gap: 0; }
 }

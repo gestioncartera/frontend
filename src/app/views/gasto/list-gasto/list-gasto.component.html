@@ -1,142 +1,144 @@
 <div class="container fade-in">
   <header class="page-header">
     <div class="title-group">
-      <h2>Movimientos de Caja Sucursal</h2>
-      <p class="subtitle">Visualiza y controla los movimientos de efectivo</p>
+      <h2>Movimientos de Caja</h2>
+      <p class="subtitle">Sucursal Activa: <span class="highlight">Gestión de Periodos</span></p>
     </div>
 
     <div class="header-actions">
-      <div class="cash-summary-card">
-        <div class="cash-info">
-          <span class="cash-label">Total en Caja</span>
-          <h3 class="cash-amount">{{ totalCaja | currency }}</h3> </div>
-        <div class="cash-icon">
-          <mat-icon>account_balance_wallet</mat-icon>
+      <div class="balance-card">
+        <div class="balance-content">
+          <span class="label">Balance del Periodo</span>
+          <h3 class="amount">{{ totalCaja | currency }}</h3>
+        </div>
+        <div class="balance-visual">
+          <mat-icon>payments</mat-icon>
         </div>
       </div>
-
-      <button mat-flat-button color="primary" class="btn-add" routerLink="/gasto/registro-egreso-suc">
-        <mat-icon>add</mat-icon> Nuevo Movimiento
+      
+      <button mat-flat-button class="btn-primary-action" routerLink="/gasto/registro-egreso-suc">
+        <mat-icon>add_circle</mat-icon>
+        <span>Nuevo Movimiento</span>
       </button>
     </div>
   </header>
 
-  <mat-card class="list-card">
-   <div class="filters-row">
-        <div class="filter-controls">
-          <mat-form-field appearance="outline" class="date-field">
-            <mat-label>Filtrar por fecha</mat-label>
-            <input matInput [matDatepicker]="picker" [(ngModel)]="fechaFiltro" (dateChange)="onFechaChange()">
-            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-            <mat-datepicker #picker></mat-datepicker>
-          </mat-form-field>
+  <mat-card class="main-card shadow-sm">
+    <div class="filters-wrapper">
+      <div class="date-controls">
+        <mat-form-field appearance="outline" class="custom-field">
+          <mat-label>Desde</mat-label>
+          <input matInput [matDatepicker]="pickerInicio" [(ngModel)]="fechaInicio" (dateChange)="onFechaChange()">
+          <mat-datepicker-toggle matIconSuffix [for]="pickerInicio"></mat-datepicker-toggle>
+          <mat-datepicker #pickerInicio></mat-datepicker>
+        </mat-form-field>
 
-          <mat-form-field appearance="outline" class="search-field">
-            <mat-label>Buscar movimiento</mat-label>
-            <input matInput (keyup)="applyFilter($event)" placeholder="Ej: Pago de luz..." />
-            <mat-icon matSuffix>search</mat-icon>
-          </mat-form-field>
-        </div>
+        <mat-form-field appearance="outline" class="custom-field">
+          <mat-label>Hasta</mat-label>
+          <input matInput [matDatepicker]="pickerFin" [(ngModel)]="fechaFin" (dateChange)="onFechaChange()">
+          <mat-datepicker-toggle matIconSuffix [for]="pickerFin"></mat-datepicker-toggle>
+          <mat-datepicker #pickerFin></mat-datepicker>
+        </mat-form-field>
       </div>
 
-    <div *ngIf="dataSource.data.length === 0" class="no-records">
-      <mat-icon>info_outline</mat-icon>
-      <p>No hay movimientos para mostrar.</p>
+      <div class="search-control">
+        <mat-form-field appearance="outline" class="custom-field search-input">
+          <mat-label>Buscar por descripción...</mat-label>
+          <input matInput (keyup)="applyFilter($event)" placeholder="Ej: Pago de servicios">
+          <mat-icon matPrefix>search</mat-icon>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div *ngIf="dataSource.data.length === 0" class="empty-state">
+      <div class="empty-icon-box">
+        <mat-icon>history_toggle_off</mat-icon>
+      </div>
+      <p>No se encontraron registros para el rango seleccionado.</p>
     </div>
 
     <div *ngIf="dataSource.data.length > 0">
-      <div *ngIf="!isMobile" class="table-container">
-        <table mat-table [dataSource]="dataSource" matSort class="modern-table">
+      <div *ngIf="!isMobile" class="table-responsive">
+        <table mat-table [dataSource]="dataSource" matSort class="refined-table">
 
-        <ng-container matColumnDef="fecha">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha</th>
-          <td mat-cell *matCellDef="let item">
-            <span class="date-text">{{ item.fecha_movimiento | date:'dd/MM/yyyy' }}</span>
-            <small class="time-text">{{ item.fecha_movimiento | date:'shortTime' }}</small>
-          </td>
-        </ng-container>
+          <ng-container matColumnDef="fecha">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha</th>
+            <td mat-cell *matCellDef="let item">
+              <div class="date-cell">
+                <span class="main-date">{{ item.fecha_movimiento | date:'dd/MM/yyyy' }}</span>
+                <span class="sub-date">{{ item.fecha_movimiento | date:'shortTime' }}</span>
+              </div>
+            </td>
+          </ng-container>
 
-        <ng-container matColumnDef="tipo">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Tipo</th>
-          <td mat-cell *matCellDef="let item">
-            <span class="type-badge" [ngClass]="item.tipo_movimiento">{{ item.tipo_movimiento }}</span>
-          </td>
-        </ng-container>
+          <ng-container matColumnDef="tipo">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Tipo</th>
+            <td mat-cell *matCellDef="let item">
+              <span class="chip-type" [ngClass]="item.tipo_movimiento">
+                {{ item.tipo_movimiento | uppercase }}
+              </span>
+            </td>
+          </ng-container>
 
-        <ng-container matColumnDef="concepto">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Concepto / Descripción</th>
-          <td mat-cell *matCellDef="let item" class="description-cell">
-            {{ item.descripcion }}
-          </td>
-        </ng-container>
+          <ng-container matColumnDef="concepto">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Descripción</th>
+            <td mat-cell *matCellDef="let item" class="desc-cell">
+              {{ item.descripcion }}
+            </td>
+          </ng-container>
 
-        <ng-container matColumnDef="valor">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Valor</th>
-          <td mat-cell *matCellDef="let item" class="amount-cell" 
-              [class.negative]="item.tipo_movimiento === 'egreso'">
-            {{ item.tipo_movimiento === 'egreso' ? '-' : '+' }} {{ item.monto | currency }}
-          </td>
-        </ng-container>
+          <ng-container matColumnDef="valor">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Valor</th>
+            <td mat-cell *matCellDef="let item" class="value-cell" [class.negative]="item.tipo_movimiento === 'egreso'">
+              {{ item.tipo_movimiento === 'egreso' ? '-' : '+' }} {{ item.monto | currency }}
+            </td>
+          </ng-container>
 
-        <ng-container matColumnDef="estado">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Estado</th>
-          <td mat-cell *matCellDef="let item">
-            <span class="status-badge" [ngClass]="item.estado_movto.toLowerCase()">
-              {{ item.estado_movto | titlecase }}
-            </span>
-          </td>
-        </ng-container>
+          <ng-container matColumnDef="estado">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Estado</th>
+            <td mat-cell *matCellDef="let item">
+              <span class="dot-status" [ngClass]="item.estado_movto.toLowerCase()">
+                {{ item.estado_movto | titlecase }}
+              </span>
+            </td>
+          </ng-container>
 
-        <ng-container matColumnDef="acciones">
+          <ng-container matColumnDef="acciones">
             <th mat-header-cell *matHeaderCellDef class="text-center">Acciones</th>
-            <td mat-cell *matCellDef="let item" class="text-center"> 
-              <button mat-icon-button 
-                      class="btn-delete" 
-                      (click)="delete(item)"
-                      [disabled]="item.estado_movto?.toLowerCase() === 'anulado'">
-                <mat-icon [style.opacity]="item.estado_movto?.toLowerCase() === 'anulado' ? '0.4' : '1'">
-                  delete_outline
-                </mat-icon>
+            <td mat-cell *matCellDef="let item" class="text-center">
+              <button mat-icon-button class="action-btn delete" (click)="delete(item)" 
+                      [disabled]="item.estado_movto?.toLowerCase() === 'anulado'"
+                      matTooltip="Anular movimiento">
+                <mat-icon>delete_sweep</mat-icon>
               </button>
             </td>
           </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns" class="row-hover"></tr>
-      </table>
-
-      <mat-paginator [pageSizeOptions]="[10, 20]" showFirstLastButtons></mat-paginator>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns" class="hover-row"></tr>
+        </table>
+        <mat-paginator [pageSizeOptions]="[10, 20]" showFirstLastButtons></mat-paginator>
       </div>
 
-      <div *ngIf="isMobile" class="mobile-list">
-        <div class="mobile-card" *ngFor="let item of dataSource.filteredData">
-          <div class="card-header">
-            <div class="header-left d-flex flex-column"> <div class="date-time-group">
-                <span class="m-date fw-bold text-dark">{{ item.fecha_movimiento | date:'dd MMM, yyyy' }}</span>
-                <small class="m-time text-muted ms-2">{{ item.fecha_movimiento | date:'hh:mm a' }}</small>
-              </div>
-              <div>
-                <span class="status-badge small mt-1" [ngClass]="item.estado_movto.toLowerCase()">
-                  {{ item.estado_movto }}
-                </span>
-              </div>
-            </div>
-            <span class="m-amount" [class.negative]="item.tipo_movimiento === 'egreso'">
+      <div *ngIf="isMobile" class="mobile-grid">
+        <div class="refined-mobile-card" *ngFor="let item of dataSource.filteredData">
+          <div class="card-top">
+            <span class="m-date">{{ item.fecha_movimiento | date:'dd MMM, yyyy' }}</span>
+            <span class="m-value" [class.negative]="item.tipo_movimiento === 'egreso'">
               {{ item.tipo_movimiento === 'egreso' ? '-' : '+' }} {{ item.monto | currency }}
             </span>
           </div>
-          
-          <div class="card-body">
-            <p class="m-type"><strong>Tipo:</strong> {{ item.tipo_movimiento | uppercase }}</p>
+          <div class="card-mid">
             <p class="m-desc">{{ item.descripcion }}</p>
+            <div class="m-badges">
+              <span class="chip-type small" [ngClass]="item.tipo_movimiento">{{ item.tipo_movimiento }}</span>
+              <span class="dot-status small" [ngClass]="item.estado_movto.toLowerCase()">{{ item.estado_movto }}</span>
+            </div>
           </div>
-          <div class="card-actions">
-            <button mat-button 
-                    (click)="delete(item)" 
-                    color="warn"
-                    [disabled]="item.estado_movto.toLowerCase() === 'anulado'">
-              Anular Movimiento
-            </button>  
+          <div class="card-bottom">
+            <button mat-button color="warn" (click)="delete(item)" [disabled]="item.estado_movto.toLowerCase() === 'anulado'">
+              <mat-icon>block</mat-icon> Anular
+            </button>
           </div>
         </div>
       </div>

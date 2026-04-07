@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { catchError, map, Observable, of } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { HttpParams } from '@angular/common/http';
-
 // Interfaz para definir la estructura de un movimiento
 export interface MovimientoCajaSucursal {
   movimiento_id: number;
@@ -43,30 +42,24 @@ export class CajaService {
    * Obtiene todos los movimientos de una sucursal específica
    * @param caja_sucursal_id ID de la sucursal
    */
-  getMovimientos(caja_sucursal_id: number): Observable<MovimientoCajaSucursal[]> {
-    console.log(`Cargando movimientos para caja_sucursal_id: ${caja_sucursal_id}`);
-    return this.http.get<MovimientoCajaSucursal[]>(`${this.URL}/getmovimientos/${caja_sucursal_id}`);
-  }
- 
-
-getCajaSucursal(sucursal_id: number, fecha?: string | Date): Observable<CajaSucursal | null> {
-  // 1. Preparamos los parámetros
-  let params = new HttpParams();
+getMovimientos(caja_sucursal_id: number, fechaInicio: string, fechaFin: string): Observable<MovimientoCajaSucursal[]> {
+  // Construye la URL exacta: .../getmovimientos/4/2026-04-02/2026-04-02
+  const url = `${this.URL}/getmovimientos/${caja_sucursal_id}/${fechaInicio}/${fechaFin}`;
   
-  if (fecha) {
-    // Si es un objeto Date, lo convertimos a YYYY-MM-DD
-    const fechaFmt = fecha instanceof Date 
-      ? fecha.toISOString().split('T')[0] 
-      : fecha;
-    params = params.set('fecha', fechaFmt);
-  }
-
-  return this.http.get<any>(`${this.URLcaja}/getCajaSucursal/${sucursal_id}`, { params }).pipe(
+  console.log('Llamando a URL:', url);
+  return this.http.get<MovimientoCajaSucursal[]>(url);
+}
+  /**
+ * Obtiene la información de la caja de una sucursal específica
+ * @param sucursal_id ID de la sucursal
+ */
+getCajaSucursal(sucursal_id: number): Observable<CajaSucursal | null> {
+  return this.http.get<any>(`${this.URLcaja}/getCajaSucursal/${sucursal_id}`).pipe(
     map(res => {
+      // El backend retorna el objeto directamente
       if (res && res.caja_sucursal_id) {
         return {
-          ...res,
-          // Convertimos el string de la base de datos a número para cálculos en el front
+          ...res, 
           saldo_actual: parseFloat(res.saldo_actual)
         };
       }
@@ -74,7 +67,7 @@ getCajaSucursal(sucursal_id: number, fecha?: string | Date): Observable<CajaSucu
     }),
     catchError(err => {
       console.error('Error al obtener saldo de caja:', err);
-      return of(null);
+      return of (null);
     })
   );
 }
