@@ -191,3 +191,81 @@
 .icon-save-mini:hover {
   transform: scale(1.2);
 }
+/* ============================
+   REGLAS DE IMPRESIÓN (POS)
+============================ */
+@media print {
+  /* 1. Ocultar absolutamente todo el flujo de la aplicación */
+  html, body, .cobro-container, mat-card, .header-actions, .header-blue, button {
+    display: none !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* 2. Configurar el contenedor de la tirilla para que sea el único visible */
+  #tirilla-print {
+    display: block !important;
+    visibility: visible !important;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 58mm; /* Ajustar al ancho de tu impresora térmica */
+    margin: 0;
+    padding: 0;
+    background-color: white;
+  }
+
+  /* 3. Asegurar que los hijos de la tirilla también sean visibles */
+  #tirilla-print * {
+    visibility: visible !important;
+    display: block !important;
+  }
+
+  /* 4. Forzar que los elementos flex de la tirilla mantengan su estructura */
+  #tirilla-print .row-ticket {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+  }
+
+  /* 5. Eliminar encabezados y pies de página del navegador (URL, fecha) */
+  @page {
+    margin: 0;
+    size: auto;
+  }
+}
+
+/* ============================
+   ESTILOS DE LA TIRILLA (PANTALLA)
+============================ */
+#tirilla-print {
+  display: none; /* Mantener oculto mientras se navega */
+}
+
+.ticket-container {
+  width: 58mm;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 12px;
+  text-align: center;
+  color: #000;
+  
+  .ticket-header {
+    border-bottom: 1px dashed #000;
+    margin-bottom: 8px;
+    h1 { font-size: 16px; margin: 0; font-weight: bold; }
+  }
+
+  .ticket-body {
+    text-align: left;
+    .info-row { margin-bottom: 2px; }
+    .divider { margin: 5px 0; text-align: center; }
+  }
+
+  .ticket-footer {
+    margin-top: 10px;
+    font-size: 10px;
+    border-top: 1px dashed #000;
+    padding-top: 5px;
+  }
+}

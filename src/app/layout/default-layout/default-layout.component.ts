@@ -77,11 +77,16 @@ export class DefaultLayoutComponent implements OnInit {
     
 
     const isCobrador = this.authService.isCobrador();
-    // Si el usuario es Cobrador (rol 2) y es redirigido al dashboard,
-    // lo enviamos directamente a la página de creación de cobros.
-    console.log('¿Es Cobrador en DefaultLayoutComponent?:', isCobrador);
-    if (isCobrador && this.router.url.includes('/dashboard')) {
-      this.router.navigate(['/cobro/crear-cobro']);
+
+    // Redirección por defecto: Si el usuario llega al dashboard o a la raíz,
+    // lo enviamos a su página principal correspondiente.
+    if (this.router.url.includes('/dashboard') || this.router.url === '/') {
+      if (isCobrador) {
+        this.router.navigate(['/cobro/crear-cobro']);
+      } else {
+        // Vista por defecto para Administradores
+        this.router.navigate(['/reportes/caja-mayor']);
+      }
     }
   }
   private closeInactiveMenus(currentUrl: string) {

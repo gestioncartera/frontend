@@ -130,3 +130,47 @@
 
   </div>
 </div>
+
+<div id="tirilla-print" class="ticket-container">
+  <div class="ticket-header">
+    <h1 class="company-name">Gestion cartera</h1>
+    <p class="subtitle">Comprobante de Pago</p>
+  </div>
+
+  <div class="ticket-body">
+    <div class="info-row">
+      <span>Fecha:</span> 
+      <span>{{ fechaActual | date:'dd/MM/yyyy HH:mm' }}</span>
+    </div>
+    <div class="info-row">
+      <span>Cliente:</span> 
+      <span>{{ cliente.nombre }}</span>
+    </div>
+    <div class="info-row">
+      <span>Préstamo ID:</span> 
+      <span>{{ cliente.prestamoId }}</span>
+    </div>
+    <div class="info-row">
+      <span>Ruta:</span> 
+      <span>{{ cliente.ruta }}</span>
+    </div>
+
+    <div class="divider">================================</div>
+
+    <div class="amount-row">
+      <span class="label">MONTO PAGADO:</span>
+      <span class="value">{{ montoRecibido | currency }}</span>
+    </div>
+    <div class="amount-row">
+      <span class="label">SALDO RESTANTE:</span>
+      <span class="value">{{ (resumen.saldoTotalPrestamo - (montoRecibido || 0)) | currency }}</span>
+    </div>
+
+    <div class="divider">================================</div>
+  </div>
+
+  <div class="ticket-footer">
+    <p>¡Gracias por su pago!</p>
+    <p>Guarde este recibo como soporte.</p>
+  </div>
+</div>

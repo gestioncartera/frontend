@@ -14,7 +14,8 @@ import { PrestamoService, PrestamoCobros, CobroDetalle } from '../../../services
 import { CobroService, CreateCobroDto } from '../../../services/cobro.service';
 import { AuthService } from '../../../services/auth.service';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
- 
+ import { finalize } from 'rxjs/operators';
+import { ChangeDetectorRef } from '@angular/core';
 
 interface Pago {
   fecha: string;
@@ -50,7 +51,7 @@ export class TarjetaComponent implements OnInit {
   clienteId!: number;
   userId: number | null = null;
   isLoading: boolean = true;
-
+  fechaActual: Date = new Date();
   displayedColumns: string[] = ['fecha', 'abono', 'estado'];
 
   // ============================
@@ -84,7 +85,8 @@ export class TarjetaComponent implements OnInit {
     private cobroService: CobroService,
     private authService: AuthService,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private cdr: ChangeDetectorRef 
   ) {}
 
   ngOnInit(): void {
@@ -106,43 +108,49 @@ export class TarjetaComponent implements OnInit {
 
     // Obtener prestamoId de los query params
     this.route.queryParams.subscribe(params => {
-      this.prestamoId = +params['prestamoId'] || 1;
+      this.prestamoId = +params['prestamoId'] || 0;
       this.cargarDatosPrestamo();
     });
   }
 
-  cargarDatosPrestamo(): void {
-    this.isLoading = true;
-    this.prestamoService.getPrestamoCobros(this.prestamoId).subscribe({
+ cargarDatosPrestamo(): void {
+  this.isLoading = true;
+
+  this.prestamoService.getPrestamoCobros(this.prestamoId)
+    .pipe(
+      finalize(() => {
+        this.isLoading = false; 
+        this.cdr.detectChanges(); // <--- CRÍTICO: Fuerza a Angular a pintar la vista
+      })
+    )
+    .subscribe({
       next: (data: PrestamoCobros) => {
-        // Actualizar datos del cliente
+        // Datos del cliente
         this.cliente.nombre = data.nombre_cliente;
         this.cliente.prestamoId = `#${data.id_prestamo}`;
-        this.clienteId = data.id_prestamo; // Guardar para enviar al crear cobro
+        this.clienteId = data.id_prestamo;
         this.cliente.ruta = data.nombre_ruta ?? 'Sin Ruta';
-       console.log('Datos del préstamo cargados:', data);
 
-        // Actualizar resumen
+        // Resumen
         this.resumen.cuotaDelDia = parseFloat(data.valor_cuota);
         this.resumen.saldoTotalPrestamo = parseFloat(data.saldo_pendiente);
 
-        // Convertir datos de cobros al formato de pagos
+        // Transformación de pagos
         this.pagos = data.data.map((cobro: CobroDetalle) => ({
           fecha: new Date(cobro.fecha_cobro).toLocaleDateString(),
           abono: parseFloat(cobro.monto_cobrado),
           estado: cobro.estado as 'PAGADO' | 'Pendiente',
           cobro_id: cobro.cobro_id
         }));
-        console.log('Pagos transformados para la tabla:', this.pagos);
-
-        this.isLoading = false;
+        
+        console.log('Datos cargados y procesados');
       },
       error: (error) => {
         console.error('Error al cargar datos del préstamo:', error);
-        this.isLoading = false;
+        this.snackBar.open('Error al obtener datos del servidor', 'Cerrar', { duration: 3000 });
       }
     });
-  }
+}
 
   // ============================
   // Guardar pago del día
@@ -198,6 +206,8 @@ private guardarCobroConfirmado(): void {
   this.cobroService.createCobro(cobroData).subscribe({
     next: (response: any) => {
       // Manejo de éxito...
+
+      this.imprimirTirilla();
       this.snackBar.open('Cobro guardado con éxito', 'Cerrar', { duration: 3000, panelClass: ['success-snackbar'] });
       setTimeout(() => window.location.reload(), 2000);
     },
@@ -248,6 +258,7 @@ validarAbonoTemporal(pago: any) {
       this.snackBar.open('Monto de cobro actualizado con éxito', 'Cerrar', { duration: 3000 });
       this.cargarDatosPrestamo();
      console.log("prueba",pago)
+     this.imprimirTirilla();
     },
     error: (err) => {
       console.error('Error al actualizar monto de cobro:', err);
@@ -264,5 +275,14 @@ validarAbonoTemporal(pago: any) {
       console.error('Error al navegar:', err);
     });
   }
+
+  imprimirTirilla() {
+  this.fechaActual = new Date(); // Actualizar fecha al momento exacto
+  
+  // Pequeño delay para asegurar que Angular renderizó los datos en el div oculto
+  setTimeout(() => {
+    window.print();
+  }, 200);
+}
 
 }
