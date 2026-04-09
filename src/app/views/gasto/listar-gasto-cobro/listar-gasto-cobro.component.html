@@ -45,7 +45,7 @@
 
         <ng-container matColumnDef="monto">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Monto</th>
-          <td mat-cell *matCellDef="let item" [class.negative]="item.tipo_movimiento?.toLowerCase() === 'egreso'" class="fw-bold">
+          <td mat-cell *matCellDef="let item" [class.negative]="item.tipo_movimiento.toLowerCase() === 'egreso'" class="fw-bold">
             {{ item.monto | currency:'USD':'symbol':'1.0-0' }}
           </td>
         </ng-container> 
@@ -65,9 +65,9 @@
               <small class="text-muted">
                 {{ item.fecha_movimiento | date:'dd MMM, yyyy' }} • {{ item.fecha_movimiento | date:'hh:mm a' }}
               </small>
-            </div>
-            <span class="fs-6 fw-bold" [class.negative]="item.tipo_movimiento?.toLowerCase() === 'egreso'">
-              {{ item.tipo_movimiento?.toLowerCase() === 'egreso' ? '-' : '+' }} {{ item.monto | currency:'USD':'symbol':'1.0-0' }}
+            </div> 
+            <span class="fs-6 fw-bold" [class.negative]="item.tipo_movimiento.toLowerCase() === 'egreso'">
+              {{ item.tipo_movimiento.toLowerCase() === 'egreso' ? '-' : '+' }} {{ item.monto | currency:'USD':'symbol':'1.0-0' }}
             </span>
           </div>
         </div>

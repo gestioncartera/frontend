@@ -222,6 +222,7 @@ logout(): void {
   this.currentUserSubject.next(null);
   this.sucursalContextService.clearSucursal();
   this.router.navigate(['/login']);
+  
 }
 
   // Verificar si el usuario está autenticado
@@ -268,5 +269,9 @@ logout(): void {
   const resultado = Number(rolId) === 2;
   console.log(`[DEBUG] Comparando: ${rolId} (tipo: ${typeof rolId}) con 2. Resultado: ${resultado}`);
   return resultado;
+}
+
+isLoggedIn(): boolean {
+  return !!this.getToken(); // Reutiliza tu método getToken() que ya mira sessionStorage
 }
 }

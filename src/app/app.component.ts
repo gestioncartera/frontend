@@ -7,7 +7,8 @@ import { delay, filter, map, tap } from 'rxjs/operators';
 import { ColorModeService } from '@coreui/angular';
 import { IconSetService } from '@coreui/icons-angular';
 import { iconSubset } from './icons';
-
+import { IdleService } from './services/IdleService.service'; 
+import { AuthService } from './services/auth.service';
 
 @Component({
     selector: 'app-root',
@@ -24,18 +25,35 @@ export class AppComponent implements OnInit {
 
   readonly #colorModeService = inject(ColorModeService);
   readonly #iconSetService = inject(IconSetService);
-
+  readonly #idleService = inject(IdleService);
+  readonly #authService = inject(AuthService);
   constructor(
   ) {
-    this.#titleService.setTitle(this.title);
-    // iconSet singleton
+    this.#titleService.setTitle(this.title); 
     this.#iconSetService.icons = { ...iconSubset };
     this.#colorModeService.localStorageItemName.set('coreui-free-angular-admin-template-theme-default');
     this.#colorModeService.eventName.set('ColorSchemeChange');
   }
 
-  ngOnInit(): void {
+ ngOnInit(): void {
+    // 2. Monitoreo inicial: Si el usuario ya tiene sesión activa al cargar la app (F5)
+    if (this.#authService.isLoggedIn()) {
+      this.#idleService.startMonitoring();
+    }
 
+    // 3. Monitoreo dinámico: Reaccionar a cambios en el estado de autenticación
+    // Suponiendo que tu AuthService tiene un observable 'currentUser$' o similar
+    this.#authService.currentUser$
+      .pipe(takeUntilDestroyed(this.#destroyRef))
+      .subscribe(user => {
+        if (user) {
+          this.#idleService.startMonitoring();
+        } else {
+          this.#idleService.stopMonitoring();
+        }
+      });
+
+    // Tu lógica existente del router
     this.#router.events.pipe(
         takeUntilDestroyed(this.#destroyRef)
       ).subscribe((evt) => {
@@ -44,6 +62,7 @@ export class AppComponent implements OnInit {
       }
     });
 
+    // Tu lógica existente de temas
     this.#activatedRoute.queryParams
       .pipe(
         delay(1),
@@ -57,3 +76,4 @@ export class AppComponent implements OnInit {
       .subscribe();
   }
 }
+ 

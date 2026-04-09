@@ -81,7 +81,7 @@ export class LoginComponent implements OnInit {
     });
 
     // Obtener URL de retorno
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/cambio-sucursal';
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/caja-mayor';
   }
 
 onSubmit(): void {
