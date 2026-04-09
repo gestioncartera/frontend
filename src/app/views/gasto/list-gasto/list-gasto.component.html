@@ -65,8 +65,8 @@
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha</th>
             <td mat-cell *matCellDef="let item">
               <div class="date-cell">
-                <span class="main-date">{{ item.fecha_movimiento | date:'dd/MM/yyyy' }}</span>
-                <span class="sub-date">{{ item.fecha_movimiento | date:'shortTime' }}</span>
+                <span class="main-date">{{ item.fecha_movimiento | date:'dd/MM/yyyy' : '-0600' }}</span>
+                <span class="sub-date">{{ item.fecha_movimiento | date:'shortTime' : '-0600' }}</span>
               </div>
             </td>
           </ng-container>
@@ -80,7 +80,7 @@
             </td>
           </ng-container>
 
-          <ng-container matColumnDef="concepto">
+          <ng-container matColumnDef="descripcion">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Descripción</th>
             <td mat-cell *matCellDef="let item" class="desc-cell">
               {{ item.descripcion }}
@@ -123,7 +123,7 @@
       <div *ngIf="isMobile" class="mobile-grid">
         <div class="refined-mobile-card" *ngFor="let item of dataSource.filteredData">
           <div class="card-top">
-            <span class="m-date">{{ item.fecha_movimiento | date:'dd MMM, yyyy' }}</span>
+            <span class="m-date">{{ item.fecha_movimiento | date:'dd/MM/yyyy' : '-0600' }}</span>
             <span class="m-value" [class.negative]="item.tipo_movimiento === 'egreso'">
               {{ item.tipo_movimiento === 'egreso' ? '-' : '+' }} {{ item.monto | currency }}
             </span>

@@ -46,7 +46,7 @@ import { FormsModule } from '@angular/forms';
   ],
 })
 export class ListGastoComponent implements OnInit, AfterViewInit {
-  displayedColumns: string[] = ['fecha', 'tipo', 'concepto', 'valor', 'estado', 'acciones'];
+  displayedColumns: string[] = ['fecha', 'tipo', 'descripcion', 'valor', 'estado', 'acciones'];
   //dataSource: MatTableDataSource<MovimientoCajaSucursal>;
   
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -133,49 +133,58 @@ private mostrarAdvertenciaSucursal(): void {
   }
 
 loadMovimientos(): void {
-  // Verificamos que tengamos la sucursal y ambas fechas
   if (!this.sucursalId || !this.fechaInicio || !this.fechaFin) return;
 
- const fInicio = this.fechaInicio.toLocaleDateString('en-CA');  
- const fFin = this.fechaFin.toLocaleDateString('en-CA');
+  const fInicio = this.fechaInicio.toLocaleDateString('en-CA');  
+  const fFin = this.fechaFin.toLocaleDateString('en-CA');
 
-  // Enviamos los tres parámetros al servicio
   this.cajaService.getMovimientos(this.sucursalId, fInicio, fFin).subscribe({
     next: (data) => {
-      this.movimientosData = data;
-      this.dataSource.data = data;
+      // 1. Procesamos los datos con tipado 'any' temporal para evitar el error TS2322
+      // Esto permite convertir el 'monto' de string a number para un MatSort correcto.
+      const dataProcesada = data.map((item: any) => ({
+        ...item,
+        monto: Number(item.monto), 
+        // Eliminamos la 'Z' para que el pipe de fecha no desfase la hora en México
+        fecha_movimiento: item.fecha_movimiento.replace('Z', '')
+      }));
 
-      // Sincronizamos los complementos de la tabla
+      this.movimientosData = dataProcesada;
+      this.dataSource.data = dataProcesada;
+
+      // 2. Sincronización segura de la tabla para evitar NG0100
       setTimeout(() => {
-        this.dataSource.paginator = this.paginator;
-        this.dataSource.sort = this.sort;
-        this.dataSource.filter = ''; 
+        if (this.paginator) this.dataSource.paginator = this.paginator;
+        if (this.sort) this.dataSource.sort = this.sort;
+        
+        // Refrescamos la detección de cambios para estabilizar el layout
+        this.cd.markForCheck();
         this.cd.detectChanges();
       });
 
-      console.log(`Movimientos cargados  `,data);
+      console.log('Movimientos procesados (México):', dataProcesada);
     },
     error: (err) => {
       console.error('Error al cargar movimientos por rango:', err);
     }
   });
 }
- 
-  loadBalance(): void {
-    if (!this.sucursalId) return;
-    this.cajaService.getCajaSucursal(this.sucursalId ).subscribe({
-      next: (balance) => {
-        setTimeout(() => {
-          this.totalCaja = Number(balance?.saldo_actual) || 0;
-          console.log('Balance de caja cargado:', this.totalCaja);
-          this.cd.detectChanges();
-        });
-      },
-      error: (err) => {
-        console.error('Error al cargar el balance', err);
-      }
-    });
-  }
+
+loadBalance(): void {
+  if (!this.sucursalId) return;
+  this.cajaService.getCajaSucursal(this.sucursalId).subscribe({
+    next: (balance) => {
+      // Sincronizamos el balance con el ciclo de vida de Angular
+      this.totalCaja = Number(balance?.saldo_actual) || 0;
+      this.cd.markForCheck();
+      this.cd.detectChanges();
+      console.log('Balance de caja cargado:', this.totalCaja);
+    },
+    error: (err) => {
+      console.error('Error al cargar el balance', err);
+    }
+  });
+}
     
 
 setupFilter(): void {
