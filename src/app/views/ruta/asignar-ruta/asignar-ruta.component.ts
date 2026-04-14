@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { DragDropModule, moveItemInArray, CdkDragDrop } from '@angular/cdk/drag-drop';
@@ -46,6 +46,8 @@ export class AsignarRutaComponent implements OnInit {
   loading: boolean = false;
   ordenModificado: boolean = false;
 
+  private cdr = inject(ChangeDetectorRef);
+
   constructor(
     private snackBar: MatSnackBar,
     private dialog: MatDialog,
@@ -89,20 +91,26 @@ export class AsignarRutaComponent implements OnInit {
   }
 
   cargarClientesDeLaRuta(idRuta: number): void {
-    this.loading = true;
-    this.clientesAsignados = [];
+    // Se utiliza setTimeout para asegurar que el cambio de estado 'loading'
+    // se procese en un nuevo ciclo de ejecución, evitando el error NG0100.
+    setTimeout(() => {
+      this.loading = true;
+      this.clientesAsignados = [];
+      this.cdr.markForCheck();
 
-    this.clienteService.getClientesByRuta(idRuta).subscribe({
-      next: (clientes) => {
-        // Ordenamos por la propiedad 'orden' que viene del backend
-        this.clientesAsignados = clientes.sort((a, b) => (a.orden || 0) - (b.orden || 0));
-        this.loading = false;
-      },
-      error: (err:any) => {
-        this.loading = false;
-        const msg = err.error?.message || 'Error al cargar los clientes de esta ruta';
-        this.mostrarError(msg);
-      }
+      this.clienteService.getClientesByRuta(idRuta).subscribe({
+        next: (clientes) => {
+          this.clientesAsignados = clientes.sort((a, b) => (a.orden || 0) - (b.orden || 0));
+          this.loading = false;
+          this.cdr.detectChanges();
+        },
+        error: (err: any) => {
+          this.loading = false;
+          this.cdr.detectChanges();
+          const msg = err.error?.message || 'Error al cargar los clientes de esta ruta';
+          this.mostrarError(msg);
+        }
+      });
     });
   }
 
@@ -114,22 +122,28 @@ export class AsignarRutaComponent implements OnInit {
   }
 
   guardarOrden() {
-    this.loading = true;
     const payload = this.clientesAsignados.map((cliente, index) => ({
       cliente_id: cliente.cliente_id,
       nuevo_orden: index + 1
     }));
 
-    this.clienteService.actualizarOrdenClientes(this.idRutaActual, payload).subscribe({
-      next: () => {
-        this.loading = false;
-        this.ordenModificado = false;
-        this.snackBar.open('¡Orden actualizado correctamente!', 'Éxito', { duration: 3000 });
-      },
-      error: (err) => {
-        this.loading = false;
-        this.mostrarError(err.error?.message || 'No se pudo guardar el nuevo orden');
-      }
+    setTimeout(() => {
+      this.loading = true;
+      this.cdr.markForCheck();
+
+      this.clienteService.actualizarOrdenClientes(this.idRutaActual, payload).subscribe({
+        next: () => {
+          this.loading = false;
+          this.ordenModificado = false;
+          this.cdr.detectChanges();
+          this.snackBar.open('¡Orden actualizado correctamente!', 'Éxito', { duration: 3000 });
+        },
+        error: (err) => {
+          this.loading = false;
+          this.cdr.detectChanges();
+          this.mostrarError(err.error?.message || 'No se pudo guardar el nuevo orden');
+        }
+      });
     });
   }
 

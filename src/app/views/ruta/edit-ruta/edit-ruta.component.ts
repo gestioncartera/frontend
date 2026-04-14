@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; // 1. Importar ChangeDetectorRef
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -15,8 +15,9 @@ import { Usuario, UsuarioService } from '../../../services/usuario.service';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
-import { AsignarRutaService,RutaCobro } from '../../../services/asignarRuta.service';
+import { AsignarRutaService } from '../../../services/asignarRuta.service';
 import { SucursalContextService } from '../../../services/sucursal-context.service';
+
 @Component({
   selector: 'app-edit-ruta',
   standalone: true,
@@ -36,17 +37,13 @@ import { SucursalContextService } from '../../../services/sucursal-context.servi
   styleUrls: ['./edit-ruta.component.scss'],
 })
 export class EditRutaComponent implements OnInit {
-    ruta: Rutas = {
-    sucursal_id: 1, // Asignar un valor por defecto o recuperarlo si es necesario
-    nombre_ruta: '',
-    descripcion: '',
-    zona: '',
-    estado: 'ACTIVO',
-  };
+  // Inicializamos con un objeto vacío pero tipado
+  ruta: Rutas = {} as Rutas;
+  
   id: string | null = '';
   cobradores: Usuario[] = [];
   cobradoresFiltrados: Usuario[] = [];
-  cobradorSeleccionadoId: string | number = '';
+  cobradorSeleccionadoId: number | string = '';
   filtroCobrador: string = '';
 
   constructor(
@@ -56,205 +53,137 @@ export class EditRutaComponent implements OnInit {
     private usuarioService: UsuarioService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
-    private asignarRutaService:AsignarRutaService,
-    private sucursalContextService: SucursalContextService
+    private asignarRutaService: AsignarRutaService,
+    private sucursalContextService: SucursalContextService,
+    private cdRef: ChangeDetectorRef // 2. Inyectar el detector de cambios
   ) {}
 
   ngOnInit() {
     this.id = this.route.snapshot.paramMap.get('id');
     this.cargarCobradores();
-    if (this.id) { 
+    if (this.id) {
       this.cargarRuta(this.id);
     } else {
-      console.error('No se proporcionó ID de ruta para editar.');
       this.router.navigate(['/ruta/list-ruta']);
     }
   }
 
   cargarCobradores(): void {
-    const idSucursal = this.sucursalContextService.getSucursalId(); 
-   if (idSucursal !== null) {
-    this.usuarioService.getUsuarios(idSucursal).subscribe({
-      next: (usuarios: Usuario[]) => {
-        // Filtrar solo usuarios con tipo_usuario = 2 (cobradores)
-        this.cobradores = usuarios.filter(u => u.tipo_usuario === 2);
-        this.cobradoresFiltrados = [...this.cobradores];
-        console.log('Cobradores cargados:', this.cobradoresFiltrados);
-      },
-      error: (err) => {
-        console.error('Error al cargar cobradores:', err);
-        this.snackBar.open(
-          'No se pudieron cargar los cobradores',
-          'Cerrar',
-          { duration: 3000 }
-        );
-      }
-    });
-    }
-  }
-
-  filtrarCobradores(): void {
-    const filtro = this.filtroCobrador.toLowerCase().trim();
-    if (!filtro) {
-      this.cobradoresFiltrados = [...this.cobradores];
-    } else {
-      this.cobradoresFiltrados = this.cobradores.filter(c =>
-        c.nombres.toLowerCase().includes(filtro) ||
-        c.apellidos.toLowerCase().includes(filtro) ||
-        (c.dni && c.dni.includes(filtro))
-      );
+    const idSucursal = this.sucursalContextService.getSucursalId();
+    if (idSucursal !== null) {
+      this.usuarioService.getUsuarios(idSucursal).subscribe({
+        next: (usuarios: Usuario[]) => {
+          this.cobradores = usuarios.filter(u => u.tipo_usuario === 2);
+          this.cobradoresFiltrados = [...this.cobradores];
+          this.cdRef.detectChanges(); // Asegurar que el selector se llene
+        },
+        error: (err) => console.error('Error cobradores:', err)
+      });
     }
   }
 
   cargarRuta(id: string): void {
-  this.rutaService.getRutasById(id).subscribe({
-    next: (data: any) => {
+    this.rutaService.getRutasById(id).subscribe({
+      next: (data: any) => {
+        const rutaData = Array.isArray(data) ? data[0] : data;
 
-      const rutaData = Array.isArray(data) ? data[0] : data;
-
-      if (rutaData && rutaData.ruta_id) {
-        this.ruta = rutaData;
-        // Asignamos el cobrador que ya tiene la ruta para que se muestre en el selector
-        this.cobradorSeleccionadoId = rutaData.usuario_id || '';
-        console.log('Ruta cargada:', rutaData);
-        return;
-      }
-
-      // Ruta no encontrada (caso lógico)
-      this.snackBar.open(
-        'La ruta solicitada no existe o fue eliminada',
-        'Cerrar',
-        { duration: 3500 }
-      );
-
-      this.router.navigate(['/ruta/list-ruta']);
-    },
-
-    error: (err) => {
-      console.error('Error al cargar la ruta:', err);
-
-      this.snackBar.open(
-        'No fue posible cargar los datos de la ruta',
-        'Cerrar',
-        { duration: 4000 }
-      );
-
-      this.router.navigate(['/ruta/list-ruta']);
-    }
-  });
-}
-
-
-  actualizar(): void {
-
-  if (!this.ruta.nombre_ruta) {
-    this.snackBar.open(
-      'El nombre de la ruta es obligatorio',
-      'Cerrar',
-      { duration: 3000 }
-    );
-    return;
-  }
-
-  const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-    width: '420px',
-    data: {
-      title: 'Actualizar ruta',
-      message: `
-        ¿Desea guardar los cambios realizados en la ruta
-        <b>${this.ruta.nombre_ruta}</b>?
-      `,
-      confirmText: 'Guardar',
-      cancelText: 'Cancelar',
-      color: 'primary',
-      icon: 'save',
-      type: 'info'
-    }
-  });
-
-  dialogRef.afterClosed().subscribe(confirmado => {
-    if (confirmado) {
-      this.actualizarRutaConfirmada();
-    }
-  });
-}
-private actualizarRutaConfirmada(): void {
-
-  if (!this.ruta.ruta_id) {
-    return;
-  }
-
-  // Primero actualizar los datos de la ruta
-  this.rutaService.editRutas(this.ruta.ruta_id, this.ruta).subscribe({
-    next: () => {
-      // Si hay un cobrador seleccionado, asignarlo
-      if (this.cobradorSeleccionadoId && this.cobradorSeleccionadoId !== '') {
-        this.asignarCobradorARuta();
-      } else {
-        this.snackBar.open(
-          'Ruta actualizada exitosamente',
-          'Cerrar',
-          { duration: 3000 }
-        );
+        if (rutaData && (rutaData.ruta_id || rutaData.id)) {
+          // 3. Usar el operador spread para crear una nueva referencia de objeto
+          this.ruta = { ...rutaData };
+          
+          // 4. Asegurar que el ID del cobrador sea del mismo tipo que el value del mat-option
+          // Si tu base de datos devuelve números, asegúrate que sea número.
+          this.cobradorSeleccionadoId = rutaData.usuario_id ? Number(rutaData.usuario_id) : '';
+          
+          console.log('Ruta cargada correctamente:', this.ruta);
+          
+          // 5. FORZAR DETECCIÓN DE CAMBIOS
+          // Esto soluciona que los inputs se vean vacíos hasta hacer click
+          this.cdRef.detectChanges(); 
+        } else {
+          this.mostrarMensaje('La ruta no existe');
+          this.router.navigate(['/ruta/list-ruta']);
+        }
+      },
+      error: (err) => {
+        console.error('Error al cargar la ruta:', err);
+        this.mostrarMensaje('Error al cargar datos');
         this.router.navigate(['/ruta/list-ruta']);
       }
-    },
-    error: (err) => {
-      console.error('Error al actualizar la ruta:', err);
-      this.snackBar.open(
-        'Ocurrió un error al actualizar la ruta',
-        'Cerrar',
-        { duration: 4000 }
-      );
-    }
-  });
-}
-private asignarCobradorARuta(): void {
-  // 1. Validaciones de seguridad
-  if (!this.ruta.ruta_id || !this.cobradorSeleccionadoId) {
-    return;
+    });
   }
 
-  // 2. Preparar el ID del cobrador (asegurar que sea número)
-  const cobradorId = typeof this.cobradorSeleccionadoId === 'string' 
-    ? parseInt(this.cobradorSeleccionadoId) 
-    : this.cobradorSeleccionadoId;
-    
-    console.log('--- OBJETO ENVIADO AL BACKEND ---');
-  console.table({ id_ruta: Number(this.ruta.ruta_id), usuario_id: cobradorId }); // console.table lo muestra mucho más ordenado
-  console.log('---------------------------------');
+  // --- Lógica de actualización (Sin cambios mayores, solo limpieza) ---
 
-  // 3. Llamar al NUEVO servicio (AsignarRutaService)
-  // Nota: Usamos los nombres de campos que pide tu interfaz RutaCobro
-  this.asignarRutaService.asignaCobrador({
-    ruta_id: Number(this.ruta.ruta_id),
-    usuario_id: cobradorId
-    
-  })
-  .then(() => {
-    // ÉXITO - Se ejecuta si la promesa se resuelve
+  actualizar(): void {
+    if (!this.ruta.nombre_ruta) {
+      this.mostrarMensaje('El nombre es obligatorio');
+      return;
+    }
 
-    this.snackBar.open(
-      'Ruta actualizada y cobrador asignado exitosamente',
-      'Cerrar',
-      { duration: 3000 }
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '420px',
+      data: {
+        title: 'Actualizar ruta',
+        message: `¿Desea guardar los cambios en <b>${this.ruta.nombre_ruta}</b>?`,
+        confirmText: 'Guardar',
+        cancelText: 'Cancelar',
+        color: 'primary',
+        icon: 'save',
+        type: 'info'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(confirmado => {
+      if (confirmado) this.actualizarRutaConfirmada();
+    });
+  }
+
+  private actualizarRutaConfirmada(): void {
+    const idRuta = this.ruta.ruta_id || this.id;
+    if (!idRuta) return;
+
+    this.rutaService.editRutas(Number(idRuta), this.ruta).subscribe({
+      next: () => {
+        if (this.cobradorSeleccionadoId) {
+          this.asignarCobradorARuta(Number(idRuta));
+        } else {
+          this.mostrarMensaje('Ruta actualizada');
+          this.router.navigate(['/ruta/list-ruta']);
+        }
+      },
+      error: () => this.mostrarMensaje('Error al actualizar')
+    });
+  }
+
+  private asignarCobradorARuta(idRuta: number): void {
+    const cobradorId = Number(this.cobradorSeleccionadoId);
+    
+    this.asignarRutaService.asignaCobrador({
+      ruta_id: idRuta,
+      usuario_id: cobradorId
+    })
+    .then(() => {
+      this.mostrarMensaje('Ruta y cobrador actualizados');
+      this.router.navigate(['/ruta/list-ruta']);
+    })
+    .catch(err => {
+      const msg = err.error?.message || 'Error al asignar cobrador';
+      this.mostrarMensaje(msg, 5000);
+    });
+  }
+
+  private mostrarMensaje(msg: string, duration: number = 3000) {
+    this.snackBar.open(msg, 'Cerrar', { duration });
+  }
+
+  filtrarCobradores(): void {
+    const filtro = this.filtroCobrador.toLowerCase().trim();
+    this.cobradoresFiltrados = this.cobradores.filter(c =>
+      `${c.nombres} ${c.apellidos}`.toLowerCase().includes(filtro) ||
+      (c.dni && c.dni.includes(filtro))
     );
-    this.router.navigate(['/ruta/list-ruta']);
-  })
-  .catch((err: any) => { // Agregamos ": any" aquí
-  console.error('Error al asignar cobrador:', err);
-  
-  // Intentamos extraer el mensaje específico del backend
-  const mensajeError = err.error?.message || err.error?.msg || err.error?.error || 'Hubo un error al asignar el cobrador';
-
-  this.snackBar.open(
-    `⚠️ ${mensajeError}`,
-    'Cerrar',
-    { duration: 5000 }
-  );
-  this.router.navigate(['/ruta/list-ruta']);
-});
-}
+  }
 
   cancelar() {
     this.router.navigate(['/ruta/list-ruta']);

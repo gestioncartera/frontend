@@ -80,13 +80,12 @@
               <button mat-icon-button (click)="editRuta(item); $event.stopPropagation()" matTooltip="Editar">
                 <mat-icon class="edit-icon">edit</mat-icon>
               </button>
-              <button mat-icon-button (click)="toggleEstadoRuta(item); $event.stopPropagation()" 
-                      [matTooltip]="item.estado === 'ACTIVO' ? 'Desactivar' : 'Activar'">
-                <mat-icon [class.active-icon]="item.estado?.toLowerCase() === 'activo'" 
-                          [class.inactive-icon]="item.estado?.toLowerCase() !== 'activo'">
-                  {{ item.estado?.toLowerCase() === 'activo' ? 'toggle_on' : 'toggle_off' }}
-                </mat-icon>
-              </button>
+             <button mat-icon-button 
+                    class="delete-btn" 
+                    (click)="toggleEstadoRuta(item); $event.stopPropagation()" 
+                    matTooltip="Eliminar">
+              <mat-icon color="warn">delete</mat-icon>
+            </button>
             </div>
           </td>
         </ng-container>
