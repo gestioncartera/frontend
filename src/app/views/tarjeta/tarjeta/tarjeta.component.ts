@@ -207,9 +207,11 @@ private guardarCobroConfirmado(): void {
     next: (response: any) => {
       // Manejo de éxito...
 
-      this.imprimirTirilla();
+      //this.imprimirTirilla();
       this.snackBar.open('Cobro guardado con éxito', 'Cerrar', { duration: 3000, panelClass: ['success-snackbar'] });
-      setTimeout(() => window.location.reload(), 2000);
+      
+      this.montoRecibido = 0; // Reset input
+      this.cargarDatosPrestamo(); // Refresh data without reloading the whole app
     },
     error: (err) => {
       console.error('DEBUG:', err);
@@ -258,7 +260,7 @@ validarAbonoTemporal(pago: any) {
       this.snackBar.open('Monto de cobro actualizado con éxito', 'Cerrar', { duration: 3000 });
       this.cargarDatosPrestamo();
      console.log("prueba",pago)
-     this.imprimirTirilla();
+    // this.imprimirTirilla();
     },
     error: (err) => {
       console.error('Error al actualizar monto de cobro:', err);

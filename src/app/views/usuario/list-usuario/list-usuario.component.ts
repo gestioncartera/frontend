@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -38,7 +38,8 @@ export class ListUsuarioComponent implements OnInit {
   constructor(
     private router: Router, 
     private usuarioService: UsuarioService,
-    private sucursalContextService: SucursalContextService
+    private sucursalContextService: SucursalContextService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -51,6 +52,7 @@ export class ListUsuarioComponent implements OnInit {
     this.usuarioService.getUsuarios(  idSucursal).subscribe({
       next: (data) => {
         this.usuarios = data;
+        this.cdr.detectChanges();
         console.log('Usuarios cargados:', data);
       },
       error: (error) => {
